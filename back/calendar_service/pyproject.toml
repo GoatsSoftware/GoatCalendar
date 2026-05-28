@@ -1,0 +1,54 @@
+[project]
+name = "calendar_service"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Antonin Durand",email = "antonin.durand576@gmail.com"},
+]
+dependencies = ["sqlmodel>=0.0.38", "aiomysql>=0.3.2", "cryptography>=48.0.0", "fastapi[standard]>=0.136.3", "goat-calendar-shared-models @ file:///${PROJECT_ROOT}/../shared_models"]
+requires-python = ">=3.13"
+readme = "../../README.md"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.15.15",
+    "goat-calendar-shared-models @ file:///${PROJECT_ROOT}/../shared_models",
+    "database-service @ file:///${PROJECT_ROOT}/../database_service",
+]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+includes = ["src/calendar_service"]
+
+[tool.pdm.scripts]
+ruff_lint = "ruff check --fix"
+ruff_format = "ruff format"
+ruff_all = {composite = ["ruff_format", "ruff_lint"]}
+dev_win = { cmd = "fastapi dev main.py --host %SERVER_HOST% --port %SERVER_PORT%", env_file = ".env" }
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "E501",
+    "D212",
+    "D205",
+    "D203",
+    "FIX002",
+    "TD002",
+    "TD003",
+    "PIE796",
+    "G004",
+    "D401", # First line of docstring should be in imperative mood
+    "D104", # Missing docstring in public package
+    "D100", # Missing docstring in public module
+    "TRY003", # Avoid specifying long messages outside the exception class
+    "EM101", # Exception must not use a string literal, assign to variable first,
+    "FAST001" # FastAPI routes with redundant `response_model` argument,
+]
