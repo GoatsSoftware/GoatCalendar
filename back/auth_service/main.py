@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from shared_models.models.server_settings import get_server_settings
 from starlette.middleware.cors import CORSMiddleware
 
-from auth_service.routes import monitoring_route, user_route
+from auth_service.routes import monitoring_route, user_route, authentication_route
 
 SERVER_SETTINGS = get_server_settings()
 
@@ -22,3 +22,4 @@ app.add_middleware(
 
 app.include_router(monitoring_route.route)
 app.include_router(user_route.route)
+app.include_router(authentication_route.route)
