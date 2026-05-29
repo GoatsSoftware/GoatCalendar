@@ -2,13 +2,13 @@ from fastapi import FastAPI
 from shared_models.models.server_settings import get_server_settings
 from starlette.middleware.cors import CORSMiddleware
 
-from calendar_service.routes import monitoring_route
+from board_service.routes import monitoring_route
 
 SERVER_SETTINGS = get_server_settings()
 
 app = FastAPI(
-    title="Calendar Service",
-    description="Service for managing user authentication and users",
+    title="Board Service",
+    description="Service for managing Boards",
     version="0.1.0",
 )
 

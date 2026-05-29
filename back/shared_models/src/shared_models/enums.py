@@ -53,3 +53,36 @@ class UserRole(StrEnum):
 
     USER = auto()
     ADMIN = auto()
+
+
+class UserRoleInBoard(StrEnum):
+    OWNER = auto()
+    EDITOR = auto()
+    VIEWER = auto()
+
+
+class BoardColumnName(StrEnum):
+    TASK_ID = "TaskID"
+    TASK_NAME = "TaskName"
+    TASK_CONTENT = "TaskContent"
+    TASK_STATUS = "TaskStatus"
+    COMMENT = "Comment"
+    STARTING_FROM = "StartingFrom"
+    DEADLINE = "Deadline"
+    FILES = "Files"
+
+
+class BoardFieldType(StrEnum):
+    TEXT = "TEXT"
+    LONG_TEXT = "LONG_TEXT"
+    STATUS = "STATUS"
+    DATE = "DATE"
+    FILE = "FILE"
+    COMMENT = "COMMENT"
+    SYSTEM = "SYSTEM"
+
+
+class BoardTaskStatus(StrEnum):
+    PENDING = auto()
+    ACCEPTED = auto()
+    COMPLETED = auto()

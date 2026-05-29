@@ -1,19 +1,28 @@
+from datetime import date
 from uuid import uuid4
 
-from shared_models.enums import UserRole
-from shared_models.schemas.user import User
+from shared_models.schemas import (
+    Board,
+    BoardColumn,
+    BoardRow,
+    BoardRowTask,
+    BoardTaskComment,
+    User, BoardEvent,
+)
+from shared_models.enums import (
+    UserRole,
+    BoardColumnName,
+    BoardFieldType,
+    BoardTaskStatus,
+)
 from sqlmodel.ext.asyncio.session import AsyncSession
+
 
 from database_service.database import engine
 
 ALICE_EMAIL = "aliceproprio@gmail.com"
 BOB_EMAIL = "boblocataire@gmail.com"
 CLAIRE_EMAIL = "clairemixte@gmail.com"
-
-ADDRESS_RIVOLI = "25 Rue de Rivoli"
-ADDRESS_MEDOC = "7 Cours du Medoc"
-ADDRESS_KERVEGAN = "12 Rue Kervegan"
-ADDRESS_SAINT_FERREOL = "14 Rue Saint-Ferreol"
 
 DEFAULT_USER_HASH = "$argon2id$v=19$m=65536,t=3,p=4$xVhr7Z3z3hsjxJiTcm5tzQ$unBxBAVRdz9Oaa3ByFIhxXNF28zIwfQlNp0E9om+9ow"
 
@@ -58,6 +67,114 @@ async def seed_users(session: AsyncSession) -> list[User]:
     return users
 
 
+async def seed_board_structure(session: AsyncSession, users: list[User]):
+    admin, editor, viewer = users
+
+    # 1. Board
+    board = Board(
+        id=uuid4(),
+        name="Demo Board",
+        description="Full seeded board",
+        created_by_id=admin.id,
+    )
+
+    session.add(board)
+    await session.flush()
+
+    # 2. Columns (5)
+    columns = []
+    column_names = [
+        BoardColumnName.TASK_ID,
+        BoardColumnName.TASK_NAME,
+        BoardColumnName.TASK_CONTENT,
+        BoardColumnName.TASK_STATUS,
+        BoardColumnName.DEADLINE,
+    ]
+
+    for i, name in enumerate(column_names):
+        col = BoardColumn(
+            id=uuid4(),
+            board_id=board.id,
+            name=name,
+            type=BoardFieldType.TEXT,
+            position=i,
+            created_by_id=admin.id,
+        )
+        columns.append(col)
+
+    session.add_all(columns)
+    await session.flush()
+
+    # 3. Rows + Tasks (5 rows × 5 tasks)
+    rows = []
+    tasks = []
+
+    for r in range(5):
+        row = BoardRow(
+            id=uuid4(),
+            board_id=board.id,
+            created_by_id=admin.id,
+        )
+        session.add(row)
+        await session.flush()
+        rows.append(row)
+
+        for c in range(5):
+            task = BoardRowTask(
+                id=uuid4(),
+                board_row_id=row.id,
+                board_column_id=columns[c].id,
+                task_name=f"Task R{r + 1}-C{c + 1}",
+                task_content=f"Content row {r + 1} column {c + 1}",
+                task_status=BoardTaskStatus.PENDING,
+                deadline=date.today(),
+                assigned_to_id=viewer.id,
+                created_by_id=admin.id,
+            )
+            tasks.append(task)
+
+        # 1 comment per row
+        comment = BoardTaskComment(
+            id=uuid4(),
+            board_row_id=row.id,
+            content=f"Comment for row {r + 1}",
+            created_by_id=editor.id,
+        )
+        session.add(comment)
+
+    session.add_all(tasks)
+    await session.flush()
+
+    # 4. Events (2)
+    events = [
+        BoardEvent(
+            id=uuid4(),
+            board_id=board.id,
+            title="Kickoff",
+            description="Project started",
+            starting_from=board.created_at.date(),
+            deadline=board.created_at.date(),
+            version=1,
+            created_by_id=admin.id,
+        ),
+        BoardEvent(
+            id=uuid4(),
+            board_id=board.id,
+            title="Mid Review",
+            description="Progress review",
+            starting_from=board.created_at.date(),
+            deadline=board.created_at.date(),
+            version=1,
+            created_by_id=editor.id,
+        ),
+    ]
+
+    session.add_all(events)
+
+    await session.flush()
+
+    return board
+
 async def base_seeder() -> None:
     """
     Orchestrates the complete database population process in the correct order.
@@ -67,5 +184,6 @@ async def base_seeder() -> None:
     steps succeed.
     """
     async with AsyncSession(engine) as session:
-        await seed_users(session)
+        users = await seed_users(session)
+        await seed_board_structure(session, users)
         await session.commit()

@@ -1,11 +1,11 @@
 [project]
-name = "calendar_service"
+name = "board_service"
 version = "0.1.0"
 description = "Default template for PDM package"
 authors = [
     {name = "Antonin Durand",email = "antonin.durand576@gmail.com"},
 ]
-dependencies = ["sqlmodel>=0.0.38", "aiomysql>=0.3.2", "cryptography>=48.0.0", "fastapi[standard]>=0.136.3", "goat-calendar-shared-models @ file:///${PROJECT_ROOT}/../shared_models"]
+dependencies = ["sqlmodel>=0.0.38", "aiomysql>=0.3.2", "cryptography>=48.0.0", "fastapi[standard]>=0.136.3"]
 requires-python = ">=3.13"
 readme = "../../README.md"
 license = {text = "MIT"}
@@ -25,7 +25,7 @@ build-backend = "pdm.backend"
 distribution = true
 
 [tool.pdm.build]
-includes = ["src/calendar_service"]
+includes = ["src/board_service"]
 
 [tool.pdm.scripts]
 ruff_lint = "ruff check --fix"
