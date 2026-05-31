@@ -6,8 +6,10 @@ from sqlalchemy import Column, DateTime
 from sqlmodel import Field, Relationship, SQLModel
 
 from .user_board_relation import UserBoardLink
+
 if TYPE_CHECKING:
     from .board_columns import BoardColumn
+    from .board_event import BoardEvent
     from .user import User
 
 
@@ -20,8 +22,10 @@ class Board(SQLModel, table=True):
     description: str = Field(default="", max_length=250)
 
     columns: list["BoardColumn"] = Relationship(back_populates="board")
-
-    users: list["User"] = Relationship(back_populates="boards", link_model=UserBoardLink)
+    users: list["User"] = Relationship(
+        back_populates="boards", link_model=UserBoardLink,
+    )
+    events: list["BoardEvent"] = Relationship(back_populates="board")
 
     created_by_id: UUID = Field(foreign_key="users.id", nullable=False)
     created_by: "User" = Relationship()

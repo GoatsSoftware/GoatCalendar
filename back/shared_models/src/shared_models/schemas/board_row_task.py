@@ -6,11 +6,11 @@ from sqlalchemy import Column, DateTime
 from sqlmodel import Field, Relationship, SQLModel
 
 from ..enums import BoardTaskStatus
+from .user import User
 
 if TYPE_CHECKING:
     from .board_columns import BoardColumn
     from .board_row import BoardRow
-    from .user import User
 
 
 class BoardRowTask(SQLModel, table=True):
@@ -40,16 +40,12 @@ class BoardRowTask(SQLModel, table=True):
     version: int = Field(default=0, nullable=False)
 
     assigned_to_id: UUID = Field(foreign_key="users.id", nullable=False)
-    assigned_to: "User" = Relationship(
-        sa_relationship_kwargs={
-            "foreign_keys": "[BoardRowTask.assigned_to_id]"
-        }
+    assigned_to: User = Relationship(
+        sa_relationship_kwargs={"foreign_keys": "[BoardRowTask.assigned_to_id]"},
     )
     created_by_id: UUID = Field(foreign_key="users.id", nullable=False)
-    created_by: "User" = Relationship(
-        sa_relationship_kwargs={
-            "foreign_keys": "[BoardRowTask.assigned_to_id]"
-        }
+    created_by: User = Relationship(
+        sa_relationship_kwargs={"foreign_keys": "[BoardRowTask.assigned_to_id]"},
     )
 
     created_at: datetime = Field(default_factory=datetime.now, nullable=False)

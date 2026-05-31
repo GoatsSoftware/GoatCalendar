@@ -14,7 +14,7 @@ route = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-db_session_dependency = Depends(get_db_session)
+db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 
 
 @route.get(
@@ -23,7 +23,7 @@ db_session_dependency = Depends(get_db_session)
     response_model=list[User],
 )
 async def get_all_users(
-    session: Annotated[AsyncSession, db_session_dependency],
+    session: db_session_dependency,
 ) -> list[User]:
     """ """
     return await user_service.get_all_users(session)

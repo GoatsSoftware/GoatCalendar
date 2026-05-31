@@ -1,6 +1,6 @@
 [project]
 name = "board_service"
-version = "0.1.0"
+version = "0.1.1"
 description = "Default template for PDM package"
 authors = [
     {name = "Antonin Durand",email = "antonin.durand576@gmail.com"},
@@ -15,6 +15,7 @@ dev = [
     "ruff>=0.15.15",
     "goat-calendar-shared-models @ file:///${PROJECT_ROOT}/../shared_models",
     "database-service @ file:///${PROJECT_ROOT}/../database_service",
+    "goat-calendar-auth-service @ file:///${PROJECT_ROOT}/../auth_service",
 ]
 
 [build-system]

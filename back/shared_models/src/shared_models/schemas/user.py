@@ -8,6 +8,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from shared_models.enums import UserRole
 
 from .user_board_relation import UserBoardLink
+
 if TYPE_CHECKING:
     from .board import Board
 
@@ -30,9 +31,11 @@ class User(SQLModel, table=True):
 
     first_name: str = Field(max_length=50, nullable=False)
     last_name: str = Field(max_length=50, nullable=False)
-    role: "UserRole" = Field(nullable=False)
+    role: UserRole = Field(nullable=False)
 
-    boards: list["Board"] = Relationship(back_populates="users", link_model=UserBoardLink)
+    boards: list["Board"] = Relationship(
+        back_populates="users", link_model=UserBoardLink,
+    )
 
     created_at: datetime = Field(default_factory=datetime.now, nullable=False)
     updated_at: datetime = Field(

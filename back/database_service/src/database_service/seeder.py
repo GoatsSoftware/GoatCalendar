@@ -1,22 +1,24 @@
 from datetime import date
 from uuid import uuid4
 
-from shared_models.schemas import (
-    Board,
-    BoardColumn,
-    BoardRow,
-    BoardRowTask,
-    BoardTaskComment,
-    User, BoardEvent,
-)
 from shared_models.enums import (
-    UserRole,
     BoardColumnName,
     BoardFieldType,
     BoardTaskStatus,
+    UserRole,
+    UserRoleInBoard,
+)
+from shared_models.schemas import (
+    Board,
+    BoardColumn,
+    BoardEvent,
+    BoardRow,
+    BoardRowComment,
+    BoardRowTask,
+    User,
+    UserBoardLink,
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
-
 
 from database_service.database import engine
 
@@ -134,7 +136,7 @@ async def seed_board_structure(session: AsyncSession, users: list[User]):
             tasks.append(task)
 
         # 1 comment per row
-        comment = BoardTaskComment(
+        comment = BoardRowComment(
             id=uuid4(),
             board_row_id=row.id,
             content=f"Comment for row {r + 1}",
@@ -171,9 +173,25 @@ async def seed_board_structure(session: AsyncSession, users: list[User]):
 
     session.add_all(events)
 
+    # 5. Users invited (2)
+    links = [
+        UserBoardLink(
+            user_id=editor.id,
+            board_id=board.id,
+            user_role_in_board=UserRoleInBoard.EDITOR,
+        ),
+        UserBoardLink(
+            user_id=viewer.id,
+            board_id=board.id,
+        ),
+    ]
+
+    session.add_all(links)
+
     await session.flush()
 
     return board
+
 
 async def base_seeder() -> None:
     """

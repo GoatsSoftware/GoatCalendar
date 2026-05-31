@@ -1,5 +1,4 @@
 from shared_models.schemas import User
-from sqlalchemy.orm import joinedload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -9,6 +8,7 @@ async def get_all_users(session: AsyncSession) -> list[User]:
 
     result = await session.exec(statement)
     return result.unique().all()
+
 
 async def get_user_by_email_address(email_address: str, session: AsyncSession) -> User:
     """
@@ -22,9 +22,6 @@ async def get_user_by_email_address(email_address: str, session: AsyncSession) -
     :param session: The active asynchronous database session.
     :return: The User instance associated with the given email address.
     """
-    statement = (
-        select(User)
-        .where(User.email_address == email_address)
-    )
+    statement = select(User).where(User.email_address == email_address)
     result = await session.exec(statement)
     return result.unique().one()

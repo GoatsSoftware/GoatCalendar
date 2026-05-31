@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from shared_models.models.server_settings import get_server_settings
 from starlette.middleware.cors import CORSMiddleware
 
-from auth_service.routes import monitoring_route, user_route, authentication_route
+from auth_service.routes import authentication_route, monitoring_route, user_route
 
 SERVER_SETTINGS = get_server_settings()
 

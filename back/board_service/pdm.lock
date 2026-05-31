@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:9f35978a4dc0737b21a67911ffa02a645d70b83b6271eb3a667f810aeb967884"
+content_hash = "sha256:cdbdcb9df9245213d8e3e51d613a2d0db8da4c2f037ae7bf57a4d623d52c0ccd"
 
 [[metadata.targets]]
 requires_python = ">=3.13"
@@ -29,7 +29,7 @@ name = "annotated-doc"
 version = "0.0.4"
 requires_python = ">=3.8"
 summary = "Document parameters, class attributes, return types, and variables inline, with Annotated."
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "annotated_doc-0.0.4-py3-none-any.whl", hash = "sha256:571ac1dc6991c450b25a9c2d84a3705e2ae7a53467b5d111c24fa8baabbed320"},
     {file = "annotated_doc-0.0.4.tar.gz", hash = "sha256:fbcda96e87e9c92ad167c2e53839e57503ecfda18804ea28102353485033faa4"},
@@ -54,7 +54,7 @@ name = "anyio"
 version = "4.13.0"
 requires_python = ">=3.10"
 summary = "High-level concurrency and networking framework on top of asyncio or Trio"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "exceptiongroup>=1.0.2; python_version < \"3.11\"",
     "idna>=2.8",
@@ -66,11 +66,59 @@ files = [
 ]
 
 [[package]]
+name = "argon2-cffi"
+version = "25.1.0"
+requires_python = ">=3.8"
+summary = "Argon2 for Python"
+groups = ["dev"]
+dependencies = [
+    "argon2-cffi-bindings",
+]
+files = [
+    {file = "argon2_cffi-25.1.0-py3-none-any.whl", hash = "sha256:fdc8b074db390fccb6eb4a3604ae7231f219aa669a2652e0f20e16ba513d5741"},
+    {file = "argon2_cffi-25.1.0.tar.gz", hash = "sha256:694ae5cc8a42f4c4e2bf2ca0e64e51e23a040c6a517a85074683d3959e1346c1"},
+]
+
+[[package]]
+name = "argon2-cffi-bindings"
+version = "25.1.0"
+requires_python = ">=3.9"
+summary = "Low-level CFFI bindings for Argon2"
+groups = ["dev"]
+dependencies = [
+    "cffi>=1.0.1; python_version < \"3.14\"",
+    "cffi>=2.0.0b1; python_version >= \"3.14\"",
+]
+files = [
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-macosx_10_13_universal2.whl", hash = "sha256:3d3f05610594151994ca9ccb3c771115bdb4daef161976a266f0dd8aa9996b8f"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-macosx_10_13_x86_64.whl", hash = "sha256:8b8efee945193e667a396cbc7b4fb7d357297d6234d30a489905d96caabde56b"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:3c6702abc36bf3ccba3f802b799505def420a1b7039862014a65db3205967f5a"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a1c70058c6ab1e352304ac7e3b52554daadacd8d453c1752e547c76e9c99ac44"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e2fd3bfbff3c5d74fef31a722f729bf93500910db650c925c2d6ef879a7e51cb"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:c4f9665de60b1b0e99bcd6be4f17d90339698ce954cfd8d9cf4f91c995165a92"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:ba92837e4a9aa6a508c8d2d7883ed5a8f6c308c89a4790e1e447a220deb79a85"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-win32.whl", hash = "sha256:84a461d4d84ae1295871329b346a97f68eade8c53b6ed9a7ca2d7467f3c8ff6f"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-win_amd64.whl", hash = "sha256:b55aec3565b65f56455eebc9b9f34130440404f27fe21c3b375bf1ea4d8fbae6"},
+    {file = "argon2_cffi_bindings-25.1.0-cp314-cp314t-win_arm64.whl", hash = "sha256:87c33a52407e4c41f3b70a9c2d3f6056d88b10dad7695be708c5021673f55623"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-macosx_10_9_universal2.whl", hash = "sha256:aecba1723ae35330a008418a91ea6cfcedf6d31e5fbaa056a166462ff066d500"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-macosx_10_9_x86_64.whl", hash = "sha256:2630b6240b495dfab90aebe159ff784d08ea999aa4b0d17efa734055a07d2f44"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:7aef0c91e2c0fbca6fc68e7555aa60ef7008a739cbe045541e438373bc54d2b0"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-manylinux_2_26_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:1e021e87faa76ae0d413b619fe2b65ab9a037f24c60a1e6cc43457ae20de6dc6"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:d3e924cfc503018a714f94a49a149fdc0b644eaead5d1f089330399134fa028a"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:c87b72589133f0346a1cb8d5ecca4b933e3c9b64656c9d175270a000e73b288d"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:1db89609c06afa1a214a69a462ea741cf735b29a57530478c06eb81dd403de99"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-win32.whl", hash = "sha256:473bcb5f82924b1becbb637b63303ec8d10e84c8d241119419897a26116515d2"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-win_amd64.whl", hash = "sha256:a98cd7d17e9f7ce244c0803cad3c23a7d379c301ba618a5fa76a67d116618b98"},
+    {file = "argon2_cffi_bindings-25.1.0-cp39-abi3-win_arm64.whl", hash = "sha256:b0fdbcf513833809c882823f98dc2f931cf659d9a1429616ac3adebb49f5db94"},
+    {file = "argon2_cffi_bindings-25.1.0.tar.gz", hash = "sha256:b957f3e6ea4d55d820e40ff76f450952807013d361a65d7f28acc0acbf29229d"},
+]
+
+[[package]]
 name = "certifi"
 version = "2026.5.20"
 requires_python = ">=3.7"
 summary = "Python package for providing Mozilla's CA Bundle."
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "certifi-2026.5.20-py3-none-any.whl", hash = "sha256:3c52e209ba0a4ad7aebe60436a4ab349c39e1e602e8c134221e546902ad25897"},
     {file = "certifi-2026.5.20.tar.gz", hash = "sha256:69dea482ab64caa7b9f6aba1c6bf48bb6a5448d1c0f1b17ab42ad8c763a5344d"},
@@ -82,7 +130,6 @@ version = "2.0.0"
 requires_python = ">=3.9"
 summary = "Foreign Function Interface for Python calling C code."
 groups = ["default", "dev"]
-marker = "platform_python_implementation != \"PyPy\""
 dependencies = [
     "pycparser; implementation_name != \"PyPy\"",
 ]
@@ -129,7 +176,7 @@ name = "click"
 version = "8.4.1"
 requires_python = ">=3.10"
 summary = "Composable command line interface toolkit"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "colorama; platform_system == \"Windows\"",
 ]
@@ -143,7 +190,7 @@ name = "colorama"
 version = "0.4.6"
 requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 summary = "Cross-platform colored terminal text."
-groups = ["default"]
+groups = ["default", "dev"]
 marker = "sys_platform == \"win32\" or platform_system == \"Windows\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
@@ -224,7 +271,7 @@ name = "detect-installer"
 version = "0.1.0"
 requires_python = ">=3.10"
 summary = "Detect how a Python package was installed and get the correct upgrade command"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "detect_installer-0.1.0-py3-none-any.whl", hash = "sha256:034fb20fd665c36e6ba52b8821525ea07fb4f7f938cac459df889fb33801528a"},
     {file = "detect_installer-0.1.0.tar.gz", hash = "sha256:00ad7ba0a36e3cf7d08a40d3643011746dbc112597c7d475cc91c416710ca4e7"},
@@ -235,10 +282,24 @@ name = "dnspython"
 version = "2.8.0"
 requires_python = ">=3.10"
 summary = "DNS toolkit"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "dnspython-2.8.0-py3-none-any.whl", hash = "sha256:01d9bbc4a2d76bf0db7c1f729812ded6d912bd318d3b1cf81d30c0f845dbf3af"},
     {file = "dnspython-2.8.0.tar.gz", hash = "sha256:181d3c6996452cb1189c4046c61599b84a5a86e099562ffde77d26984ff26d0f"},
+]
+
+[[package]]
+name = "ecdsa"
+version = "0.19.2"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.6"
+summary = "ECDSA cryptographic signature library (pure python)"
+groups = ["dev"]
+dependencies = [
+    "six>=1.9.0",
+]
+files = [
+    {file = "ecdsa-0.19.2-py2.py3-none-any.whl", hash = "sha256:840f5dc5e375c68f36c1a7a5b9caad28f95daa65185c9253c0c08dd952bb7399"},
+    {file = "ecdsa-0.19.2.tar.gz", hash = "sha256:62635b0ac1ca2e027f82122b5b81cb706edc38cd91c63dda28e4f3455a2bf930"},
 ]
 
 [[package]]
@@ -246,7 +307,7 @@ name = "email-validator"
 version = "2.3.0"
 requires_python = ">=3.8"
 summary = "A robust email address syntax and deliverability validation library."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "dnspython>=2.0.0",
     "idna>=2.0.0",
@@ -261,7 +322,7 @@ name = "fastapi"
 version = "0.136.3"
 requires_python = ">=3.10"
 summary = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "annotated-doc>=0.0.2",
     "pydantic>=2.9.0",
@@ -279,7 +340,7 @@ name = "fastapi-cli"
 version = "0.0.24"
 requires_python = ">=3.10"
 summary = "Run and manage FastAPI apps from the command line with FastAPI CLI. 🚀"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "rich-toolkit>=0.14.8",
     "tomli>=2.0.0; python_version < \"3.11\"",
@@ -297,7 +358,7 @@ version = "0.0.24"
 extras = ["standard"]
 requires_python = ">=3.10"
 summary = "Run and manage FastAPI apps from the command line with FastAPI CLI. 🚀"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "fastapi-cli==0.0.24",
     "fastapi-cloud-cli>=0.1.1",
@@ -313,7 +374,7 @@ name = "fastapi-cloud-cli"
 version = "0.18.0"
 requires_python = ">=3.10"
 summary = "Deploy and manage FastAPI Cloud apps from the command line 🚀"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "detect-installer>=0.1.0",
     "fastar>=0.10.0",
@@ -338,7 +399,7 @@ version = "0.136.3"
 extras = ["standard"]
 requires_python = ">=3.10"
 summary = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "email-validator>=2.0.0",
     "fastapi-cli[standard]>=0.0.8",
@@ -361,7 +422,7 @@ name = "fastar"
 version = "0.11.0"
 requires_python = ">=3.8"
 summary = "High-level bindings for the Rust tar crate"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "fastar-0.11.0-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:33f544b08b4541b678e53749b4552a44720d96761fb79c172b005b1089c443ed"},
     {file = "fastar-0.11.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:91c1c792447e4a642745f347ff9847c52af39633071c57ee67ed53c157fc3506"},
@@ -415,12 +476,28 @@ files = [
 ]
 
 [[package]]
+name = "goat-calendar-auth-service"
+version = "0.1.0"
+requires_python = ">=3.13"
+path = "../auth_service"
+summary = "Default template for PDM package"
+groups = ["dev"]
+dependencies = [
+    "aiomysql>=0.3.2",
+    "cryptography>=48.0.0",
+    "fastapi[standard]>=0.136.3",
+    "passlib[argon2]>=1.7.4",
+    "python-jose[cryptography]>=3.5.0",
+    "sqlmodel>=0.0.38",
+]
+
+[[package]]
 name = "goat-calendar-shared-models"
 version = "0.1.0"
 requires_python = ">=3.13"
 path = "../shared_models"
 summary = "Default template for PDM package"
-groups = ["default", "dev"]
+groups = ["dev"]
 dependencies = [
     "pydantic-settings>=2.14.1",
     "pydantic>=2.13.4",
@@ -493,7 +570,7 @@ name = "h11"
 version = "0.16.0"
 requires_python = ">=3.8"
 summary = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "h11-0.16.0-py3-none-any.whl", hash = "sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86"},
     {file = "h11-0.16.0.tar.gz", hash = "sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1"},
@@ -504,7 +581,7 @@ name = "httpcore"
 version = "1.0.9"
 requires_python = ">=3.8"
 summary = "A minimal low-level HTTP client."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "certifi",
     "h11>=0.16",
@@ -519,7 +596,7 @@ name = "httptools"
 version = "0.8.0"
 requires_python = ">=3.9"
 summary = "A collection of framework independent HTTP protocol utils."
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "httptools-0.8.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:614ceea8ea606848bece2338ac03b3ce5324bcb4be8dc7d377ed708012fa4db8"},
     {file = "httptools-0.8.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:2d689918c15a013c65ef52d9fd495d766893ab831a2c8d89f2ac5940a5df847c"},
@@ -550,7 +627,7 @@ name = "httpx"
 version = "0.28.1"
 requires_python = ">=3.8"
 summary = "The next generation HTTP client."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "anyio",
     "certifi",
@@ -567,7 +644,7 @@ name = "idna"
 version = "3.17"
 requires_python = ">=3.9"
 summary = "Internationalized Domain Names in Applications (IDNA)"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "idna-3.17-py3-none-any.whl", hash = "sha256:466e48829084efe2548012b855df21540b96f2e20e51bd124c851536556a592c"},
     {file = "idna-3.17.tar.gz", hash = "sha256:5eb0cb53bc467c12eadcf6de83163ad8527cec9416f44b9b61b19caedad2b87f"},
@@ -578,7 +655,7 @@ name = "jinja2"
 version = "3.1.6"
 requires_python = ">=3.7"
 summary = "A very fast and expressive template engine."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "MarkupSafe>=2.0",
 ]
@@ -592,7 +669,7 @@ name = "markdown-it-py"
 version = "4.2.0"
 requires_python = ">=3.10"
 summary = "Python port of markdown-it. Markdown parsing, done right!"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "mdurl~=0.1",
 ]
@@ -606,7 +683,7 @@ name = "markupsafe"
 version = "3.0.3"
 requires_python = ">=3.9"
 summary = "Safely add untrusted strings to HTML/XML markup."
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "markupsafe-3.0.3-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:e1cf1972137e83c5d4c136c43ced9ac51d0e124706ee1c8aa8532c1287fa8795"},
     {file = "markupsafe-3.0.3-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:116bb52f642a37c115f517494ea5feb03889e04df47eeff5b130b1808ce7c219"},
@@ -660,10 +737,46 @@ name = "mdurl"
 version = "0.1.2"
 requires_python = ">=3.7"
 summary = "Markdown URL utilities"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
     {file = "mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba"},
+]
+
+[[package]]
+name = "passlib"
+version = "1.7.4"
+summary = "comprehensive password hashing framework supporting over 30 schemes"
+groups = ["dev"]
+files = [
+    {file = "passlib-1.7.4-py2.py3-none-any.whl", hash = "sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1"},
+    {file = "passlib-1.7.4.tar.gz", hash = "sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04"},
+]
+
+[[package]]
+name = "passlib"
+version = "1.7.4"
+extras = ["argon2"]
+summary = "comprehensive password hashing framework supporting over 30 schemes"
+groups = ["dev"]
+dependencies = [
+    "argon2-cffi>=18.2.0",
+    "passlib==1.7.4",
+]
+files = [
+    {file = "passlib-1.7.4-py2.py3-none-any.whl", hash = "sha256:aa6bca462b8d8bda89c70b382f0c298a20b5560af6cbfa2dce410c0a2fb669f1"},
+    {file = "passlib-1.7.4.tar.gz", hash = "sha256:defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c4152ebe04"},
+]
+
+[[package]]
+name = "pyasn1"
+version = "0.6.3"
+requires_python = ">=3.8"
+summary = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)"
+groups = ["dev"]
+files = [
+    {file = "pyasn1-0.6.3-py3-none-any.whl", hash = "sha256:a80184d120f0864a52a073acc6fc642847d0be408e7c7252f31390c0f4eadcde"},
+    {file = "pyasn1-0.6.3.tar.gz", hash = "sha256:697a8ecd6d98891189184ca1fa05d1bb00e2f84b5977c481452050549c8a72cf"},
 ]
 
 [[package]]
@@ -672,7 +785,7 @@ version = "3.0"
 requires_python = ">=3.10"
 summary = "C parser in Python"
 groups = ["default", "dev"]
-marker = "implementation_name != \"PyPy\" and platform_python_implementation != \"PyPy\""
+marker = "implementation_name != \"PyPy\""
 files = [
     {file = "pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"},
     {file = "pycparser-3.0.tar.gz", hash = "sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"},
@@ -758,7 +871,7 @@ name = "pydantic-extra-types"
 version = "2.11.1"
 requires_python = ">=3.9"
 summary = "Extra Pydantic types."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "pydantic>=2.5.2",
     "typing-extensions",
@@ -790,8 +903,8 @@ version = "2.13.4"
 extras = ["email"]
 requires_python = ">=3.9"
 summary = "Data validation using Python type hints"
-groups = ["default"]
-marker = "python_version == \"3.13\" or python_version >= \"3.14\""
+groups = ["default", "dev"]
+marker = "python_version >= \"3.14\" or python_version == \"3.13\""
 dependencies = [
     "email-validator>=2.0.0",
     "pydantic==2.13.4",
@@ -806,7 +919,7 @@ name = "pygments"
 version = "2.20.0"
 requires_python = ">=3.9"
 summary = "Pygments is a syntax highlighting package written in Python."
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "pygments-2.20.0-py3-none-any.whl", hash = "sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176"},
     {file = "pygments-2.20.0.tar.gz", hash = "sha256:6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f"},
@@ -835,11 +948,43 @@ files = [
 ]
 
 [[package]]
+name = "python-jose"
+version = "3.5.0"
+requires_python = ">=3.9"
+summary = "JOSE implementation in Python"
+groups = ["dev"]
+dependencies = [
+    "ecdsa!=0.15",
+    "pyasn1>=0.5.0",
+    "rsa!=4.1.1,!=4.4,<5.0,>=4.0",
+]
+files = [
+    {file = "python_jose-3.5.0-py2.py3-none-any.whl", hash = "sha256:abd1202f23d34dfad2c3d28cb8617b90acf34132c7afd60abd0b0b7d3cb55771"},
+    {file = "python_jose-3.5.0.tar.gz", hash = "sha256:fb4eaa44dbeb1c26dcc69e4bd7ec54a1cb8dd64d3b4d81ef08d90ff453f2b01b"},
+]
+
+[[package]]
+name = "python-jose"
+version = "3.5.0"
+extras = ["cryptography"]
+requires_python = ">=3.9"
+summary = "JOSE implementation in Python"
+groups = ["dev"]
+dependencies = [
+    "cryptography>=3.4.0",
+    "python-jose==3.5.0",
+]
+files = [
+    {file = "python_jose-3.5.0-py2.py3-none-any.whl", hash = "sha256:abd1202f23d34dfad2c3d28cb8617b90acf34132c7afd60abd0b0b7d3cb55771"},
+    {file = "python_jose-3.5.0.tar.gz", hash = "sha256:fb4eaa44dbeb1c26dcc69e4bd7ec54a1cb8dd64d3b4d81ef08d90ff453f2b01b"},
+]
+
+[[package]]
 name = "python-multipart"
 version = "0.0.29"
 requires_python = ">=3.10"
 summary = "A streaming multipart parser for Python"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "python_multipart-0.0.29-py3-none-any.whl", hash = "sha256:2ddcc971cef266225f54f552d8fa10bcfbb1f14446caec199060daac59ff2d69"},
     {file = "python_multipart-0.0.29.tar.gz", hash = "sha256:643e93849196645e2dbdd81a0f8829a23123ad7f797a84a364c6fb3563f18904"},
@@ -850,7 +995,7 @@ name = "pyyaml"
 version = "6.0.3"
 requires_python = ">=3.8"
 summary = "YAML parser and emitter for Python"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "pyyaml-6.0.3-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:8da9669d359f02c0b91ccc01cac4a67f16afec0dac22c2ad09f46bee0697eba8"},
     {file = "pyyaml-6.0.3-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:2283a07e2c21a2aa78d9c4442724ec1eb15f5e42a723b99cb3d822d48f5f7ad1"},
@@ -888,7 +1033,7 @@ name = "rich"
 version = "15.0.0"
 requires_python = ">=3.9.0"
 summary = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "markdown-it-py>=2.2.0",
     "pygments<3.0.0,>=2.13.0",
@@ -903,7 +1048,7 @@ name = "rich-toolkit"
 version = "0.19.10"
 requires_python = ">=3.8"
 summary = "Rich toolkit for building command-line applications"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "click>=8.1.7",
     "rich>=13.7.1",
@@ -919,7 +1064,7 @@ name = "rignore"
 version = "0.7.6"
 requires_python = ">=3.8"
 summary = "Python Bindings for the ignore crate"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "rignore-0.7.6-cp313-cp313-macosx_10_12_x86_64.whl", hash = "sha256:2bdab1d31ec9b4fb1331980ee49ea051c0d7f7bb6baa28b3125ef03cdc48fdaf"},
     {file = "rignore-0.7.6-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:90f0a00ce0c866c275bf888271f1dc0d2140f29b82fcf33cdbda1e1a6af01010"},
@@ -970,11 +1115,25 @@ files = [
 ]
 
 [[package]]
+name = "rsa"
+version = "4.9.1"
+requires_python = "<4,>=3.6"
+summary = "Pure-Python RSA implementation"
+groups = ["dev"]
+dependencies = [
+    "pyasn1>=0.1.3",
+]
+files = [
+    {file = "rsa-4.9.1-py3-none-any.whl", hash = "sha256:68635866661c6836b8d39430f97a996acbd61bfa49406748ea243539fe239762"},
+    {file = "rsa-4.9.1.tar.gz", hash = "sha256:e7bdbfdb5497da4c07dfd35530e1a902659db6ff241e39d9953cad06ebd0ae75"},
+]
+
+[[package]]
 name = "ruff"
 version = "0.15.15"
 requires_python = ">=3.7"
 summary = "An extremely fast Python linter and code formatter, written in Rust."
-groups = ["default", "dev"]
+groups = ["dev"]
 files = [
     {file = "ruff-0.15.15-py3-none-linux_armv6l.whl", hash = "sha256:cf93e5388f412e1b108b1f8b34a6e036b70fe8aff89393befad96fe48670311b"},
     {file = "ruff-0.15.15-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:ac5a646d1f6a7dadd5d50842dae2c1f9862ac887ef5d1b1375e02def791fde6e"},
@@ -1001,7 +1160,7 @@ name = "sentry-sdk"
 version = "2.61.0"
 requires_python = ">=3.6"
 summary = "Python client for Sentry (https://sentry.io)"
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "certifi",
     "urllib3>=1.26.11",
@@ -1016,10 +1175,21 @@ name = "shellingham"
 version = "1.5.4"
 requires_python = ">=3.7"
 summary = "Tool to Detect Surrounding Shell"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
     {file = "shellingham-1.5.4.tar.gz", hash = "sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de"},
+]
+
+[[package]]
+name = "six"
+version = "1.17.0"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+summary = "Python 2 and 3 compatibility utilities"
+groups = ["dev"]
+files = [
+    {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
+    {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
 ]
 
 [[package]]
@@ -1080,7 +1250,7 @@ name = "starlette"
 version = "1.2.0"
 requires_python = ">=3.10"
 summary = "The little ASGI library that shines."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "anyio<5,>=3.6.2",
     "typing-extensions>=4.10.0; python_version < \"3.13\"",
@@ -1095,7 +1265,7 @@ name = "typer"
 version = "0.26.2"
 requires_python = ">=3.10"
 summary = "Typer, build great CLIs. Easy to code. Based on Python type hints."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "annotated-doc>=0.0.2",
     "colorama; platform_system == \"Windows\"",
@@ -1137,7 +1307,7 @@ name = "urllib3"
 version = "2.7.0"
 requires_python = ">=3.10"
 summary = "HTTP library with thread-safe connection pooling, file post, and more."
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "urllib3-2.7.0-py3-none-any.whl", hash = "sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897"},
     {file = "urllib3-2.7.0.tar.gz", hash = "sha256:231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c"},
@@ -1148,7 +1318,7 @@ name = "uvicorn"
 version = "0.48.0"
 requires_python = ">=3.10"
 summary = "The lightning-fast ASGI server."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "click>=7.0",
     "h11>=0.8",
@@ -1165,7 +1335,7 @@ version = "0.48.0"
 extras = ["standard"]
 requires_python = ">=3.10"
 summary = "The lightning-fast ASGI server."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "colorama>=0.4; sys_platform == \"win32\"",
     "httptools>=0.6.3",
@@ -1186,7 +1356,7 @@ name = "uvloop"
 version = "0.22.1"
 requires_python = ">=3.8.1"
 summary = "Fast implementation of asyncio event loop on top of libuv"
-groups = ["default"]
+groups = ["default", "dev"]
 marker = "(sys_platform != \"cygwin\" and sys_platform != \"win32\") and platform_python_implementation != \"PyPy\""
 files = [
     {file = "uvloop-0.22.1-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:561577354eb94200d75aca23fbde86ee11be36b00e52a4eaf8f50fb0c86b7705"},
@@ -1215,7 +1385,7 @@ name = "watchfiles"
 version = "1.2.0"
 requires_python = ">=3.10"
 summary = "Simple, modern and high performance file watching and code reload in python."
-groups = ["default"]
+groups = ["default", "dev"]
 dependencies = [
     "anyio>=3.0.0",
 ]
@@ -1289,7 +1459,7 @@ name = "websockets"
 version = "16.0"
 requires_python = ">=3.10"
 summary = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "websockets-16.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:878b336ac47938b474c8f982ac2f7266a540adc3fa4ad74ae96fea9823a02cc9"},
     {file = "websockets-16.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:52a0fec0e6c8d9a784c2c78276a48a2bdf099e4ccc2a4cad53b27718dbfd0230"},

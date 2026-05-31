@@ -20,10 +20,7 @@ route = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/authentication/auth",
-    auto_error=False
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/authentication/auth", auto_error=False)
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -31,11 +28,11 @@ credentials_exception = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
-db_session_dependency = Depends(get_db_session)
+db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 
 
 async def get_current_user(
-    session: Annotated[AsyncSession, Depends(get_db_session)],
+    session: db_session_dependency,
     token: Annotated[str | None, Depends(oauth2_scheme)] = None,
 ) -> UserAuthDTO:
     """
@@ -49,7 +46,6 @@ async def get_current_user(
     :param token: The JWT access token extracted from the Authorization header if provided.
     :return: A DTO containing the authenticated user's information.
     """
-    print(token)
     if token is None:
         raise credentials_exception
 
@@ -59,14 +55,13 @@ async def get_current_user(
             session=session,
         )
     except (NoResultFound, ValueError) as exception:
-        print(exception)
         raise credentials_exception from exception
 
 
 @route.post("/auth", response_model=JWTTokens, status_code=status.HTTP_201_CREATED)
 async def authenticate_user(
     credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
-    session: Annotated[AsyncSession, db_session_dependency],
+    session: db_session_dependency,
 ) -> JWTTokens:
     """
     Validates user credentials and issues a new pair of JWT tokens.
@@ -95,7 +90,7 @@ async def authenticate_user(
 )
 async def refresh_user_access_token(
     refresh_token: str,
-    session: Annotated[AsyncSession, db_session_dependency],
+    session: db_session_dependency,
 ) -> UserAuthDTO:
     """
     Renews an expired access token using a valid refresh token.

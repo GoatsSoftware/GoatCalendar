@@ -6,10 +6,10 @@ from sqlalchemy import Column, DateTime
 from sqlmodel import Field, Relationship, SQLModel
 
 from ..enums import BoardColumnName, BoardFieldType
+from .user import User
 
 if TYPE_CHECKING:
     from .board import Board
-    from .user import User
 
 
 class BoardColumn(SQLModel, table=True):
@@ -25,7 +25,7 @@ class BoardColumn(SQLModel, table=True):
     position: int = Field(ge=0)
 
     created_by_id: UUID = Field(foreign_key="users.id", nullable=False)
-    created_by: "User" = Relationship()
+    created_by: User = Relationship()
 
     created_at: datetime = Field(default_factory=datetime.now, nullable=False)
     updated_at: datetime = Field(
