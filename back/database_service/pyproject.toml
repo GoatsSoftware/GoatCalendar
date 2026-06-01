@@ -1,5 +1,5 @@
 [project]
-name = "database_service"
+name = "goat_calendar_database_service"
 version = "0.1.1"
 description = "Default template for PDM package"
 authors = [

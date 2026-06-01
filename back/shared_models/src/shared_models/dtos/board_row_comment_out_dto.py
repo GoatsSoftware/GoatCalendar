@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from shared_models.dtos.user_out_dto import UserOutDTO
+from shared_models.dtos.user_dtos import UserOutDTO
 
 
 class BoardRowCommentOutDTO(BaseModel):

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from shared_models.schemas.board import Board
+from shared_models.schemas import Board, UserBoardPermission
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlmodel import select
@@ -10,7 +10,7 @@ def get_board_dependencies_loading_options() -> tuple:
     return (
         joinedload(Board.created_by),
         joinedload(Board.columns),
-        joinedload(Board.users),
+        joinedload(Board.user_relations).joinedload(UserBoardPermission.user),
         joinedload(Board.events),
     )
 

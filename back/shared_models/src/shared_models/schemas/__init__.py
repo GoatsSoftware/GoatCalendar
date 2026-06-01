@@ -5,7 +5,7 @@ from .board_row import BoardRow
 from .board_row_comment import BoardRowComment
 from .board_row_task import BoardRowTask
 from .user import User
-from .user_board_relation import UserBoardLink
+from .user_board_relation import UserBoardPermission
 
 __all__ = [
     "Board",
@@ -15,5 +15,5 @@ __all__ = [
     "BoardRowComment",
     "BoardRowTask",
     "User",
-    "UserBoardLink",
+    "UserBoardPermission",
 ]

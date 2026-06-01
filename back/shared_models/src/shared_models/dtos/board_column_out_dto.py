@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from ..enums import BoardColumnName, BoardFieldType
-from .user_out_dto import UserOutDTO
+from .user_dtos import UserOutDTO
 
 
 class BoardColumnOutDTO(BaseModel):

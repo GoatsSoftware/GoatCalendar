@@ -45,7 +45,7 @@ class BoardRowTask(SQLModel, table=True):
     )
     created_by_id: UUID = Field(foreign_key="users.id", nullable=False)
     created_by: User = Relationship(
-        sa_relationship_kwargs={"foreign_keys": "[BoardRowTask.assigned_to_id]"},
+        sa_relationship_kwargs={"foreign_keys": "[BoardRowTask.created_by_id]"},
     )
 
     created_at: datetime = Field(default_factory=datetime.now, nullable=False)

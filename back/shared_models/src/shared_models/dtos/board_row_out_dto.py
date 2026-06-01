@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from shared_models.dtos.board_row_comment_out_dto import BoardRowCommentOutDTO
 from shared_models.dtos.board_row_task_out_dto import BoardRowTaskOutDTO
-from shared_models.dtos.user_out_dto import UserOutDTO
+from shared_models.dtos.user_dtos import UserOutDTO
 
 
 class BoardRowOutDTO(BaseModel):

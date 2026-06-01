@@ -16,7 +16,7 @@ from shared_models.schemas import (
     BoardRowComment,
     BoardRowTask,
     User,
-    UserBoardLink,
+    UserBoardPermission,
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -175,12 +175,12 @@ async def seed_board_structure(session: AsyncSession, users: list[User]):
 
     # 5. Users invited (2)
     links = [
-        UserBoardLink(
+        UserBoardPermission(
             user_id=editor.id,
             board_id=board.id,
             user_role_in_board=UserRoleInBoard.EDITOR,
         ),
-        UserBoardLink(
+        UserBoardPermission(
             user_id=viewer.id,
             board_id=board.id,
         ),

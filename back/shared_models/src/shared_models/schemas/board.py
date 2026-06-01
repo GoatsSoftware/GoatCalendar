@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import Column, DateTime
 from sqlmodel import Field, Relationship, SQLModel
 
-from .user_board_relation import UserBoardLink
+from .user_board_relation import UserBoardPermission
 
 if TYPE_CHECKING:
     from .board_columns import BoardColumn
@@ -22,9 +22,7 @@ class Board(SQLModel, table=True):
     description: str = Field(default="", max_length=250)
 
     columns: list["BoardColumn"] = Relationship(back_populates="board")
-    users: list["User"] = Relationship(
-        back_populates="boards", link_model=UserBoardLink,
-    )
+    user_relations: list["UserBoardPermission"] = Relationship(back_populates="board")
     events: list["BoardEvent"] = Relationship(back_populates="board")
 
     created_by_id: UUID = Field(foreign_key="users.id", nullable=False)

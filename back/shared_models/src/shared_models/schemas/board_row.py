@@ -19,7 +19,7 @@ class BoardRow(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 
     board_id: UUID = Field(foreign_key="boards.id", nullable=False, index=True)
-    board: "Board" = Relationship(    sa_relationship_kwargs={"lazy": "selectin"})
+    board: "Board" = Relationship(sa_relationship_kwargs={"lazy": "selectin"})
 
     tasks: list["BoardRowTask"] = Relationship(back_populates="board_row")
     comments: list["BoardRowComment"] = Relationship(back_populates="board_row")

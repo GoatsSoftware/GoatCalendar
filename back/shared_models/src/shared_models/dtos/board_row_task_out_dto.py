@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from ..enums import BoardTaskStatus
 from .board_column_out_dto import BoardColumnOutDTO
-from .user_out_dto import UserOutDTO
+from .user_dtos import UserOutDTO
 
 
 class BoardRowTaskOutDTO(BaseModel):
