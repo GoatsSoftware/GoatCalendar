@@ -34,6 +34,7 @@ pdm publish
 Dependancies installation
 
 ```bash
+pdm lock --dev -G:all
 pdm install --group test --group dev
 ```
 
