@@ -1,13 +1,13 @@
 [project]
-name = "goat_calendar_shared_models"
-version = "0.1.4"
+name = "goat-calendar-shared-models"
+version = "0.1.6"
 description = "Default template for PDM package"
 authors = [
-    {name = "Antonin Durand",email = "antonin.durand576@gmail.com"},
+    {name = "GoatsSoftware", email = "antonin.durand576@gmail.com"},
 ]
 dependencies = ["pydantic>=2.13.4", "pydantic-settings>=2.14.1", "sqlmodel>=0.0.38", "ruff>=0.15.15"]
 requires-python = ">=3.13"
-readme = "../../README.md"
+readme = "./README.md"
 license = {text = "MIT"}
 
 [build-system]

@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:b1a20583ba174a6de4f67b7a718e624b41f6bff6380e19584666639c7e1e617b"
+content_hash = "sha256:ff87ac285e52069528bfac2e5d55bc22cba4c0741c6dd60a351cfc111fcdc6bb"
 
 [[metadata.targets]]
 requires_python = ">=3.13"
@@ -144,7 +144,7 @@ files = [
 
 [[package]]
 name = "goat-calendar-shared-models"
-version = "0.1.2"
+version = "0.1.5"
 requires_python = ">=3.13"
 path = "../shared_models"
 summary = "Default template for PDM package"

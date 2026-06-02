@@ -1,20 +1,24 @@
 [project]
-name = "board_service"
+name = "goat-calendar-board-service"
 version = "0.1.2"
 description = "Default template for PDM package"
 authors = [
-    {name = "Antonin Durand",email = "antonin.durand576@gmail.com"},
+    {name = "GoatsSoftware", email = "antonin.durand576@gmail.com"},
 ]
 dependencies = ["sqlmodel>=0.0.38", "aiomysql>=0.3.2", "cryptography>=48.0.0", "fastapi[standard]>=0.136.3"]
 requires-python = ">=3.13"
-readme = "../../README.md"
+readme = "./README.md"
 license = {text = "MIT"}
 
 [project.optional-dependencies]
-dev = [
+test = [
     "ruff>=0.15.15",
+]
+
+[dependency-groups]
+dev = [
+    "goat-calendar-database-service @ file:///${PROJECT_ROOT}/../database_service",
     "goat-calendar-shared-models @ file:///${PROJECT_ROOT}/../shared_models",
-    "database-service @ file:///${PROJECT_ROOT}/../database_service",
     "goat-calendar-auth-service @ file:///${PROJECT_ROOT}/../auth_service",
 ]
 
