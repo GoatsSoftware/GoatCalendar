@@ -15,6 +15,7 @@ test = [
     "ruff>=0.15.15",
 ]
 prod = [
+    "goat-calendar-database-service>=0.1.2",
     "goat-calendar-shared-models>=0.1.5",
 ]
 
