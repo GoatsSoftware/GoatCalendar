@@ -30,6 +30,18 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy service source files
 COPY back/board_service /app/back/board_service
 
+# Copy env variables
+RUN rm *.env && \
+    echo 'ENV_MODE="prod"' > .env && \
+    echo 'DB_DIALECT="mysql+aiomysql"' >> .env && \
+    echo 'DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"' >> .env && \
+    echo 'SERVER_HOST="0.0.0.0"' >> .env && \
+    echo 'SERVER_PORT=5002' >> .env && \
+    echo 'FRONT_URL="front-service:80"' >> .env && \
+    echo 'ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="' >> .env && \
+    echo 'ACCESS_TOKEN_DURATION_MINUTES=1000' >> .env && \
+    echo 'REFRESH_TOKEN_DURATION_HOURS=24' >> .env
+
 # start service
 WORKDIR /app/back/board_service
 
