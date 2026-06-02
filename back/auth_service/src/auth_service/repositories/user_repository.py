@@ -4,6 +4,12 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 async def get_all_users(session: AsyncSession) -> list[User]:
+    """
+    Fetch all users from the database.
+
+    :param session: The active asynchronous database session.
+    :return: A list of all unique User records.
+    """
     statement = select(User)
 
     result = await session.exec(statement)

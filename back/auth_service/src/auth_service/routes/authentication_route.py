@@ -84,7 +84,7 @@ async def authenticate_user(
 
 
 @route.post(
-    "/refresh_access_token",
+    "/refresh-access-token",
     response_model=UserAuthDTO,
     status_code=status.HTTP_201_CREATED,
 )

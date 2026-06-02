@@ -5,7 +5,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class ServerSettings(BaseSettings):
-    """ """
+    """
+    Manage the application server environment settings and configuration.
+
+    This class loads environment variables from local configuration files
+    and exposes them as type-safe Python attributes.
+
+    :param front_url: The base URL of the frontend application.
+    """
 
     front_url: str = Field(
         validation_alias="FRONT_URL",

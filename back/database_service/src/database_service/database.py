@@ -3,6 +3,7 @@ from collections.abc import AsyncGenerator
 
 from shared_models import schemas  # noqa: F401
 from shared_models.models.db_connection_settings import get_db_connection_settings
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -32,7 +33,7 @@ async def create_db_and_tables(nb_tries: int = 0) -> None:
     try:
         async with engine.begin() as conn:
             await conn.run_sync(SQLModel.metadata.create_all)
-    except Exception as exception:
+    except SQLAlchemyError as exception:
         print(f"Failed to connect to db in try n°{nb_tries}, exception: {exception}")
 
         # retry connection

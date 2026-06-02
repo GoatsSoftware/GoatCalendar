@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from sqlalchemy import Column, DateTime
@@ -6,7 +7,8 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from shared_models.enums import UserRole
 
-from .user_board_relation import UserBoardPermission
+if TYPE_CHECKING:
+    from .user_board_relation import UserBoardPermission
 
 
 class User(SQLModel, table=True):

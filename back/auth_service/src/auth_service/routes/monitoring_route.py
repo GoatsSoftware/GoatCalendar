@@ -3,8 +3,8 @@ from shared_models.enums import HealthStatus
 from shared_models.models.server_health import ServerHealth
 
 route = APIRouter(
-    prefix="/user_monitoring",
-    tags=["user_monitoring"],
+    prefix="/auth_monitoring",
+    tags=["auth_monitoring"],
     responses={404: {"description": "Not found"}},
 )
 
@@ -20,6 +20,6 @@ async def health() -> ServerHealth:
     :return: A JSON object containing the service name and health status.
     """
     return ServerHealth(
-        service_name="User Service",
+        service_name="Auth Service",
         status=HealthStatus.UP,
     )

@@ -7,6 +7,11 @@ from sqlmodel import select
 
 
 def get_board_row_dependencies_loading_options() -> tuple:
+    """
+    Define eager loading relationships for a BoardRow query to avoid N+1 issues.
+
+    :return: A tuple of SQLAlchemy loading options.
+    """
     return (
         joinedload(BoardRow.tasks).options(
             joinedload(BoardRowTask.board_column),
@@ -18,7 +23,14 @@ def get_board_row_dependencies_loading_options() -> tuple:
     )
 
 
-async def get_board_row_by_id(board_row_id: UUID, session=AsyncSession) -> BoardRow:
+async def get_board_row_by_id(board_row_id: UUID, session: AsyncSession) -> BoardRow:
+    """
+    Fetch a single board row by its unique identifier.
+
+    :param board_row_id: The UUID of the row to retrieve.
+    :param session: The active database session.
+    :return: The matching BoardRow record.
+    """
     statement = (
         select(BoardRow)
         .where(BoardRow.id == board_row_id)
@@ -31,8 +43,15 @@ async def get_board_row_by_id(board_row_id: UUID, session=AsyncSession) -> Board
 
 async def get_board_rows_by_board_id(
     board_id: UUID,
-    session=AsyncSession,
+    session: AsyncSession,
 ) -> list[BoardRow]:
+    """
+    Fetch all horizontal rows associated with a specific board.
+
+    :param board_id: The UUID of the board.
+    :param session: The active database session.
+    :return: A list of matching BoardRow records.
+    """
     statement = (
         select(BoardRow)
         .where(BoardRow.board_id == board_id)

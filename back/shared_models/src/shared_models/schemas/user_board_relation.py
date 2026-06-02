@@ -11,6 +11,16 @@ if TYPE_CHECKING:
 
 
 class UserBoardPermission(SQLModel, table=True):
+    """
+    Pivot table managing a user's role and permissions inside a specific board.
+
+    :param user_id: ID of the member user.
+    :param board_id: ID of the target board.
+    :param user_role_in_board: Specific access level role of the user on this board.
+    :param user: User instance linked to this permission.
+    :param board: Board instance linked to this permission.
+    """
+
     __tablename__ = "users_boards_permission"
 
     user_id: UUID = Field(foreign_key="users.id", primary_key=True)

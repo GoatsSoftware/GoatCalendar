@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:2ae3874fb830dcebf4355a81e2e8e067f734d3dd39218c86be3a38fa7ee22294"
+content_hash = "sha256:010eaff8140f6887cb9b23df8f2a8b78c2fe76a36bd29a5f03d37217d0d79a18"
 
 [[metadata.targets]]
 requires_python = ">=3.13"
@@ -464,7 +464,7 @@ files = [
 
 [[package]]
 name = "goat-calendar-auth-service"
-version = "0.1.1"
+version = "0.1.2"
 requires_python = ">=3.13"
 path = "../auth_service"
 summary = "Default template for PDM package"
@@ -480,7 +480,7 @@ dependencies = [
 
 [[package]]
 name = "goat-calendar-database-service"
-version = "0.1.2"
+version = "0.1.3"
 requires_python = ">=3.13"
 path = "../database_service"
 summary = "Default template for PDM package"
@@ -493,7 +493,7 @@ dependencies = [
 
 [[package]]
 name = "goat-calendar-shared-models"
-version = "0.1.6"
+version = "0.1.7"
 requires_python = ">=3.13"
 path = "../shared_models"
 summary = "Default template for PDM package"

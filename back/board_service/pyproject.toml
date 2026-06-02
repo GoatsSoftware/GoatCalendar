@@ -1,6 +1,6 @@
 [project]
 name = "goat-calendar-board-service"
-version = "0.1.2"
+version = "0.1.4"
 description = "Default template for PDM package"
 authors = [
     {name = "GoatsSoftware", email = "antonin.durand576@gmail.com"},
@@ -60,5 +60,5 @@ ignore = [
     "D100", # Missing docstring in public module
     "TRY003", # Avoid specifying long messages outside the exception class
     "EM101", # Exception must not use a string literal, assign to variable first,
-    "FAST001" # FastAPI routes with redundant `response_model` argument,
+    "FAST001" # FastAPI routes with redundant `response_model` argument
 ]

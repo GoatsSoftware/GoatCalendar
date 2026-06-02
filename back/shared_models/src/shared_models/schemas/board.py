@@ -5,15 +5,29 @@ from uuid import UUID, uuid4
 from sqlalchemy import Column, DateTime
 from sqlmodel import Field, Relationship, SQLModel
 
-from .user_board_relation import UserBoardPermission
-
 if TYPE_CHECKING:
     from .board_columns import BoardColumn
     from .board_event import BoardEvent
     from .user import User
+    from .user_board_relation import UserBoardPermission
 
 
 class Board(SQLModel, table=True):
+    """
+    Represent a project board within the application.
+
+    :param id: Unique identifier for the board.
+    :param name: Name of the board.
+    :param description: Short description of the board's purpose.
+    :param columns: List of columns associated with this board.
+    :param user_relations: List of user access permissions for this board.
+    :param events: List of calendar events linked to this board.
+    :param created_by_id: ID of the user who created the board.
+    :param created_by: User instance of the board creator.
+    :param created_at: Timestamp when the board was created.
+    :param updated_at: Timestamp when the board was last updated.
+    """
+
     __tablename__ = "boards"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)

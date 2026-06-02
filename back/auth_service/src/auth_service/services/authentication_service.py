@@ -103,8 +103,6 @@ async def check_auth_user(access_token: str, session: AsyncSession) -> UserAuthD
             "Email address and token type in jwt token access token must be set",
         )
 
-    print(email_address, token_type)
-
     # check provided token is an access token
     if token_type != TokenType.ACCESS:
         raise ValueError("Provided token must be an access token")

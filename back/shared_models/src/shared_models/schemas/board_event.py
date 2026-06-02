@@ -5,13 +5,29 @@ from uuid import UUID, uuid4
 from sqlalchemy import Column, DateTime
 from sqlmodel import Field, Relationship, SQLModel
 
-from .user import User
-
 if TYPE_CHECKING:
     from .board import Board
+    from .user import User
 
 
 class BoardEvent(SQLModel, table=True):
+    """
+    Represent a timeline event or milestone linked to a board.
+
+    :param id: Unique identifier for the event.
+    :param board_id: ID of the board this event belongs to.
+    :param board: Board instance associated with this event.
+    :param title: Title of the event.
+    :param description: Detailed description of the event.
+    :param starting_from: Start date of the event.
+    :param deadline: End or target date for the event.
+    :param version: Optimistic locking version number.
+    :param created_by_id: ID of the user who created the event.
+    :param created_by: User instance of the event creator.
+    :param created_at: Timestamp when the event was created.
+    :param updated_at: Timestamp when the event was last updated.
+    """
+
     __tablename__ = "board_events"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
@@ -27,7 +43,7 @@ class BoardEvent(SQLModel, table=True):
     version: int = Field(default=0, nullable=False)
 
     created_by_id: UUID = Field(foreign_key="users.id", nullable=False)
-    created_by: User = Relationship()
+    created_by: "User" = Relationship()
 
     created_at: datetime = Field(default_factory=datetime.now, nullable=False)
     updated_at: datetime = Field(

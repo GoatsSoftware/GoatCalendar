@@ -1,5 +1,6 @@
-from datetime import date
+from datetime import datetime
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
 from shared_models.enums import (
     BoardColumnName,
@@ -69,7 +70,17 @@ async def seed_users(session: AsyncSession) -> list[User]:
     return users
 
 
-async def seed_board_structure(session: AsyncSession, users: list[User]):
+async def seed_board_structure(session: AsyncSession, users: list[User]) -> Board:
+    """
+    Create a complete demo board structure with columns, rows, tasks, comments, and events.
+
+    This function sets up a standard board layout, generates a grid of dummy tasks,
+    adds calendar events, and assigns access permissions to the provided users.
+
+    :param session: The active database session.
+    :param users: The list of users to associate with the board.
+    :return: The newly created Board object.
+    """
     admin, editor, viewer = users
 
     # 1. Board
@@ -107,7 +118,7 @@ async def seed_board_structure(session: AsyncSession, users: list[User]):
     session.add_all(columns)
     await session.flush()
 
-    # 3. Rows + Tasks (5 rows × 5 tasks)
+    # 3. Rows + Tasks (5 rows x 5 tasks)
     rows = []
     tasks = []
 
@@ -129,7 +140,7 @@ async def seed_board_structure(session: AsyncSession, users: list[User]):
                 task_name=f"Task R{r + 1}-C{c + 1}",
                 task_content=f"Content row {r + 1} column {c + 1}",
                 task_status=BoardTaskStatus.PENDING,
-                deadline=date.today(),
+                deadline=datetime.now(tz=ZoneInfo("Europe/Paris")).date(),
                 assigned_to_id=viewer.id,
                 created_by_id=admin.id,
             )

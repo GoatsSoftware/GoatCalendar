@@ -18,12 +18,17 @@ db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 
 
 @route.get(
-    "/all",
+    "",
     status_code=status.HTTP_200_OK,
     response_model=list[User],
 )
 async def get_all_users(
     session: db_session_dependency,
 ) -> list[User]:
-    """ """
+    """
+    HTTP GET endpoint to fetch a complete list of all registered users.
+
+    :param session: The injected asynchronous database session dependency.
+    :return: A response list containing all users.
+    """
     return await user_service.get_all_users(session)

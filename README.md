@@ -44,6 +44,11 @@ pdm lock --dev -G:all
 pdm install --group test --group dev
 ```
 
+To update local dependancies :
+```bash
+pdm install --dev -G:all
+```
+
 To export dependancies for production (used automatically in dockerfile) :
 ```bash
 pdm export --pyproject --prod --group prod --format requirements --output requirements.txt --no-hashes
