@@ -1,0 +1,47 @@
+[project]
+name = "goat-calendar-shared-models"
+version = "0.1.7"
+description = "Default template for PDM package"
+authors = [
+    {name = "GoatsSoftware", email = "antonin.durand576@gmail.com"},
+]
+dependencies = ["pydantic>=2.13.4", "pydantic-settings>=2.14.1", "sqlmodel>=0.0.38", "ruff>=0.15.15"]
+requires-python = ">=3.13"
+readme = "./README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+includes = ["src/shared_models"]
+
+[tool.pdm.scripts]
+ruff_lint = "ruff check --fix"
+ruff_format = "ruff format"
+ruff_all = {composite = ["ruff_format", "ruff_lint"]}
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "E501",
+    "D212",
+    "D205",
+    "D203",
+    "FIX002",
+    "TD002",
+    "TD003",
+    "PIE796",
+    "G004",
+    "D401", # First line of docstring should be in imperative mood
+    "D104", # Missing docstring in public package
+    "D100", # Missing docstring in public module
+    "TRY003", # Avoid specifying long messages outside the exception class
+    "EM101", # Exception must not use a string literal, assign to variable first,
+    "FAST001" # FastAPI route with redundant `response_model` argument,
+]

@@ -1,0 +1,66 @@
+services:
+    mysql-db:
+        image: mysql:9.6.0
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: azerty
+            MYSQL_DATABASE: goatcalendar_db
+            MYSQL_USER: goatcalendar_user
+            MYSQL_PASSWORD: goatcalendar_passwd
+        volumes:
+            - mysql-data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$${MYSQL_ROOT_PASSWORD} --silent"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+            start_period: 40s
+
+    database-seed:
+        build:
+            context: .
+            dockerfile: production/Dockerfile.DatabaseService
+        depends_on:
+            mysql-db:
+                condition: service_healthy
+        restart: "no"
+
+    auth-service:
+        build:
+            context: .
+            dockerfile: production/Dockerfile.AuthService
+        ports:
+            - "5001:5001"
+        depends_on:
+            mysql-db:
+                condition: service_healthy
+            database-seed:
+                condition: service_completed_successfully
+
+    board-service:
+        build:
+            context: .
+            dockerfile: production/Dockerfile.BoardService
+        ports:
+            - "5002:5002"
+        depends_on:
+            mysql-db:
+                condition: service_healthy
+            database-seed:
+                condition: service_completed_successfully
+
+    # front-service:
+    #     build:
+    #         context: .
+    #         dockerfile: production/frontend.Dockerfile
+    #     ports:
+    #         - "5000:5000"
+    #     depends_on:
+    #         auth-service:
+    #             condition: service_started
+    #         board-service:
+    #             condition: service_started
+
+volumes:
+    mysql-data:

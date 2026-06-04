@@ -1,0 +1,39 @@
+# 1. Build
+FROM python:3.13-slim as builder
+
+# Update libs and install python pdm package
+RUN apt update && apt upgrade && \
+    python -m pip install --upgrade pip && \
+    python -m pip install pdm
+
+WORKDIR /app
+
+# Set env variables
+ENV PDM_CHECK_UPDATE=false
+
+# Import service conf
+COPY back/board_service/pyproject.toml back/board_service/pdm.lock .
+
+# Install service dependancies
+RUN pdm export --pyproject --prod --group prod --format requirements --output requirements.txt --no-hashes
+RUN python -m pip install -r requirements.txtd
+
+# 2. Run
+FROM python:3.13-slim as runner
+
+WORKDIR /app/back
+
+# Copy service libs
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy service source files
+COPY back/board_service /app/back/board_service
+
+# start service
+WORKDIR /app/back/board_service
+
+EXPOSE 5002
+
+ENTRYPOINT ["fastapi", "run", "main.py"]
+CMD ["--host", "0.0.0.0", "--port", "5002", "--workers", "4"]
