@@ -67,9 +67,7 @@ jobs:
       - name: Publish to PyPI
         run: |
           cd back/${{ matrix.service }}
-          # --no-comment instructs PDM to skip prompting for credentials,
-          # forcing it to use the OIDC token provided by GitHub Actions
-          pdm publish --no-comment
+          pdm publish
 
   build:
     runs-on: ubuntu-latest
@@ -127,7 +125,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./back/production/${{ matrix.dockerfile }}
+          file: ./production/${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

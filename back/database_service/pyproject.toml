@@ -1,6 +1,6 @@
 [project]
 name = "goat-calendar-database-service"
-version = "0.1.3"
+version = "0.1.4"
 description = "Default template for PDM package"
 authors = [
     {name = "GoatsSoftware", email = "antonin.durand576@gmail.com"},
@@ -15,7 +15,7 @@ test = [
     "ruff>=0.15.15",
 ]
 prod = [
-    "goat-calendar-shared-models>=0.1.5",
+    "goat-calendar-shared-models",
 ]
 
 [dependency-groups]

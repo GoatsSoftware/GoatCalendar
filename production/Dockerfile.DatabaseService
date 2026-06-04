@@ -30,12 +30,14 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy service source files
 COPY back/database_service /app/back/database_service
 
+WORKDIR /app/back/database_service
+
 # Copy env variables
-RUN rm *.env && \
+RUN rm -f .env && \
     echo 'ENV_MODE="prod"' > .env && \
     echo 'DB_DIALECT="mysql+aiomysql"' >> .env && \
     echo 'DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"' >> .env
 
-# start service
-WORKDIR /app/back/database_service
+ENV PYTHONPATH="/app/back/database_service/src"
+
 ENTRYPOINT ["python", "-m", "main"]
