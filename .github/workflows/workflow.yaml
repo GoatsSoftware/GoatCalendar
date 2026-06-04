@@ -45,8 +45,10 @@ jobs:
         service: [database_service, shared_models, auth_service, board_service]
 
     steps:
-      - name: Checkout code
+      - name: Checkout code (with full git history to compare versions)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -58,13 +60,50 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Build Package
+      - name: Check if version changed
+        id: check_version
         run: |
-          # Move into the service directory and build the wheel/sdist
+          cd back/${{ matrix.service }}
+          CURRENT_VERSION=$(pdm show --version)
+          
+          # Determine target branch to compare against (PR target or previous commit on Push)
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TARGET_REF="origin/${{ github.base_ref }}"
+          else
+            TARGET_REF="HEAD~1"
+          fi
+          
+          echo "Comparing current version against $TARGET_REF"
+          
+          # Checkout the old pyproject.toml to a temporary file
+          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > /tmp/old_pyproject.toml 2>/dev/null || true
+          
+          if [ -s /tmp/old_pyproject.toml ]; then
+            # Use PDM to read the version from the temporary file safely
+            OLD_VERSION=$(pdm --config /tmp/old_pyproject.toml show --version 2>/dev/null || echo "0.0.0")
+          else
+            OLD_VERSION="0.0.0"
+          fi
+          
+          echo "Old version: $OLD_VERSION"
+          echo "Current version: $CURRENT_VERSION"
+          
+          if [ "$CURRENT_VERSION" = "$OLD_VERSION" ]; then
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version has NOT changed. Skipping build/publish."
+          else
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $OLD_VERSION to $CURRENT_VERSION."
+          fi
+
+      - name: Build Package
+        if: steps.check_version.outputs.version_changed == 'true'
+        run: |
           cd back/${{ matrix.service }}
           pdm build
 
       - name: Publish to PyPI
+        if: steps.check_version.outputs.version_changed == 'true'
         run: |
           cd back/${{ matrix.service }}
           pdm publish
@@ -83,8 +122,10 @@ jobs:
             dockerfile: "Dockerfile.BoardService"
 
     steps:
-      - name: Checkout code
+      - name: Checkout code (with full git history to compare versions)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -96,21 +137,42 @@ jobs:
         with:
           python-version: '3.14'
 
-      - name: Extract Version from pyproject.toml
+      - name: Check if version changed & Extract Version
         id: get_version
         run: |
-          # Navigates to the service folder, gets the version via PDM, and stores it as an output
           cd back/${{ matrix.service }}
-          VERSION=$(pdm show --version)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          CURRENT_VERSION=$(pdm show --version)
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TARGET_REF="origin/${{ github.base_ref }}"
+          else
+            TARGET_REF="HEAD~1"
+          fi
+          
+          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > /tmp/old_pyproject.toml 2>/dev/null || true
+          
+          if [ -s /tmp/old_pyproject.toml ]; then
+            OLD_VERSION=$(pdm --config /tmp/old_pyproject.toml show --version 2>/dev/null || echo "0.0.0")
+          else
+            OLD_VERSION="0.0.0"
+          fi
+          
+          if [ "$CURRENT_VERSION" = "$OLD_VERSION" ]; then
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Log in to Docker Hub
+        if: steps.get_version.outputs.version_changed == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Extract metadata (tags, labels) for Docker
+        if: steps.get_version.outputs.version_changed == 'true'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -121,6 +183,7 @@ jobs:
             type=sha,format=long
 
       - name: Build and push Docker image
+        if: steps.get_version.outputs.version_changed == 'true'
         id: push
         uses: docker/build-push-action@v5
         with:
@@ -131,59 +194,9 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Generate artifact attestation
+        if: steps.get_version.outputs.version_changed == 'true'
         uses: actions/attest-build-provenance@v1
         with:
           subject-name: index.docker.io/antonind5/goat-calendar-${{ matrix.service }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
-
-  # build:
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 30
-
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v6
-    
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v6
-  #       with:
-  #         python-version: '3.14' 
-
-  #     - name: Run Tests with Coverage
-  #       run: |
-  #         cd ./HelloWorldService
-  #         pip install -r requirements.txt
-  #         python -m pytest
-
-  #     - name: Log in to Docker Hub
-  #       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-  #       with:
-  #         username: ${{ secrets.DOCKER_USERNAME }}
-  #         password: ${{ secrets.DOCKER_PASSWORD }}
-
-  #     - name: Extract metadata (tags, labels) for Docker
-  #       id: meta
-  #       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-  #       with:
-  #         images: antonind5/goat-calendar-auth-service
-  #         tags: |
-  #           type=raw,value=latest
-  #           type=sha,format=long
-
-  #     - name: Build and push Docker image
-  #       id: push
-  #       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-  #       with:
-  #         context: HelloWorldService
-  #         file: ./HelloWorldService/Dockerfile
-  #         push: true
-  #         tags: ${{ steps.meta.outputs.tags }}
-  #         labels: ${{ steps.meta.outputs.labels }}
-
-  #     - name: Generate artifact attestation
-  #       uses: actions/attest@v4
-  #       with:
-  #         subject-name: index.docker.io/antonind5/py3.14-fastapi
-  #         subject-digest: ${{ steps.push.outputs.digest }}
-  #         push-to-registry: true
