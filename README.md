@@ -10,6 +10,8 @@
 
 # Installation en dev
 
+https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/ci-based-analysis/gitlab-ci
+
 ## Back
 
 To create mysql container for project:
@@ -68,6 +70,7 @@ DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 
 ```bash
 ENV_MODE="prod"
+
 DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 SERVER_HOST="127.0.0.1"

@@ -1,0 +1,218 @@
+name: CI - Services Integration Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+  id-token: write
+  attestations: write
+  pull-requests: write
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v6.0.0
+      with:
+          args: >
+            -Dsonar.projectVersion=${{ github.sha }}
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  publish-pypi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: pypi
+      url: https://pypi.org/p/${{ matrix.service }}
+    permissions:
+      id-token: write
+      contents: read
+
+    strategy:
+      matrix:
+        service: [database_service, shared_models, auth_service, board_service]
+
+    steps:
+      - name: Checkout code (with full git history to compare versions)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: '3.14'
+
+      - name: Check if version changed
+        id: check_version
+        run: |
+          cd back/${{ matrix.service }}
+          CURRENT_VERSION=$(pdm show --version)
+          
+          # Determine target branch to compare against (PR target or previous commit on Push)
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TARGET_REF="origin/${{ github.base_ref }}"
+          else
+            TARGET_REF="HEAD~1"
+          fi
+          
+          echo "Comparing current version against $TARGET_REF"
+          
+          # Checkout the old pyproject.toml to a temporary file
+          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > pyproject.toml.old 2>/dev/null || true
+          
+          if [ -s pyproject.toml.old ]; then
+            mv pyproject.toml pyproject.toml.new
+            mv pyproject.toml.old pyproject.toml
+            # Use PDM to read the version from the temporary file safely
+            OLD_VERSION=$(pdm show --version 2>/dev/null || echo "0.0.0")
+            mv pyproject.toml.new pyproject.toml
+          else
+            OLD_VERSION="0.0.0"
+          fi
+          
+          echo "Old version: $OLD_VERSION"
+          echo "Current version: $CURRENT_VERSION"
+          
+          if [ "$CURRENT_VERSION" = "$OLD_VERSION" ]; then
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version has NOT changed. Skipping build/publish."
+          else
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $OLD_VERSION to $CURRENT_VERSION."
+          fi
+
+      - name: Build Package
+        if: steps.check_version.outputs.version_changed == 'true'
+        run: |
+          cd back/${{ matrix.service }}
+          pdm build
+
+      - name: Publish to PyPI
+        if: steps.check_version.outputs.version_changed == 'true'
+        run: |
+          cd back/${{ matrix.service }}
+          pdm publish
+
+  publish-dockerhub:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [publish-pypi]
+    strategy:
+      matrix:
+        include:
+          - service: "database_service"
+            dockerfile: "Dockerfile.DatabaseService"
+          - service: "auth_service"
+            dockerfile: "Dockerfile.AuthService"
+          - service: "board_service"
+            dockerfile: "Dockerfile.BoardService"
+
+    steps:
+      - name: Checkout code (with full git history to compare versions)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: '3.14'
+
+      - name: Check if version changed & Extract Version
+        id: get_version
+        run: |
+          cd back/${{ matrix.service }}
+          CURRENT_VERSION=$(pdm show --version)
+          
+          # Determine target branch to compare against (PR target or previous commit on Push)
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TARGET_REF="origin/${{ github.base_ref }}"
+          else
+            TARGET_REF="HEAD~1"
+          fi
+          
+          echo "Comparing current version against $TARGET_REF"
+          
+          # Checkout the old pyproject.toml to a temporary file
+          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > pyproject.toml.old 2>/dev/null || true
+          
+          if [ -s pyproject.toml.old ]; then
+            mv pyproject.toml pyproject.toml.new
+            mv pyproject.toml.old pyproject.toml
+            # Use PDM to read the version from the temporary file safely
+            OLD_VERSION=$(pdm show --version 2>/dev/null || echo "0.0.0")
+            mv pyproject.toml.new pyproject.toml
+          else
+            OLD_VERSION="0.0.0"
+          fi
+          
+          echo "Old version: $OLD_VERSION"
+          echo "Current version: $CURRENT_VERSION"
+          
+          if [ "$CURRENT_VERSION" = "$OLD_VERSION" ]; then
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version has NOT changed. Skipping build/publish."
+          else
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $OLD_VERSION to $CURRENT_VERSION."
+          fi
+
+      - name: Log in to Docker Hub
+        if: steps.get_version.outputs.version_changed == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        if: steps.get_version.outputs.version_changed == 'true'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: antonind5/goat-calendar-${{ matrix.service }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=${{ steps.get_version.outputs.version }}
+            type=sha,format=long
+
+      - name: Build and push Docker image
+        if: steps.get_version.outputs.version_changed == 'true'
+        id: push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./production/${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Generate artifact attestation
+        if: steps.get_version.outputs.version_changed == 'true'
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: index.docker.io/antonind5/goat-calendar-${{ matrix.service }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
