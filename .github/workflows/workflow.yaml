@@ -76,11 +76,14 @@ jobs:
           echo "Comparing current version against $TARGET_REF"
           
           # Checkout the old pyproject.toml to a temporary file
-          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > /tmp/old_pyproject.toml 2>/dev/null || true
+          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > pyproject.toml.old 2>/dev/null || true
           
-          if [ -s /tmp/old_pyproject.toml ]; then
+          if [ -s pyproject.toml.old ]; then
+            mv pyproject.toml pyproject.toml.new
+            mv pyproject.toml.old pyproject.toml
             # Use PDM to read the version from the temporary file safely
-            OLD_VERSION=$(pdm --config /tmp/old_pyproject.toml show --version 2>/dev/null || echo "0.0.0")
+            OLD_VERSION=$(pdm show --version 2>/dev/null || echo "0.0.0")
+            mv pyproject.toml.new pyproject.toml
           else
             OLD_VERSION="0.0.0"
           fi
@@ -142,26 +145,38 @@ jobs:
         run: |
           cd back/${{ matrix.service }}
           CURRENT_VERSION=$(pdm show --version)
-          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           
+          # Determine target branch to compare against (PR target or previous commit on Push)
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             TARGET_REF="origin/${{ github.base_ref }}"
           else
             TARGET_REF="HEAD~1"
           fi
           
-          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > /tmp/old_pyproject.toml 2>/dev/null || true
+          echo "Comparing current version against $TARGET_REF"
           
-          if [ -s /tmp/old_pyproject.toml ]; then
-            OLD_VERSION=$(pdm --config /tmp/old_pyproject.toml show --version 2>/dev/null || echo "0.0.0")
+          # Checkout the old pyproject.toml to a temporary file
+          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > pyproject.toml.old 2>/dev/null || true
+          
+          if [ -s pyproject.toml.old ]; then
+            mv pyproject.toml pyproject.toml.new
+            mv pyproject.toml.old pyproject.toml
+            # Use PDM to read the version from the temporary file safely
+            OLD_VERSION=$(pdm show --version 2>/dev/null || echo "0.0.0")
+            mv pyproject.toml.new pyproject.toml
           else
             OLD_VERSION="0.0.0"
           fi
           
+          echo "Old version: $OLD_VERSION"
+          echo "Current version: $CURRENT_VERSION"
+          
           if [ "$CURRENT_VERSION" = "$OLD_VERSION" ]; then
             echo "version_changed=false" >> $GITHUB_OUTPUT
+            echo "Version has NOT changed. Skipping build/publish."
           else
             echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "Version changed from $OLD_VERSION to $CURRENT_VERSION."
           fi
 
       - name: Log in to Docker Hub
