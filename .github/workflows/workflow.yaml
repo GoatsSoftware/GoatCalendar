@@ -2,7 +2,7 @@ name: CI - Services Integration Tests
 
 on:
   push:
-    branches: [ main, develop, feature/services_deploiement ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
 
