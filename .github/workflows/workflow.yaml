@@ -67,12 +67,13 @@ jobs:
           CURRENT_VERSION=$(pdm show --version)
           
           # Determine target branch to compare against (PR target or previous commit on Push)
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            TARGET_REF="origin/${{ github.base_ref }}"
-          else
-            TARGET_REF="HEAD~1"
-          fi
-          
+          # if [ "${{ github.event_name }}" = "pull_request" ]; then
+          #   TARGET_REF="origin/${{ github.base_ref }}"
+          # else
+          #   TARGET_REF="HEAD~1"
+          # fi
+          TARGET_REF="HEAD~1"
+
           echo "Comparing current version against $TARGET_REF"
           
           # Checkout the old pyproject.toml to a temporary file
@@ -148,12 +149,13 @@ jobs:
           CURRENT_VERSION=$(pdm show --version)
           
           # Determine target branch to compare against (PR target or previous commit on Push)
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            TARGET_REF="origin/${{ github.base_ref }}"
-          else
-            TARGET_REF="HEAD~1"
-          fi
-          
+          # if [ "${{ github.event_name }}" = "pull_request" ]; then
+          #   TARGET_REF="origin/${{ github.base_ref }}"
+          # else
+          #   TARGET_REF="HEAD~1"
+          # fi
+          TARGET_REF
+
           echo "Comparing current version against $TARGET_REF"
           
           # Checkout the old pyproject.toml to a temporary file
