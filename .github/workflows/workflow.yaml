@@ -111,9 +111,10 @@ jobs:
           cd back/${{ matrix.service }}
           pdm publish
 
-  build:
+  publish-dockerhub:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: [publish-pypi]
     strategy:
       matrix:
         include:
