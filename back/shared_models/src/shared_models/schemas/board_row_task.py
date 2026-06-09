@@ -59,7 +59,7 @@ class BoardRowTask(SQLModel, table=True):
     starting_from: date = Field(default_factory=date.today, nullable=False)
     deadline: date = Field(nullable=False)
 
-    version: int = Field(default=0, nullable=False)
+    version: int = Field(default=1, nullable=False)
 
     assigned_to_id: UUID = Field(foreign_key="users.id", nullable=False)
     assigned_to: "User" = Relationship(

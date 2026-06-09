@@ -5,6 +5,12 @@ from shared_models.schemas import BoardRow
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from board_service.repositories import board_row_repository
+from board_service.services.exceptions import ConcurrencyException
+from shared_models.dtos.board_row_task_in_dto import (
+    BoardRowTaskCreateDTO,
+    BoardRowTaskUpdateDTO,
+)
+from shared_models.schemas import BoardRowTask
 
 
 async def get_board_row_by_id(board_row_id: UUID, session: AsyncSession) -> BoardRow:
@@ -71,3 +77,38 @@ async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> None:
         board_row_id=board_row_id,
         session=session,
     )
+
+
+async def create_board_row_task(
+    task_data: BoardRowTaskCreateDTO, created_by_id: UUID, session: AsyncSession
+) -> BoardRowTask:
+    task_payload = task_data.model_dump(exclude_none=True)
+    task_payload["created_by_id"] = created_by_id
+    task_payload["version"] = 1
+    return await board_row_repository.create_board_row_task(
+        task_payload,
+        session=session,
+    )
+
+
+async def update_board_row_task(
+    task_id: UUID, task_data: BoardRowTaskUpdateDTO, session: AsyncSession
+) -> BoardRowTask:
+    task_payload = task_data.model_dump(exclude_none=True)
+    version_from_client = task_payload.pop("version")
+
+    updated_task = await board_row_repository.update_board_row_task_with_version(
+        task_id=task_id,
+        updated_data=task_payload,
+        version_from_client=version_from_client,
+        session=session,
+    )
+
+    if updated_task is None:
+        raise ConcurrencyException("Task version mismatch")
+
+    return updated_task
+
+
+async def delete_board_row_task(task_id: UUID, session: AsyncSession) -> None:
+    await board_row_repository.delete_board_row_task(task_id=task_id, session=session)
