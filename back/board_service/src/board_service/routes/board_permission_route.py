@@ -24,11 +24,11 @@ route = APIRouter(
 
 db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 user_connected_dependency = Annotated[UserAuthDTO, Depends(get_current_user)]
+PERMISSION_NOT_FOUND_DETAIL = "Permission not found"
 
 
 @route.get(
     "/{board_id}/permissions",
-    response_model=list[BoardPermissionOutDTO],
     status_code=status.HTTP_200_OK,
 )
 async def get_board_permissions(
@@ -44,7 +44,6 @@ async def get_board_permissions(
 
 @route.get(
     "/{board_id}/permissions/{user_id}",
-    response_model=BoardPermissionOutDTO,
     status_code=status.HTTP_200_OK,
 )
 async def get_board_permission(
@@ -60,7 +59,10 @@ async def get_board_permission(
             session=session,
         )
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Permission not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=PERMISSION_NOT_FOUND_DETAIL,
+        ) from exception
 
 
 @route.post("/{board_id}/permissions", status_code=status.HTTP_201_CREATED)
@@ -94,7 +96,10 @@ async def update_user_board_permission(
             session=session,
         )
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Permission not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=PERMISSION_NOT_FOUND_DETAIL,
+        ) from exception
 
 
 @route.delete("/{board_id}/permissions/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -112,4 +117,7 @@ async def remove_user_from_board(
         )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Permission not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=PERMISSION_NOT_FOUND_DETAIL,
+        ) from exception

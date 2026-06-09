@@ -2,14 +2,13 @@ from typing import Annotated
 
 from database_service.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException
-from shared_models.schemas import User
-from sqlmodel.ext.asyncio.session import AsyncSession
-from starlette import status
-from sqlalchemy.exc import NoResultFound
-
+from auth_service.routes.authentication_route import get_current_user
 from auth_service.services import user_service
 from shared_models.dtos.user_auth_dto import UserAuthDTO
-from auth_service.routes.authentication_route import get_current_user
+from shared_models.schemas import User
+from sqlalchemy.exc import NoResultFound
+from sqlmodel.ext.asyncio.session import AsyncSession
+from starlette import status
 
 route = APIRouter(
     prefix="/users",
@@ -18,12 +17,17 @@ route = APIRouter(
 )
 
 db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
+current_user_dependency = Annotated[UserAuthDTO, Depends(get_current_user)]
+MIN_SEARCH_QUERY_LENGTH = 2
+SEARCH_QUERY_TOO_SHORT_DETAIL = (
+    f"Search query must be at least {MIN_SEARCH_QUERY_LENGTH} characters"
+)
+USER_NOT_FOUND_DETAIL = "User not found"
 
 
 @route.get(
     "",
     status_code=status.HTTP_200_OK,
-    response_model=list[User],
 )
 async def get_all_users(
     session: db_session_dependency,
@@ -37,37 +41,52 @@ async def get_all_users(
     return await user_service.get_all_users(session)
 
 
-@route.get("/me", status_code=status.HTTP_200_OK, response_model=User)
+@route.get("/me", status_code=status.HTTP_200_OK)
 async def get_me(
-    current_user: UserAuthDTO = Depends(get_current_user),
-) -> User:
+    current_user: current_user_dependency,
+) -> UserAuthDTO:
     """Get the authenticated user's profile."""
     return current_user
 
 
-@route.get("/search", status_code=status.HTTP_200_OK, response_model=list[User])
+@route.get(
+    "/search",
+    status_code=status.HTTP_200_OK,
+    responses={400: {"description": SEARCH_QUERY_TOO_SHORT_DETAIL}},
+)
 async def search_users(
     q: str,
     session: db_session_dependency,
 ) -> list[User]:
     """Search for users by name or email."""
-    if not q or len(q.strip()) < 2:
+    if not q or len(q.strip()) < MIN_SEARCH_QUERY_LENGTH:
         raise HTTPException(
-            status_code=400,
-            detail="Search query must be at least 2 characters",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=SEARCH_QUERY_TOO_SHORT_DETAIL,
         )
     return await user_service.search_users(q, session)
 
 
-@route.put("/me", status_code=status.HTTP_200_OK, response_model=User)
+@route.put(
+    "/me",
+    status_code=status.HTTP_200_OK,
+    responses={
+        400: {"description": "Invalid user update payload"},
+        404: {"description": USER_NOT_FOUND_DETAIL},
+    },
+)
 async def update_me(
     user_update: dict,
-    current_user: UserAuthDTO = Depends(get_current_user),
+    session: db_session_dependency,
+    current_user: current_user_dependency,
 ) -> User:
     """Update current user's profile (limited fields like display name)."""
     try:
         return await user_service.update_user(current_user.id, user_update, session)
-    except NoResultFound:
-        raise HTTPException(status_code=404, detail="User not found")
+    except NoResultFound as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=USER_NOT_FOUND_DETAIL,
+        ) from exception
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

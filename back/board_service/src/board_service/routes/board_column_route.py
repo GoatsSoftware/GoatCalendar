@@ -7,7 +7,6 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from shared_models.dtos.board_column_in_dto import BoardColumnCreateDTO, BoardColumnUpdateDTO
 from shared_models.dtos.board_column_out_dto import BoardColumnOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
-from shared_models.schemas import BoardColumn
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
@@ -22,37 +21,40 @@ route = APIRouter(
 
 db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 user_connected_dependency = Annotated[UserAuthDTO, Depends(get_current_user)]
+COLUMN_NOT_FOUND_DETAIL = "Column not found"
 
 
 @route.get(
     "/board/{board_id}",
-    response_model=list[BoardColumnOutDTO],
     status_code=status.HTTP_200_OK,
 )
 async def get_board_columns_by_board_id(
     board_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> list[BoardColumn]:
+) -> list[BoardColumnOutDTO]:
     return await board_service.get_board_columns_by_board_id(
         board_id=board_id,
         session=session,
     )
 
 
-@route.get("/{column_id}", response_model=BoardColumnOutDTO, status_code=status.HTTP_200_OK)
+@route.get("/{column_id}", status_code=status.HTTP_200_OK)
 async def get_board_column_by_id(
     column_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> BoardColumn:
+) -> BoardColumnOutDTO:
     try:
         return await board_service.get_board_column_by_id(
             column_id=column_id,
             session=session,
         )
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Column not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=COLUMN_NOT_FOUND_DETAIL,
+        ) from exception
 
 
 @route.post("", status_code=status.HTTP_201_CREATED)
@@ -82,7 +84,10 @@ async def update_board_column(
             session=session,
         )
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Column not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=COLUMN_NOT_FOUND_DETAIL,
+        ) from exception
 
 
 @route.delete("/{column_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -98,4 +103,7 @@ async def delete_board_column(
         )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Column not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=COLUMN_NOT_FOUND_DETAIL,
+        ) from exception

@@ -10,7 +10,6 @@ from shared_models.dtos.board_row_comment_in_dto import (
 )
 from shared_models.dtos.board_row_comment_out_dto import BoardRowCommentOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
-from shared_models.schemas import BoardRowComment
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
@@ -25,37 +24,39 @@ route = APIRouter(
 
 db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 user_connected_dependency = Annotated[UserAuthDTO, Depends(get_current_user)]
+COMMENT_NOT_FOUND_DETAIL = "Comment not found"
 
 
 @route.get(
     "/{comment_id}",
-    response_model=BoardRowCommentOutDTO,
     status_code=status.HTTP_200_OK,
 )
 async def get_board_row_comment_by_id(
     comment_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> BoardRowComment:
+) -> BoardRowCommentOutDTO:
     try:
         return await board_row_service.get_board_row_comment_by_id(
             comment_id=comment_id,
             session=session,
         )
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=COMMENT_NOT_FOUND_DETAIL,
+        ) from exception
 
 
 @route.get(
     "/board-row/{board_row_id}",
-    response_model=list[BoardRowCommentOutDTO],
     status_code=status.HTTP_200_OK,
 )
 async def get_board_row_comments_by_board_row_id(
     board_row_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> list[BoardRowComment]:
+) -> list[BoardRowCommentOutDTO]:
     return await board_row_service.get_board_row_comments_by_board_row_id(
         board_row_id=board_row_id,
         session=session,
@@ -89,7 +90,10 @@ async def update_board_row_comment(
             session=session,
         )
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=COMMENT_NOT_FOUND_DETAIL,
+        ) from exception
 
 
 @route.delete("/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -105,4 +109,7 @@ async def delete_board_row_comment(
         )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=COMMENT_NOT_FOUND_DETAIL,
+        ) from exception

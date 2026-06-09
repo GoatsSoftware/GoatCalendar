@@ -21,9 +21,10 @@ route = APIRouter(
 
 db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 user_connected_dependency = Annotated[UserAuthDTO, Depends(get_current_user)]
+EVENT_NOT_FOUND_DETAIL = "Event not found"
 
 
-@route.get("/{event_id}", response_model=BoardEventOutDTO, status_code=status.HTTP_200_OK)
+@route.get("/{event_id}", status_code=status.HTTP_200_OK)
 async def get_board_event_by_id(
     event_id: UUID,
     session: db_session_dependency,
@@ -35,12 +36,14 @@ async def get_board_event_by_id(
             session=session,
         )
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=EVENT_NOT_FOUND_DETAIL,
+        ) from exception
 
 
 @route.get(
     "/board/{board_id}",
-    response_model=list[BoardEventOutDTO],
     status_code=status.HTTP_200_OK,
 )
 async def get_board_events_by_board_id(
@@ -81,7 +84,10 @@ async def update_board_event(
             session=session,
         )
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=EVENT_NOT_FOUND_DETAIL,
+        ) from exception
 
 
 @route.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -97,4 +103,7 @@ async def delete_board_event(
         )
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except NoResultFound as exception:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found") from exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=EVENT_NOT_FOUND_DETAIL,
+        ) from exception
