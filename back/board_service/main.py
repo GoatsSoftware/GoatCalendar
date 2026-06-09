@@ -20,7 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(monitoring_route.route)
-app.include_router(board_route.route)
-app.include_router(board_row_route.route)
-app.include_router(board_row_task_route.route)
+app.include_router(monitoring_route)
+app.include_router(board_route)
+app.include_router(board_row_route)
+app.include_router(board_row_task_route)
