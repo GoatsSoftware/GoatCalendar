@@ -2,7 +2,16 @@ from fastapi import FastAPI
 from shared_models.models.server_settings import get_server_settings
 from starlette.middleware.cors import CORSMiddleware
 
-from board_service.routes import board_route, board_row_route, monitoring_route, board_row_task_route
+from board_service.routes import (
+    board_route,
+    board_row_route,
+    monitoring_route,
+    board_row_task_route,
+    board_column_route,
+    board_row_comment_route,
+    board_event_route,
+    board_permission_route,
+)
 
 SERVER_SETTINGS = get_server_settings()
 
@@ -24,3 +33,7 @@ app.include_router(monitoring_route)
 app.include_router(board_route)
 app.include_router(board_row_route)
 app.include_router(board_row_task_route)
+app.include_router(board_column_route)
+app.include_router(board_row_comment_route)
+app.include_router(board_event_route)
+app.include_router(board_permission_route)
