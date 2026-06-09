@@ -20,7 +20,6 @@ db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 async def create_board_event(
     event_data: BoardEventCreateDTO,
     current_user: UserAuthDTO = Depends(get_current_user),
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Create a new board event/milestone."""
     try:
@@ -37,7 +36,6 @@ async def create_board_event(
 async def update_board_event(
     event_id: UUID,
     event_data: BoardEventUpdateDTO,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Update a board event."""
     try:
@@ -55,7 +53,6 @@ async def update_board_event(
 @route.delete("/{event_id}")
 async def delete_board_event(
     event_id: UUID,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Delete a board event."""
     try:

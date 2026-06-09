@@ -20,7 +20,6 @@ db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 async def create_board_column(
     column_data: BoardColumnCreateDTO,
     current_user: UserAuthDTO = Depends(get_current_user),
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Create a new board column."""
     try:
@@ -37,7 +36,6 @@ async def create_board_column(
 async def update_board_column(
     column_id: UUID,
     column_data: BoardColumnUpdateDTO,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Update a board column."""
     try:
@@ -55,7 +53,6 @@ async def update_board_column(
 @route.delete("/{column_id}")
 async def delete_board_column(
     column_id: UUID,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Delete a board column."""
     try:

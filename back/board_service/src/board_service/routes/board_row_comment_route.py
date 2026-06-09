@@ -20,7 +20,6 @@ db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 async def create_board_row_comment(
     comment_data: BoardRowCommentCreateDTO,
     current_user: UserAuthDTO = Depends(get_current_user),
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Create a new comment on a board row."""
     try:
@@ -37,7 +36,6 @@ async def create_board_row_comment(
 async def update_board_row_comment(
     comment_id: UUID,
     comment_data: BoardRowCommentUpdateDTO,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Update a board row comment."""
     try:
@@ -55,7 +53,6 @@ async def update_board_row_comment(
 @route.delete("/{comment_id}")
 async def delete_board_row_comment(
     comment_id: UUID,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Delete a board row comment."""
     try:

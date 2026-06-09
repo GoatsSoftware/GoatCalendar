@@ -18,7 +18,6 @@ db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 async def add_user_to_board(
     board_id: UUID,
     permission_data: BoardPermissionCreateDTO,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Add a user to a board with a specific role."""
     try:
@@ -37,7 +36,6 @@ async def update_user_board_permission(
     board_id: UUID,
     user_id: UUID,
     permission_data: BoardPermissionUpdateDTO,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Update a user's role in a board."""
     try:
@@ -57,7 +55,6 @@ async def update_user_board_permission(
 async def remove_user_from_board(
     board_id: UUID,
     user_id: UUID,
-    session: db_session_dependency = Depends(get_db_session),
 ):
     """Remove a user from a board."""
     try:
