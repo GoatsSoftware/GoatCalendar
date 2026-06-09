@@ -33,6 +33,14 @@ async def get_board_columns_by_board_id(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> list[BoardColumnOutDTO]:
+    """
+    HTTP GET endpoint to fetch all columns belonging to a board.
+
+    :param board_id: The UUID of the parent board.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: A list of matching board column DTOs.
+    """
     return await board_service.get_board_columns_by_board_id(
         board_id=board_id,
         session=session,
@@ -45,6 +53,15 @@ async def get_board_column_by_id(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> BoardColumnOutDTO:
+    """
+    HTTP GET endpoint to fetch a single board column by its ID.
+
+    :param column_id: The UUID of the requested column.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The matching board column DTO.
+    :raises HTTPException: 404 error if the column does not exist.
+    """
     try:
         return await board_service.get_board_column_by_id(
             column_id=column_id,
@@ -63,6 +80,14 @@ async def create_board_column(
     session: db_session_dependency,
     current_user: user_connected_dependency,
 ):
+    """
+    HTTP POST endpoint to create a new board column.
+
+    :param column_data: The validated payload describing the new column.
+    :param session: The injected database session.
+    :param current_user: The authenticated user creating the column.
+    :return: The newly created board column model.
+    """
     return await board_service.create_board_column(
         column_data=column_data,
         created_by_id=current_user.id,
@@ -77,6 +102,16 @@ async def update_board_column(
     session: db_session_dependency,
     _: user_connected_dependency,
 ):
+    """
+    HTTP PUT endpoint to update an existing board column.
+
+    :param column_id: The UUID of the column to update.
+    :param column_data: The validated payload containing updated column values.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The updated board column model.
+    :raises HTTPException: 404 error if the column does not exist.
+    """
     try:
         return await board_service.update_board_column(
             column_id=column_id,
@@ -96,6 +131,15 @@ async def delete_board_column(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> Response:
+    """
+    HTTP DELETE endpoint to remove a board column.
+
+    :param column_id: The UUID of the column to delete.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: An empty HTTP 204 response.
+    :raises HTTPException: 404 error if the column does not exist.
+    """
     try:
         await board_service.delete_board_column(
             column_id=column_id,

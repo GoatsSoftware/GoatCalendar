@@ -30,6 +30,15 @@ async def get_board_event_by_id(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> BoardEventOutDTO:
+    """
+    HTTP GET endpoint to fetch a single board event by its ID.
+
+    :param event_id: The UUID of the requested event.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The matching board event DTO.
+    :raises HTTPException: 404 error if the event does not exist.
+    """
     try:
         return await board_service.get_board_event_by_id(
             event_id=event_id,
@@ -51,6 +60,14 @@ async def get_board_events_by_board_id(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> list[BoardEventOutDTO]:
+    """
+    HTTP GET endpoint to fetch all events belonging to a board.
+
+    :param board_id: The UUID of the parent board.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: A list of matching board event DTOs.
+    """
     return await board_service.get_board_events_by_board_id(
         board_id=board_id,
         session=session,
@@ -63,6 +80,14 @@ async def create_board_event(
     session: db_session_dependency,
     current_user: user_connected_dependency,
 ):
+    """
+    HTTP POST endpoint to create a new board event.
+
+    :param event_data: The validated payload describing the new event.
+    :param session: The injected database session.
+    :param current_user: The authenticated user creating the event.
+    :return: The newly created board event model.
+    """
     return await board_service.create_board_event(
         event_data=event_data,
         created_by_id=current_user.id,
@@ -77,6 +102,16 @@ async def update_board_event(
     session: db_session_dependency,
     _: user_connected_dependency,
 ):
+    """
+    HTTP PUT endpoint to update an existing board event.
+
+    :param event_id: The UUID of the event to update.
+    :param event_data: The validated payload containing updated event values.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The updated board event model.
+    :raises HTTPException: 404 error if the event does not exist.
+    """
     try:
         return await board_service.update_board_event(
             event_id=event_id,
@@ -96,6 +131,15 @@ async def delete_board_event(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> Response:
+    """
+    HTTP DELETE endpoint to remove a board event.
+
+    :param event_id: The UUID of the event to delete.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: An empty HTTP 204 response.
+    :raises HTTPException: 404 error if the event does not exist.
+    """
     try:
         await board_service.delete_board_event(
             event_id=event_id,

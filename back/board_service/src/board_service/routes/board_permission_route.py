@@ -36,6 +36,14 @@ async def get_board_permissions(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> list[BoardPermissionOutDTO]:
+    """
+    HTTP GET endpoint to fetch all permissions attached to a board.
+
+    :param board_id: The UUID of the parent board.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: A list of matching board permission DTOs.
+    """
     return await board_service.get_board_permissions_by_board_id(
         board_id=board_id,
         session=session,
@@ -52,6 +60,16 @@ async def get_board_permission(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> BoardPermissionOutDTO:
+    """
+    HTTP GET endpoint to fetch a specific board permission.
+
+    :param board_id: The UUID of the target board.
+    :param user_id: The UUID of the target user.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The matching board permission DTO.
+    :raises HTTPException: 404 error if the permission does not exist.
+    """
     try:
         return await board_service.get_board_permission(
             board_id=board_id,
@@ -72,6 +90,15 @@ async def add_user_to_board(
     session: db_session_dependency,
     _: user_connected_dependency,
 ):
+    """
+    HTTP POST endpoint to grant a user access to a board.
+
+    :param board_id: The UUID of the target board.
+    :param permission_data: The validated payload describing the granted role.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The newly created permission model.
+    """
     permission_payload = permission_data.model_dump(exclude_none=True)
     permission_payload["board_id"] = board_id
     return await board_service.add_user_to_board(
@@ -88,6 +115,17 @@ async def update_user_board_permission(
     session: db_session_dependency,
     _: user_connected_dependency,
 ):
+    """
+    HTTP PUT endpoint to update a user's role on a board.
+
+    :param board_id: The UUID of the target board.
+    :param user_id: The UUID of the target user.
+    :param permission_data: The validated payload containing updated role data.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The updated permission model.
+    :raises HTTPException: 404 error if the permission does not exist.
+    """
     try:
         return await board_service.update_user_board_permission(
             board_id=board_id,
@@ -109,6 +147,16 @@ async def remove_user_from_board(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> Response:
+    """
+    HTTP DELETE endpoint to remove a user's permission from a board.
+
+    :param board_id: The UUID of the target board.
+    :param user_id: The UUID of the target user.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: An empty HTTP 204 response.
+    :raises HTTPException: 404 error if the permission does not exist.
+    """
     try:
         await board_service.remove_user_from_board(
             board_id=board_id,

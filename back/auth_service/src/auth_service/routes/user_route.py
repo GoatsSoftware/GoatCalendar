@@ -43,7 +43,12 @@ async def get_all_users(
 async def get_me(
     current_user: current_user_dependency,
 ) -> UserAuthDTO:
-    """Get the authenticated user's profile."""
+    """
+    HTTP GET endpoint to fetch the profile of the authenticated user.
+
+    :param current_user: The authenticated user dependency.
+    :return: The data transfer object of the currently authenticated user.
+    """
     return current_user
 
 
@@ -55,7 +60,13 @@ async def search_users(
     search_query: search_users_query_dependency,
     session: db_session_dependency,
 ) -> list[User]:
-    """Search for users by name or email."""
+    """
+    HTTP GET endpoint to search users by name or email.
+
+    :param search_query: The validated query parameters for the search operation.
+    :param session: The injected asynchronous database session dependency.
+    :return: A list of users matching the search query.
+    """
     return await user_service.search_users(search_query.q, session)
 
 
@@ -72,7 +83,16 @@ async def update_me(
     session: db_session_dependency,
     current_user: current_user_dependency,
 ) -> User:
-    """Update current user's profile (limited fields like display name)."""
+    """
+    HTTP PUT endpoint to update the profile of the authenticated user.
+
+    :param user_update: The raw payload containing profile fields to update.
+    :param session: The injected asynchronous database session dependency.
+    :param current_user: The authenticated user dependency.
+    :return: The updated user model.
+    :raises HTTPException: 404 error if the user does not exist.
+    :raises HTTPException: 400 error if the payload is invalid.
+    """
     try:
         return await user_service.update_user(current_user.id, user_update, session)
     except NoResultFound as exception:

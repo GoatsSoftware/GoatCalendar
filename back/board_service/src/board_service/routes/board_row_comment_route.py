@@ -36,6 +36,15 @@ async def get_board_row_comment_by_id(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> BoardRowCommentOutDTO:
+    """
+    HTTP GET endpoint to fetch a single board row comment by its ID.
+
+    :param comment_id: The UUID of the requested comment.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The matching board row comment DTO.
+    :raises HTTPException: 404 error if the comment does not exist.
+    """
     try:
         return await board_row_service.get_board_row_comment_by_id(
             comment_id=comment_id,
@@ -57,6 +66,14 @@ async def get_board_row_comments_by_board_row_id(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> list[BoardRowCommentOutDTO]:
+    """
+    HTTP GET endpoint to fetch all comments attached to a board row.
+
+    :param board_row_id: The UUID of the parent board row.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: A list of matching board row comment DTOs.
+    """
     return await board_row_service.get_board_row_comments_by_board_row_id(
         board_row_id=board_row_id,
         session=session,
@@ -69,6 +86,14 @@ async def create_board_row_comment(
     session: db_session_dependency,
     current_user: user_connected_dependency,
 ):
+    """
+    HTTP POST endpoint to create a new comment on a board row.
+
+    :param comment_data: The validated payload describing the new comment.
+    :param session: The injected database session.
+    :param current_user: The authenticated user creating the comment.
+    :return: The newly created comment model.
+    """
     return await board_row_service.create_board_row_comment(
         comment_data=comment_data,
         created_by_id=current_user.id,
@@ -83,6 +108,16 @@ async def update_board_row_comment(
     session: db_session_dependency,
     _: user_connected_dependency,
 ):
+    """
+    HTTP PUT endpoint to update an existing board row comment.
+
+    :param comment_id: The UUID of the comment to update.
+    :param comment_data: The validated payload containing updated comment values.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The updated comment model.
+    :raises HTTPException: 404 error if the comment does not exist.
+    """
     try:
         return await board_row_service.update_board_row_comment(
             comment_id=comment_id,
@@ -102,6 +137,15 @@ async def delete_board_row_comment(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> Response:
+    """
+    HTTP DELETE endpoint to remove a board row comment.
+
+    :param comment_id: The UUID of the comment to delete.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: An empty HTTP 204 response.
+    :raises HTTPException: 404 error if the comment does not exist.
+    """
     try:
         await board_row_service.delete_board_row_comment(
             comment_id=comment_id,

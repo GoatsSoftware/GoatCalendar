@@ -37,12 +37,24 @@ def serialize_board_as_dto(board: Board) -> BoardOutDTO:
 
 
 def serialize_board_event_as_dto(event: BoardEvent) -> BoardEventOutDTO:
+    """
+    Convert a board event model into its outbound DTO representation.
+
+    :param event: The source board event entity.
+    :return: The validated board event output DTO.
+    """
     return BoardEventOutDTO.model_validate(event, from_attributes=True)
 
 
 def serialize_board_permission_as_dto(
     permission: UserBoardPermission,
 ) -> BoardPermissionOutDTO:
+    """
+    Convert a board permission model into its outbound DTO representation.
+
+    :param permission: The source board permission entity.
+    :return: The validated board permission output DTO.
+    """
     return BoardPermissionOutDTO.model_validate(permission, from_attributes=True)
 
 
@@ -108,12 +120,26 @@ async def create_board(
 
 
 async def get_board_column_by_id(column_id: UUID, session: AsyncSession) -> BoardColumn:
+    """
+    Retrieve a single board column by its identifier.
+
+    :param column_id: The UUID of the column to retrieve.
+    :param session: The active database session.
+    :return: The matching board column model.
+    """
     return await board_repository.get_board_column_by_id(column_id=column_id, session=session)
 
 
 async def get_board_columns_by_board_id(
     board_id: UUID, session: AsyncSession
 ) -> list[BoardColumn]:
+    """
+    Retrieve all columns belonging to a board.
+
+    :param board_id: The UUID of the parent board.
+    :param session: The active database session.
+    :return: A list of matching board column models.
+    """
     return await board_repository.get_board_columns_by_board_id(
         board_id=board_id,
         session=session,
@@ -142,8 +168,14 @@ async def delete_board(board_id: UUID, session: AsyncSession) -> None:
 # Column service methods
 
 async def create_board_column(column_data, created_by_id: UUID, session: AsyncSession):
-    """Create a new board column."""
-    from shared_models.dtos.board_column_in_dto import BoardColumnCreateDTO
+    """
+    Create a new board column.
+
+    :param column_data: The validated payload describing the new column.
+    :param created_by_id: The UUID of the authenticated creator.
+    :param session: The active database session.
+    :return: The newly created board column model.
+    """
     column_payload = column_data.model_dump(exclude_none=True)
     column_payload['created_by_id'] = created_by_id
     return await board_repository.create_board_column(
@@ -153,7 +185,14 @@ async def create_board_column(column_data, created_by_id: UUID, session: AsyncSe
 
 
 async def update_board_column(column_id: UUID, column_data, session: AsyncSession):
-    """Update a board column."""
+    """
+    Update a board column.
+
+    :param column_id: The UUID of the column to update.
+    :param column_data: The validated payload containing updated column values.
+    :param session: The active database session.
+    :return: The updated board column model.
+    """
     return await board_repository.update_board_column(
         column_id=column_id,
         updated_data=column_data.model_dump(exclude_none=True),
@@ -162,7 +201,13 @@ async def update_board_column(column_id: UUID, column_data, session: AsyncSessio
 
 
 async def delete_board_column(column_id: UUID, session: AsyncSession) -> None:
-    """Delete a board column."""
+    """
+    Delete a board column.
+
+    :param column_id: The UUID of the column to delete.
+    :param session: The active database session.
+    :return: None.
+    """
     await board_repository.delete_board_column(
         column_id=column_id,
         session=session,
@@ -172,8 +217,14 @@ async def delete_board_column(column_id: UUID, session: AsyncSession) -> None:
 # Event service methods
 
 async def create_board_event(event_data, created_by_id: UUID, session: AsyncSession):
-    """Create a board event/milestone."""
-    from shared_models.dtos.board_event_in_dto import BoardEventCreateDTO
+    """
+    Create a board event or milestone.
+
+    :param event_data: The validated payload describing the new event.
+    :param created_by_id: The UUID of the authenticated creator.
+    :param session: The active database session.
+    :return: The newly created board event model.
+    """
     event_payload = event_data.model_dump(exclude_none=True)
     event_payload['created_by_id'] = created_by_id
     event_payload['version'] = 1
@@ -186,6 +237,13 @@ async def create_board_event(event_data, created_by_id: UUID, session: AsyncSess
 async def get_board_event_by_id(
     event_id: UUID, session: AsyncSession
 ) -> BoardEventOutDTO:
+    """
+    Retrieve a single board event by its identifier.
+
+    :param event_id: The UUID of the event to retrieve.
+    :param session: The active database session.
+    :return: The matching board event output DTO.
+    """
     return serialize_board_event_as_dto(
         await board_repository.get_board_event_by_id(event_id=event_id, session=session)
     )
@@ -194,6 +252,13 @@ async def get_board_event_by_id(
 async def get_board_events_by_board_id(
     board_id: UUID, session: AsyncSession
 ) -> list[BoardEventOutDTO]:
+    """
+    Retrieve all events belonging to a board.
+
+    :param board_id: The UUID of the parent board.
+    :param session: The active database session.
+    :return: A list of matching board event output DTOs.
+    """
     return [
         serialize_board_event_as_dto(event)
         for event in await board_repository.get_board_events_by_board_id(
@@ -204,7 +269,14 @@ async def get_board_events_by_board_id(
 
 
 async def update_board_event(event_id: UUID, event_data, session: AsyncSession):
-    """Update a board event."""
+    """
+    Update a board event.
+
+    :param event_id: The UUID of the event to update.
+    :param event_data: The validated payload containing updated event values.
+    :param session: The active database session.
+    :return: The updated board event model.
+    """
     return await board_repository.update_board_event(
         event_id=event_id,
         updated_data=event_data.model_dump(exclude_none=True),
@@ -213,7 +285,13 @@ async def update_board_event(event_id: UUID, event_data, session: AsyncSession):
 
 
 async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
-    """Delete a board event."""
+    """
+    Delete a board event.
+
+    :param event_id: The UUID of the event to delete.
+    :param session: The active database session.
+    :return: None.
+    """
     await board_repository.delete_board_event(
         event_id=event_id,
         session=session,
@@ -223,7 +301,13 @@ async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
 # Permission service methods
 
 async def add_user_to_board(permission_data, session: AsyncSession):
-    """Add a user to a board with a specific role."""
+    """
+    Add a user to a board with a specific role.
+
+    :param permission_data: The payload describing the granted permission.
+    :param session: The active database session.
+    :return: The newly created board permission model.
+    """
     permission_payload = permission_data
     return await board_repository.add_user_to_board(
         permission_payload,
@@ -234,6 +318,14 @@ async def add_user_to_board(permission_data, session: AsyncSession):
 async def get_board_permission(
     board_id: UUID, user_id: UUID, session: AsyncSession
 ) -> BoardPermissionOutDTO:
+    """
+    Retrieve a single board permission by board and user identifiers.
+
+    :param board_id: The UUID of the target board.
+    :param user_id: The UUID of the target user.
+    :param session: The active database session.
+    :return: The matching board permission output DTO.
+    """
     return serialize_board_permission_as_dto(
         await board_repository.get_board_permission(
             board_id=board_id,
@@ -246,6 +338,13 @@ async def get_board_permission(
 async def get_board_permissions_by_board_id(
     board_id: UUID, session: AsyncSession
 ) -> list[BoardPermissionOutDTO]:
+    """
+    Retrieve all permissions attached to a board.
+
+    :param board_id: The UUID of the target board.
+    :param session: The active database session.
+    :return: A list of matching board permission output DTOs.
+    """
     return [
         serialize_board_permission_as_dto(permission)
         for permission in await board_repository.get_board_permissions_by_board_id(
@@ -258,7 +357,15 @@ async def get_board_permissions_by_board_id(
 async def update_user_board_permission(
     board_id: UUID, user_id: UUID, permission_data, session: AsyncSession
 ):
-    """Update a user's role in a board."""
+    """
+    Update a user's role in a board.
+
+    :param board_id: The UUID of the target board.
+    :param user_id: The UUID of the target user.
+    :param permission_data: The validated payload containing updated role data.
+    :param session: The active database session.
+    :return: The updated board permission model.
+    """
     return await board_repository.update_user_board_permission(
         board_id=board_id,
         user_id=user_id,
@@ -268,7 +375,14 @@ async def update_user_board_permission(
 
 
 async def remove_user_from_board(board_id: UUID, user_id: UUID, session: AsyncSession) -> None:
-    """Remove a user from a board."""
+    """
+    Remove a user from a board.
+
+    :param board_id: The UUID of the target board.
+    :param user_id: The UUID of the target user.
+    :param session: The active database session.
+    :return: None.
+    """
     await board_repository.remove_user_from_board(
         board_id=board_id,
         user_id=user_id,
