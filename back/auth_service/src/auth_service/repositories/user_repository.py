@@ -31,3 +31,33 @@ async def get_user_by_email_address(email_address: str, session: AsyncSession) -
     statement = select(User).where(User.email_address == email_address)
     result = await session.exec(statement)
     return result.unique().one()
+
+
+async def search_users(query: str, session: AsyncSession) -> list[User]:
+    """Search users by display name or email."""
+    from sqlalchemy import or_
+    search_term = f"%{query}%"
+    statement = select(User).where(
+        or_(
+            User.display_name.ilike(search_term),
+            User.email_address.ilike(search_term),
+        )
+    )
+    result = await session.exec(statement)
+    return result.unique().all()
+
+
+async def update_user(user_id, update_data: dict, session: AsyncSession) -> User:
+    """Update a user record."""
+    from sqlalchemy.exc import NoResultFound
+    from uuid import UUID
+    user = await session.get(User, user_id)
+    if user is None:
+        raise NoResultFound
+    for key, value in update_data.items():
+        if value is not None:
+            setattr(user, key, value)
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+    return user
