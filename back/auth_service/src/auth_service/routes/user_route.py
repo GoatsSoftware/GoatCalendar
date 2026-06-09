@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from auth_service.routes.authentication_route import get_current_user
 from auth_service.services import user_service
 from shared_models.dtos.user_auth_dto import UserAuthDTO
+from shared_models.dtos.user_search_query_dto import UserSearchQueryDTO
 from shared_models.schemas import User
 from sqlalchemy.exc import NoResultFound
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -18,10 +19,7 @@ route = APIRouter(
 
 db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 current_user_dependency = Annotated[UserAuthDTO, Depends(get_current_user)]
-MIN_SEARCH_QUERY_LENGTH = 2
-SEARCH_QUERY_TOO_SHORT_DETAIL = (
-    f"Search query must be at least {MIN_SEARCH_QUERY_LENGTH} characters"
-)
+search_users_query_dependency = Annotated[UserSearchQueryDTO, Depends()]
 USER_NOT_FOUND_DETAIL = "User not found"
 
 
@@ -52,19 +50,13 @@ async def get_me(
 @route.get(
     "/search",
     status_code=status.HTTP_200_OK,
-    responses={400: {"description": SEARCH_QUERY_TOO_SHORT_DETAIL}},
 )
 async def search_users(
-    q: str,
+    search_query: search_users_query_dependency,
     session: db_session_dependency,
 ) -> list[User]:
     """Search for users by name or email."""
-    if not q or len(q.strip()) < MIN_SEARCH_QUERY_LENGTH:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=SEARCH_QUERY_TOO_SHORT_DETAIL,
-        )
-    return await user_service.search_users(q, session)
+    return await user_service.search_users(search_query.q, session)
 
 
 @route.put(

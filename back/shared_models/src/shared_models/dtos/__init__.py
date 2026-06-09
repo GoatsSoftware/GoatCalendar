@@ -10,6 +10,7 @@ from .board_row_comment_in_dto import BoardRowCommentCreateDTO, BoardRowCommentU
 from .board_row_comment_out_dto import BoardRowCommentOutDTO
 from .board_row_task_in_dto import BoardRowTaskCreateDTO, BoardRowTaskUpdateDTO
 from .board_row_task_out_dto import BoardRowTaskOutDTO
+from .user_search_query_dto import UserSearchQueryDTO
 
 __all__ = [
     "BoardCreateDTO",
@@ -31,4 +32,5 @@ __all__ = [
     "BoardRowTaskCreateDTO",
     "BoardRowTaskUpdateDTO",
     "BoardRowTaskOutDTO",
+    "UserSearchQueryDTO",
 ]
