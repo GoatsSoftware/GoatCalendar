@@ -3,7 +3,8 @@ from uuid import UUID
 
 from auth_service.routes.authentication_route import get_current_user
 from database_service.database import get_db_session
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from shared_models.dtos.board_in_dtos import BoardCreateDTO, BoardUpdateDTO
 from shared_models.dtos.board_out_dto import BoardOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
 from shared_models.schemas import Board
@@ -85,4 +86,52 @@ async def get_user_boards(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"User '{user_id}' not found",
+        ) from exception
+
+
+@route.post("", response_model=BoardOutDTO, status_code=status.HTTP_201_CREATED)
+async def create_board(
+    board_data: BoardCreateDTO,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> Board:
+    """HTTP POST endpoint to create a new board."""
+    return await board_service.create_board(board_data=board_data, session=session)
+
+
+@route.put("/{board_id}", response_model=BoardOutDTO, status_code=status.HTTP_200_OK)
+async def update_board(
+    board_id: UUID,
+    board_data: BoardUpdateDTO,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> Board:
+    """HTTP PUT endpoint to update an existing board."""
+    try:
+        return await board_service.update_board(
+            board_id=board_id,
+            board_data=board_data,
+            session=session,
+        )
+    except NoResultFound as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Board '{board_id}' not found",
+        ) from exception
+
+
+@route.delete("/{board_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_board(
+    board_id: UUID,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> Response:
+    """HTTP DELETE endpoint to remove a board."""
+    try:
+        await board_service.delete_board(board_id=board_id, session=session)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except NoResultFound as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Board '{board_id}' not found",
         ) from exception

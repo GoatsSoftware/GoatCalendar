@@ -3,7 +3,8 @@ from uuid import UUID
 
 from auth_service.routes.authentication_route import get_current_user
 from database_service.database import get_db_session
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from shared_models.dtos.board_row_in_dtos import BoardRowCreateDTO, BoardRowUpdateDTO
 from shared_models.dtos.board_row_out_dto import BoardRowOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
 from shared_models.schemas import BoardRow
@@ -81,4 +82,58 @@ async def get_board_rows_by_board_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Board '{board_id}' not found",
+        ) from exception
+
+
+@route.post("", response_model=BoardRowOutDTO, status_code=status.HTTP_201_CREATED)
+async def create_board_row(
+    board_row_data: BoardRowCreateDTO,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> BoardRow:
+    """HTTP POST endpoint to create a new board row."""
+    return await board_row_service.create_board_row(
+        board_row_data=board_row_data,
+        session=session,
+    )
+
+
+@route.put("/{board_row_id}", response_model=BoardRowOutDTO, status_code=status.HTTP_200_OK)
+async def update_board_row(
+    board_row_id: UUID,
+    board_row_data: BoardRowUpdateDTO,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> BoardRow:
+    """HTTP PUT endpoint to update an existing board row."""
+    try:
+        return await board_row_service.update_board_row(
+            board_row_id=board_row_id,
+            board_row_data=board_row_data,
+            session=session,
+        )
+    except NoResultFound as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Board row '{board_row_id}' not found",
+        ) from exception
+
+
+@route.delete("/{board_row_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_board_row(
+    board_row_id: UUID,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> Response:
+    """HTTP DELETE endpoint to remove a board row."""
+    try:
+        await board_row_service.delete_board_row(
+            board_row_id=board_row_id,
+            session=session,
+        )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    except NoResultFound as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Board row '{board_row_id}' not found",
         ) from exception
