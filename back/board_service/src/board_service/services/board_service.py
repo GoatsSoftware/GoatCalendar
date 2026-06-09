@@ -112,3 +112,97 @@ async def update_board(
 async def delete_board(board_id: UUID, session: AsyncSession) -> None:
     """Delete a board by its identifier."""
     await board_repository.delete_board(board_id=board_id, session=session)
+
+
+# Column service methods
+
+async def create_board_column(column_data, created_by_id: UUID, session: AsyncSession):
+    """Create a new board column."""
+    from shared_models.dtos.board_column_in_dto import BoardColumnCreateDTO
+    column_payload = column_data.model_dump(exclude_none=True)
+    column_payload['created_by_id'] = created_by_id
+    return await board_repository.create_board_column(
+        column_payload,
+        session=session,
+    )
+
+
+async def update_board_column(column_id: UUID, column_data, session: AsyncSession):
+    """Update a board column."""
+    return await board_repository.update_board_column(
+        column_id=column_id,
+        updated_data=column_data.model_dump(exclude_none=True),
+        session=session,
+    )
+
+
+async def delete_board_column(column_id: UUID, session: AsyncSession) -> None:
+    """Delete a board column."""
+    await board_repository.delete_board_column(
+        column_id=column_id,
+        session=session,
+    )
+
+
+# Event service methods
+
+async def create_board_event(event_data, created_by_id: UUID, session: AsyncSession):
+    """Create a board event/milestone."""
+    from shared_models.dtos.board_event_in_dto import BoardEventCreateDTO
+    event_payload = event_data.model_dump(exclude_none=True)
+    event_payload['created_by_id'] = created_by_id
+    event_payload['version'] = 1
+    return await board_repository.create_board_event(
+        event_payload,
+        session=session,
+    )
+
+
+async def update_board_event(event_id: UUID, event_data, session: AsyncSession):
+    """Update a board event."""
+    return await board_repository.update_board_event(
+        event_id=event_id,
+        updated_data=event_data.model_dump(exclude_none=True),
+        session=session,
+    )
+
+
+async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
+    """Delete a board event."""
+    await board_repository.delete_board_event(
+        event_id=event_id,
+        session=session,
+    )
+
+
+# Permission service methods
+
+async def add_user_to_board(permission_data, session: AsyncSession):
+    """Add a user to a board with a specific role."""
+    from shared_models.dtos.board_permission_in_dto import BoardPermissionCreateDTO
+    permission_payload = permission_data.model_dump(exclude_none=True)
+    return await board_repository.add_user_to_board(
+        permission_payload,
+        session=session,
+    )
+
+
+async def update_user_board_permission(
+    board_id: UUID, user_id: UUID, permission_data, session: AsyncSession
+):
+    """Update a user's role in a board."""
+    return await board_repository.update_user_board_permission(
+        board_id=board_id,
+        user_id=user_id,
+        updated_data=permission_data.model_dump(exclude_none=True),
+        session=session,
+    )
+
+
+async def remove_user_from_board(board_id: UUID, user_id: UUID, session: AsyncSession) -> None:
+    """Remove a user from a board."""
+    await board_repository.remove_user_from_board(
+        board_id=board_id,
+        user_id=user_id,
+        session=session,
+    )

@@ -134,3 +134,34 @@ async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> BoardRo
     await session.delete(board_row)
     await session.commit()
     return board_row
+
+
+async def create_board_row_comment(comment_data: dict, session: AsyncSession) -> BoardRowComment:
+    """Create a new comment on a board row."""
+    comment = BoardRowComment(**comment_data)
+    session.add(comment)
+    await session.commit()
+    await session.refresh(comment)
+    return comment
+
+
+async def update_board_row_comment(comment_id: UUID, updated_data: dict, session: AsyncSession) -> BoardRowComment:
+    """Update a board row comment."""
+    comment = await session.get(BoardRowComment, comment_id)
+    if comment is None:
+        raise NoResultFound
+    for key, value in updated_data.items():
+        setattr(comment, key, value)
+    session.add(comment)
+    await session.commit()
+    await session.refresh(comment)
+    return comment
+
+
+async def delete_board_row_comment(comment_id: UUID, session: AsyncSession) -> None:
+    """Delete a board row comment."""
+    stmt = delete(BoardRowComment).where(BoardRowComment.id == comment_id)
+    result = await session.execute(stmt)
+    if result.rowcount == 0:
+        raise NoResultFound
+    await session.commit()

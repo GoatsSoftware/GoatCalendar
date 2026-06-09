@@ -112,3 +112,34 @@ async def update_board_row_task(
 
 async def delete_board_row_task(task_id: UUID, session: AsyncSession) -> None:
     await board_row_repository.delete_board_row_task(task_id=task_id, session=session)
+
+
+async def create_board_row_comment(
+    comment_data, created_by_id: UUID, session: AsyncSession
+):
+    """Create a new comment on a board row."""
+    from shared_models.dtos.board_row_comment_in_dto import BoardRowCommentCreateDTO
+    comment_payload = comment_data.model_dump(exclude_none=True)
+    comment_payload['created_by_id'] = created_by_id
+    return await board_row_repository.create_board_row_comment(
+        comment_payload,
+        session=session,
+    )
+
+
+async def update_board_row_comment(comment_id: UUID, comment_data, session: AsyncSession):
+    """Update a board row comment."""
+    from shared_models.dtos.board_row_comment_in_dto import BoardRowCommentUpdateDTO
+    return await board_row_repository.update_board_row_comment(
+        comment_id=comment_id,
+        updated_data=comment_data.model_dump(exclude_none=True),
+        session=session,
+    )
+
+
+async def delete_board_row_comment(comment_id: UUID, session: AsyncSession) -> None:
+    """Delete a board row comment."""
+    await board_row_repository.delete_board_row_comment(
+        comment_id=comment_id,
+        session=session,
+    )
