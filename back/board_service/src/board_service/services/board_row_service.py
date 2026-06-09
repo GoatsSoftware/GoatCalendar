@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from shared_models.dtos.board_row_in_dtos import BoardRowCreateDTO, BoardRowUpdateDTO
 from shared_models.schemas import BoardRow
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
@@ -33,5 +34,34 @@ async def get_board_rows_by_board_id(
     """
     return await board_row_repository.get_board_rows_by_board_id(
         board_id=board_id,
+        session=session,
+    )
+
+
+async def create_board_row(board_row_data: BoardRowCreateDTO, session: AsyncSession) -> BoardRow:
+    """Create a new row inside a board."""
+    return await board_row_repository.create_board_row(
+        board_row_data.model_dump(exclude_none=True),
+        session=session,
+    )
+
+
+async def update_board_row(
+    board_row_id: UUID,
+    board_row_data: BoardRowUpdateDTO,
+    session: AsyncSession,
+) -> BoardRow:
+    """Update a board row's properties."""
+    return await board_row_repository.update_board_row(
+        board_row_id=board_row_id,
+        updated_data=board_row_data.model_dump(exclude_none=True),
+        session=session,
+    )
+
+
+async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> None:
+    """Delete a board row by its identifier."""
+    await board_row_repository.delete_board_row(
+        board_row_id=board_row_id,
         session=session,
     )

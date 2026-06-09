@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from shared_models.dtos.board_in_dtos import BoardCreateDTO, BoardUpdateDTO
 from shared_models.dtos.board_out_dto import BoardOutDTO
 from shared_models.dtos.user_dtos import UserWithBoardPermissionOutDTO
 from shared_models.schemas.board import Board
@@ -77,3 +78,31 @@ async def get_user_boards(user_id: UUID, session: AsyncSession) -> list[BoardOut
             session=session,
         )
     ]
+
+
+async def create_board(board_data: BoardCreateDTO, session: AsyncSession) -> BoardOutDTO:
+    """Create a new board and return its serialized DTO."""
+    board = await board_repository.create_board(
+        board_data.model_dump(exclude_none=True),
+        session=session,
+    )
+    return serialize_board_as_dto(board=board)
+
+
+async def update_board(
+    board_id: UUID,
+    board_data: BoardUpdateDTO,
+    session: AsyncSession,
+) -> BoardOutDTO:
+    """Update an existing board and return the latest DTO."""
+    board = await board_repository.update_board(
+        board_id=board_id,
+        updated_data=board_data.model_dump(exclude_none=True),
+        session=session,
+    )
+    return serialize_board_as_dto(board=board)
+
+
+async def delete_board(board_id: UUID, session: AsyncSession) -> None:
+    """Delete a board by its identifier."""
+    await board_repository.delete_board(board_id=board_id, session=session)
