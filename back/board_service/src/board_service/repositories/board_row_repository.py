@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from shared_models.schemas import BoardRow, BoardRowComment, BoardRowTask
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlmodel import select
@@ -60,3 +61,35 @@ async def get_board_rows_by_board_id(
 
     result = await session.exec(statement)
     return result.unique().all()
+
+
+async def create_board_row(board_row_data: dict, session: AsyncSession) -> BoardRow:
+    """Create a new board row record in the database."""
+    board_row = BoardRow(**board_row_data)
+    session.add(board_row)
+    await session.commit()
+    await session.refresh(board_row)
+    return board_row
+
+
+async def update_board_row(board_row_id: UUID, updated_data: dict, session: AsyncSession) -> BoardRow:
+    """Update an existing board row record."""
+    board_row = await session.get(BoardRow, board_row_id)
+    if board_row is None:
+        raise NoResultFound
+    for key, value in updated_data.items():
+        setattr(board_row, key, value)
+    session.add(board_row)
+    await session.commit()
+    await session.refresh(board_row)
+    return board_row
+
+
+async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> BoardRow:
+    """Delete an existing board row record."""
+    board_row = await session.get(BoardRow, board_row_id)
+    if board_row is None:
+        raise NoResultFound
+    await session.delete(board_row)
+    await session.commit()
+    return board_row

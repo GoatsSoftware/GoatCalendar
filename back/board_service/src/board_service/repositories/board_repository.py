@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from shared_models.schemas import Board, UserBoardPermission
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlmodel import select
@@ -67,3 +68,35 @@ async def get_user_boards(user_id: UUID, session: AsyncSession) -> list[Board]:
 
     result = await session.exec(statement)
     return result.unique().all()
+
+
+async def create_board(board_data: dict, session: AsyncSession) -> Board:
+    """Create a new board record in the database."""
+    board = Board(**board_data)
+    session.add(board)
+    await session.commit()
+    await session.refresh(board)
+    return board
+
+
+async def update_board(board_id: UUID, updated_data: dict, session: AsyncSession) -> Board:
+    """Update an existing board record."""
+    board = await session.get(Board, board_id)
+    if board is None:
+        raise NoResultFound
+    for key, value in updated_data.items():
+        setattr(board, key, value)
+    session.add(board)
+    await session.commit()
+    await session.refresh(board)
+    return board
+
+
+async def delete_board(board_id: UUID, session: AsyncSession) -> Board:
+    """Delete an existing board record."""
+    board = await session.get(Board, board_id)
+    if board is None:
+        raise NoResultFound
+    await session.delete(board)
+    await session.commit()
+    return board
