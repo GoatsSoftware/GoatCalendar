@@ -1,10 +1,11 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from database_service.database import get_session
+from database_service.database import get_db_session
 from shared_models.dtos.board_row_comment_in_dto import BoardRowCommentCreateDTO, BoardRowCommentUpdateDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
 from auth_service.routes.authentication_route import get_current_user
@@ -12,13 +13,14 @@ from board_service.services import board_row_service
 
 
 route = APIRouter(prefix="/board-row-comments", tags=["board-row-comments"])
+db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 
 
 @route.post("")
 async def create_board_row_comment(
     comment_data: BoardRowCommentCreateDTO,
     current_user: UserAuthDTO = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
+    session: db_session_dependency = Depends(get_db_session),
 ):
     """Create a new comment on a board row."""
     try:
@@ -35,7 +37,7 @@ async def create_board_row_comment(
 async def update_board_row_comment(
     comment_id: UUID,
     comment_data: BoardRowCommentUpdateDTO,
-    session: AsyncSession = Depends(get_session),
+    session: db_session_dependency = Depends(get_db_session),
 ):
     """Update a board row comment."""
     try:
@@ -53,7 +55,7 @@ async def update_board_row_comment(
 @route.delete("/{comment_id}")
 async def delete_board_row_comment(
     comment_id: UUID,
-    session: AsyncSession = Depends(get_session),
+    session: db_session_dependency = Depends(get_db_session),
 ):
     """Delete a board row comment."""
     try:

@@ -1,22 +1,24 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from database_service.database import get_session
+from database_service.database import get_db_session
 from shared_models.dtos.board_permission_in_dto import BoardPermissionCreateDTO, BoardPermissionUpdateDTO
 from board_service.services import board_service
 
 
 route = APIRouter(prefix="/boards", tags=["board-permissions"])
+db_session_dependency = Annotated[AsyncSession, Depends(get_db_session)]
 
 
 @route.post("/{board_id}/permissions")
 async def add_user_to_board(
     board_id: UUID,
     permission_data: BoardPermissionCreateDTO,
-    session: AsyncSession = Depends(get_session),
+    session: db_session_dependency = Depends(get_db_session),
 ):
     """Add a user to a board with a specific role."""
     try:
@@ -35,7 +37,7 @@ async def update_user_board_permission(
     board_id: UUID,
     user_id: UUID,
     permission_data: BoardPermissionUpdateDTO,
-    session: AsyncSession = Depends(get_session),
+    session: db_session_dependency = Depends(get_db_session),
 ):
     """Update a user's role in a board."""
     try:
@@ -55,7 +57,7 @@ async def update_user_board_permission(
 async def remove_user_from_board(
     board_id: UUID,
     user_id: UUID,
-    session: AsyncSession = Depends(get_session),
+    session: db_session_dependency = Depends(get_db_session),
 ):
     """Remove a user from a board."""
     try:

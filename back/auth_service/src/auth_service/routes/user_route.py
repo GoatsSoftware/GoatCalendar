@@ -38,9 +38,9 @@ async def get_all_users(
 
 
 @route.get("/me", status_code=status.HTTP_200_OK, response_model=User)
-async def get_current_user(
+async def get_me(
     current_user: UserAuthDTO = Depends(get_current_user),
-    session: db_session_dependency = None,
+    session: db_session_dependency = Depends(get_db_session),
 ) -> User:
     """Get the authenticated user's profile."""
     return current_user
@@ -61,10 +61,10 @@ async def search_users(
 
 
 @route.put("/me", status_code=status.HTTP_200_OK, response_model=User)
-async def update_current_user(
+async def update_me(
     user_update: dict,
     current_user: UserAuthDTO = Depends(get_current_user),
-    session: db_session_dependency = None,
+    session: db_session_dependency = Depends(get_db_session),
 ) -> User:
     """Update current user's profile (limited fields like display name)."""
     try:
