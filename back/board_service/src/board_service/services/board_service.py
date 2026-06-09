@@ -80,10 +80,16 @@ async def get_user_boards(user_id: UUID, session: AsyncSession) -> list[BoardOut
     ]
 
 
-async def create_board(board_data: BoardCreateDTO, session: AsyncSession) -> BoardOutDTO:
+async def create_board(
+    board_data: BoardCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
+) -> BoardOutDTO:
     """Create a new board and return its serialized DTO."""
+    board_payload = board_data.model_dump(exclude_none=True)
+    board_payload["created_by_id"] = created_by_id
     board = await board_repository.create_board(
-        board_data.model_dump(exclude_none=True),
+        board_payload,
         session=session,
     )
     return serialize_board_as_dto(board=board)

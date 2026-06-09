@@ -38,10 +38,16 @@ async def get_board_rows_by_board_id(
     )
 
 
-async def create_board_row(board_row_data: BoardRowCreateDTO, session: AsyncSession) -> BoardRow:
+async def create_board_row(
+    board_row_data: BoardRowCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
+) -> BoardRow:
     """Create a new row inside a board."""
+    board_row_payload = board_row_data.model_dump(exclude_none=True)
+    board_row_payload["created_by_id"] = created_by_id
     return await board_row_repository.create_board_row(
-        board_row_data.model_dump(exclude_none=True),
+        board_row_payload,
         session=session,
     )
 

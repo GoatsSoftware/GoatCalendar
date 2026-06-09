@@ -8,7 +8,6 @@ class BoardRowCreateDTO(BaseModel):
     """Data required to create a new board row."""
 
     board_id: UUID
-    created_by_id: UUID
 
 
 class BoardRowUpdateDTO(BaseModel):

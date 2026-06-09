@@ -93,10 +93,14 @@ async def get_user_boards(
 async def create_board(
     board_data: BoardCreateDTO,
     session: db_session_dependency,
-    _: user_connected_dependency,
+    current_user: user_connected_dependency,
 ) -> Board:
     """HTTP POST endpoint to create a new board."""
-    return await board_service.create_board(board_data=board_data, session=session)
+    return await board_service.create_board(
+        board_data=board_data,
+        created_by_id=current_user.id,
+        session=session,
+    )
 
 
 @route.put("/{board_id}", response_model=BoardOutDTO, status_code=status.HTTP_200_OK)

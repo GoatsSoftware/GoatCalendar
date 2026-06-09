@@ -9,7 +9,6 @@ class BoardCreateDTO(BaseModel):
 
     name: str = Field(..., max_length=125)
     description: str = Field(default="", max_length=250)
-    created_by_id: UUID
 
 
 class BoardUpdateDTO(BaseModel):

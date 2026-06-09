@@ -89,11 +89,12 @@ async def get_board_rows_by_board_id(
 async def create_board_row(
     board_row_data: BoardRowCreateDTO,
     session: db_session_dependency,
-    _: user_connected_dependency,
+    current_user: user_connected_dependency,
 ) -> BoardRow:
     """HTTP POST endpoint to create a new board row."""
     return await board_row_service.create_board_row(
         board_row_data=board_row_data,
+        created_by_id=current_user.id,
         session=session,
     )
 
