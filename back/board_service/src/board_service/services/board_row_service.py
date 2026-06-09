@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from shared_models.dtos.board_row_in_dtos import BoardRowCreateDTO, BoardRowUpdateDTO
-from shared_models.schemas import BoardRow
+from shared_models.schemas import BoardRow, BoardRowComment, BoardRowTask
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from board_service.repositories import board_row_repository
@@ -10,8 +10,6 @@ from shared_models.dtos.board_row_task_in_dto import (
     BoardRowTaskCreateDTO,
     BoardRowTaskUpdateDTO,
 )
-from shared_models.schemas import BoardRowTask
-
 
 async def get_board_row_by_id(board_row_id: UUID, session: AsyncSession) -> BoardRow:
     """
@@ -85,8 +83,37 @@ async def create_board_row_task(
     task_payload = task_data.model_dump(exclude_none=True)
     task_payload["created_by_id"] = created_by_id
     task_payload["version"] = 1
-    return await board_row_repository.create_board_row_task(
+    task = await board_row_repository.create_board_row_task(
         task_payload,
+        session=session,
+    )
+    return await board_row_repository.get_board_row_task_by_id(
+        task_id=task.id,
+        session=session,
+    )
+
+
+async def get_board_row_task_by_id(task_id: UUID, session: AsyncSession) -> BoardRowTask:
+    return await board_row_repository.get_board_row_task_by_id(
+        task_id=task_id,
+        session=session,
+    )
+
+
+async def get_board_row_tasks_by_board_row_id(
+    board_row_id: UUID, session: AsyncSession
+) -> list[BoardRowTask]:
+    return await board_row_repository.get_board_row_tasks_by_board_row_id(
+        board_row_id=board_row_id,
+        session=session,
+    )
+
+
+async def get_board_row_tasks_by_board_column_id(
+    board_column_id: UUID, session: AsyncSession
+) -> list[BoardRowTask]:
+    return await board_row_repository.get_board_row_tasks_by_board_column_id(
+        board_column_id=board_column_id,
         session=session,
     )
 
@@ -118,7 +145,6 @@ async def create_board_row_comment(
     comment_data, created_by_id: UUID, session: AsyncSession
 ):
     """Create a new comment on a board row."""
-    from shared_models.dtos.board_row_comment_in_dto import BoardRowCommentCreateDTO
     comment_payload = comment_data.model_dump(exclude_none=True)
     comment_payload['created_by_id'] = created_by_id
     return await board_row_repository.create_board_row_comment(
@@ -127,9 +153,26 @@ async def create_board_row_comment(
     )
 
 
+async def get_board_row_comment_by_id(
+    comment_id: UUID, session: AsyncSession
+) -> BoardRowComment:
+    return await board_row_repository.get_board_row_comment_by_id(
+        comment_id=comment_id,
+        session=session,
+    )
+
+
+async def get_board_row_comments_by_board_row_id(
+    board_row_id: UUID, session: AsyncSession
+) -> list[BoardRowComment]:
+    return await board_row_repository.get_board_row_comments_by_board_row_id(
+        board_row_id=board_row_id,
+        session=session,
+    )
+
+
 async def update_board_row_comment(comment_id: UUID, comment_data, session: AsyncSession):
     """Update a board row comment."""
-    from shared_models.dtos.board_row_comment_in_dto import BoardRowCommentUpdateDTO
     return await board_row_repository.update_board_row_comment(
         comment_id=comment_id,
         updated_data=comment_data.model_dump(exclude_none=True),

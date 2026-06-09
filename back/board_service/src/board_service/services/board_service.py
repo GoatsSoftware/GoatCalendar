@@ -1,9 +1,11 @@
 from uuid import UUID
 
+from shared_models.dtos.board_event_out_dto import BoardEventOutDTO
+from shared_models.dtos.board_permission_out_dto import BoardPermissionOutDTO
 from shared_models.dtos.board_in_dtos import BoardCreateDTO, BoardUpdateDTO
 from shared_models.dtos.board_out_dto import BoardOutDTO
 from shared_models.dtos.user_dtos import UserWithBoardPermissionOutDTO
-from shared_models.schemas.board import Board
+from shared_models.schemas import Board, BoardColumn, BoardEvent, UserBoardPermission
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from board_service.repositories import board_repository
@@ -32,6 +34,16 @@ def serialize_board_as_dto(board: Board) -> BoardOutDTO:
         )
 
     return board_dto
+
+
+def serialize_board_event_as_dto(event: BoardEvent) -> BoardEventOutDTO:
+    return BoardEventOutDTO.model_validate(event, from_attributes=True)
+
+
+def serialize_board_permission_as_dto(
+    permission: UserBoardPermission,
+) -> BoardPermissionOutDTO:
+    return BoardPermissionOutDTO.model_validate(permission, from_attributes=True)
 
 
 async def get_all_boards(session: AsyncSession) -> list[BoardOutDTO]:
@@ -93,6 +105,19 @@ async def create_board(
         session=session,
     )
     return serialize_board_as_dto(board=board)
+
+
+async def get_board_column_by_id(column_id: UUID, session: AsyncSession) -> BoardColumn:
+    return await board_repository.get_board_column_by_id(column_id=column_id, session=session)
+
+
+async def get_board_columns_by_board_id(
+    board_id: UUID, session: AsyncSession
+) -> list[BoardColumn]:
+    return await board_repository.get_board_columns_by_board_id(
+        board_id=board_id,
+        session=session,
+    )
 
 
 async def update_board(
@@ -158,6 +183,26 @@ async def create_board_event(event_data, created_by_id: UUID, session: AsyncSess
     )
 
 
+async def get_board_event_by_id(
+    event_id: UUID, session: AsyncSession
+) -> BoardEventOutDTO:
+    return serialize_board_event_as_dto(
+        await board_repository.get_board_event_by_id(event_id=event_id, session=session)
+    )
+
+
+async def get_board_events_by_board_id(
+    board_id: UUID, session: AsyncSession
+) -> list[BoardEventOutDTO]:
+    return [
+        serialize_board_event_as_dto(event)
+        for event in await board_repository.get_board_events_by_board_id(
+            board_id=board_id,
+            session=session,
+        )
+    ]
+
+
 async def update_board_event(event_id: UUID, event_data, session: AsyncSession):
     """Update a board event."""
     return await board_repository.update_board_event(
@@ -179,12 +224,35 @@ async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
 
 async def add_user_to_board(permission_data, session: AsyncSession):
     """Add a user to a board with a specific role."""
-    from shared_models.dtos.board_permission_in_dto import BoardPermissionCreateDTO
-    permission_payload = permission_data.model_dump(exclude_none=True)
+    permission_payload = permission_data
     return await board_repository.add_user_to_board(
         permission_payload,
         session=session,
     )
+
+
+async def get_board_permission(
+    board_id: UUID, user_id: UUID, session: AsyncSession
+) -> BoardPermissionOutDTO:
+    return serialize_board_permission_as_dto(
+        await board_repository.get_board_permission(
+            board_id=board_id,
+            user_id=user_id,
+            session=session,
+        )
+    )
+
+
+async def get_board_permissions_by_board_id(
+    board_id: UUID, session: AsyncSession
+) -> list[BoardPermissionOutDTO]:
+    return [
+        serialize_board_permission_as_dto(permission)
+        for permission in await board_repository.get_board_permissions_by_board_id(
+            board_id=board_id,
+            session=session,
+        )
+    ]
 
 
 async def update_user_board_permission(

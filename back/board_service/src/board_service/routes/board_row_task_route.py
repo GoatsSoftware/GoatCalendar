@@ -39,6 +39,56 @@ async def create_task(
     )
 
 
+@route.get("/{task_id}", response_model=BoardRowTaskOutDTO, status_code=status.HTTP_200_OK)
+async def get_task_by_id(
+    task_id: UUID,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> BoardRowTask:
+    try:
+        return await board_row_service.get_board_row_task_by_id(
+            task_id=task_id,
+            session=session,
+        )
+    except NoResultFound as exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task '{task_id}' not found",
+        ) from exception
+
+
+@route.get(
+    "/board-row/{board_row_id}",
+    response_model=list[BoardRowTaskOutDTO],
+    status_code=status.HTTP_200_OK,
+)
+async def get_tasks_by_board_row_id(
+    board_row_id: UUID,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> list[BoardRowTask]:
+    return await board_row_service.get_board_row_tasks_by_board_row_id(
+        board_row_id=board_row_id,
+        session=session,
+    )
+
+
+@route.get(
+    "/board-column/{board_column_id}",
+    response_model=list[BoardRowTaskOutDTO],
+    status_code=status.HTTP_200_OK,
+)
+async def get_tasks_by_board_column_id(
+    board_column_id: UUID,
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> list[BoardRowTask]:
+    return await board_row_service.get_board_row_tasks_by_board_column_id(
+        board_column_id=board_column_id,
+        session=session,
+    )
+
+
 @route.put("/{task_id}", response_model=BoardRowTaskOutDTO, status_code=status.HTTP_200_OK)
 async def update_task(
     task_id: UUID,

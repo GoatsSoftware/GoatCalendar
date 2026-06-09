@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from shared_models.schemas import BoardRow, BoardRowComment, BoardRowTask
+from shared_models.schemas import BoardColumn, BoardRow, BoardRowComment, BoardRowTask
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -16,13 +16,25 @@ def get_board_row_dependencies_loading_options() -> tuple:
     """
     return (
         joinedload(BoardRow.tasks).options(
-            joinedload(BoardRowTask.board_column),
+            joinedload(BoardRowTask.board_column).joinedload(BoardColumn.created_by),
             joinedload(BoardRowTask.assigned_to),
             joinedload(BoardRowTask.created_by),
         ),
         joinedload(BoardRow.comments).joinedload(BoardRowComment.created_by),
         joinedload(BoardRow.created_by),
     )
+
+
+def get_board_row_task_dependencies_loading_options() -> tuple:
+    return (
+        joinedload(BoardRowTask.board_column).joinedload(BoardColumn.created_by),
+        joinedload(BoardRowTask.assigned_to),
+        joinedload(BoardRowTask.created_by),
+    )
+
+
+def get_board_row_comment_dependencies_loading_options() -> tuple:
+    return (joinedload(BoardRowComment.created_by),)
 
 
 async def get_board_row_by_id(board_row_id: UUID, session: AsyncSession) -> BoardRow:
@@ -73,6 +85,40 @@ async def create_board_row_task(task_data: dict, session: AsyncSession) -> Board
     return task
 
 
+async def get_board_row_task_by_id(task_id: UUID, session: AsyncSession) -> BoardRowTask:
+    statement = (
+        select(BoardRowTask)
+        .where(BoardRowTask.id == task_id)
+        .options(*get_board_row_task_dependencies_loading_options())
+    )
+    result = await session.exec(statement)
+    return result.unique().one()
+
+
+async def get_board_row_tasks_by_board_row_id(
+    board_row_id: UUID, session: AsyncSession
+) -> list[BoardRowTask]:
+    statement = (
+        select(BoardRowTask)
+        .where(BoardRowTask.board_row_id == board_row_id)
+        .options(*get_board_row_task_dependencies_loading_options())
+    )
+    result = await session.exec(statement)
+    return result.unique().all()
+
+
+async def get_board_row_tasks_by_board_column_id(
+    board_column_id: UUID, session: AsyncSession
+) -> list[BoardRowTask]:
+    statement = (
+        select(BoardRowTask)
+        .where(BoardRowTask.board_column_id == board_column_id)
+        .options(*get_board_row_task_dependencies_loading_options())
+    )
+    result = await session.exec(statement)
+    return result.unique().all()
+
+
 async def update_board_row_task_with_version(
     task_id: UUID, updated_data: dict, version_from_client: int, session: AsyncSession
 ) -> BoardRowTask | None:
@@ -94,7 +140,7 @@ async def update_board_row_task_with_version(
         return None
 
     await session.commit()
-    return await session.get(BoardRowTask, task_id)
+    return await get_board_row_task_by_id(task_id=task_id, session=session)
 
 
 async def delete_board_row_task(task_id: UUID, session: AsyncSession) -> None:
@@ -143,6 +189,30 @@ async def create_board_row_comment(comment_data: dict, session: AsyncSession) ->
     await session.commit()
     await session.refresh(comment)
     return comment
+
+
+async def get_board_row_comment_by_id(
+    comment_id: UUID, session: AsyncSession
+) -> BoardRowComment:
+    statement = (
+        select(BoardRowComment)
+        .where(BoardRowComment.id == comment_id)
+        .options(*get_board_row_comment_dependencies_loading_options())
+    )
+    result = await session.exec(statement)
+    return result.unique().one()
+
+
+async def get_board_row_comments_by_board_row_id(
+    board_row_id: UUID, session: AsyncSession
+) -> list[BoardRowComment]:
+    statement = (
+        select(BoardRowComment)
+        .where(BoardRowComment.board_row_id == board_row_id)
+        .options(*get_board_row_comment_dependencies_loading_options())
+    )
+    result = await session.exec(statement)
+    return result.unique().all()
 
 
 async def update_board_row_comment(comment_id: UUID, updated_data: dict, session: AsyncSession) -> BoardRowComment:
