@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -21,13 +20,13 @@ class BoardRowTaskCreateDTO(BaseModel):
 
 
 class BoardRowTaskUpdateDTO(BaseModel):
-    task_name: Optional[str] = Field(default=None, max_length=125)
-    task_content: Optional[str] = Field(default=None, max_length=125)
-    task_status: Optional[BoardTaskStatus] = None
-    starting_from: Optional[date] = None
-    deadline: Optional[date] = None
+    task_name: str | None = Field(default=None, max_length=125)
+    task_content: str | None = Field(default=None, max_length=125)
+    task_status: BoardTaskStatus | None = None
+    starting_from: date | None = None
+    deadline: date | None = None
 
-    assigned_to_id: Optional[UUID] = None
+    assigned_to_id: UUID | None = None
 
     # Version from client for optimistic locking
     version: int

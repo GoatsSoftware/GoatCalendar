@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from shared_models.enums import UserRoleInBoard
 
@@ -20,6 +20,13 @@ class UserOutDTO(BaseModel):
 
     first_name: str
     last_name: str
+
+
+class UserInDTO(BaseModel):
+    email_address: str | None = Field(default=None)
+
+    first_name: str | None = Field(default=None)
+    last_name: str | None = Field(default=None)
 
 
 class UserWithBoardPermissionOutDTO(UserOutDTO):

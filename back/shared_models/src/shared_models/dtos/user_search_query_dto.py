@@ -1,6 +1,5 @@
 from pydantic import BaseModel, field_validator
 
-
 MIN_SEARCH_QUERY_LENGTH = 2
 
 
@@ -13,8 +12,9 @@ class UserSearchQueryDTO(BaseModel):
     @classmethod
     def validate_q(cls, value: str) -> str:
         normalized_value = value.strip()
+        message = f"Search query must be at least {MIN_SEARCH_QUERY_LENGTH} characters"
+
         if len(normalized_value) < MIN_SEARCH_QUERY_LENGTH:
-            raise ValueError(
-                f"Search query must be at least {MIN_SEARCH_QUERY_LENGTH} characters"
-            )
+            raise ValueError(message)
+
         return normalized_value

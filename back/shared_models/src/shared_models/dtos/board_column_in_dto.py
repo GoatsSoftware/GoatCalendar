@@ -1,5 +1,3 @@
-from datetime import date
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -19,6 +17,6 @@ class BoardColumnCreateDTO(BaseModel):
 class BoardColumnUpdateDTO(BaseModel):
     """Data to update a board column."""
 
-    name: Optional[BoardColumnName] = None
-    type: Optional[BoardFieldType] = None
-    position: Optional[int] = Field(default=None, ge=0)
+    name: BoardColumnName | None = None
+    type: BoardFieldType | None = None
+    position: int | None = Field(default=None, ge=0)

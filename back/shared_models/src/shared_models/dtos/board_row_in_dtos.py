@@ -1,7 +1,6 @@
-from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class BoardRowCreateDTO(BaseModel):
@@ -13,4 +12,4 @@ class BoardRowCreateDTO(BaseModel):
 class BoardRowUpdateDTO(BaseModel):
     """Fields accepted when updating an existing board row."""
 
-    board_id: Optional[UUID] = None
+    board_id: UUID | None = None

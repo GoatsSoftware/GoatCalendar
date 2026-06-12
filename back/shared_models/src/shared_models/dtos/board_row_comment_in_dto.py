@@ -1,4 +1,3 @@
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -14,4 +13,4 @@ class BoardRowCommentCreateDTO(BaseModel):
 class BoardRowCommentUpdateDTO(BaseModel):
     """Data to update a board row comment."""
 
-    content: Optional[str] = Field(default=None, max_length=125)
+    content: str | None = Field(default=None, max_length=125)

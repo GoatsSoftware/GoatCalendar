@@ -2,14 +2,16 @@ from typing import Annotated
 
 from database_service.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException
-from auth_service.routes.authentication_route import get_current_user
-from auth_service.services import user_service
 from shared_models.dtos.user_auth_dto import UserAuthDTO
+from shared_models.dtos.user_dtos import UserInDTO
 from shared_models.dtos.user_search_query_dto import UserSearchQueryDTO
 from shared_models.schemas import User
 from sqlalchemy.exc import NoResultFound
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette import status
+
+from auth_service.routes.authentication_route import get_current_user
+from auth_service.services import user_service
 
 route = APIRouter(
     prefix="/users",
@@ -39,19 +41,6 @@ async def get_all_users(
     return await user_service.get_all_users(session)
 
 
-@route.get("/me", status_code=status.HTTP_200_OK)
-async def get_me(
-    current_user: current_user_dependency,
-) -> UserAuthDTO:
-    """
-    HTTP GET endpoint to fetch the profile of the authenticated user.
-
-    :param current_user: The authenticated user dependency.
-    :return: The data transfer object of the currently authenticated user.
-    """
-    return current_user
-
-
 @route.get(
     "/search",
     status_code=status.HTTP_200_OK,
@@ -79,7 +68,7 @@ async def search_users(
     },
 )
 async def update_me(
-    user_update: dict,
+    user_update: UserInDTO,
     session: db_session_dependency,
     current_user: current_user_dependency,
 ) -> User:
@@ -101,4 +90,7 @@ async def update_me(
             detail=USER_NOT_FOUND_DETAIL,
         ) from exception
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        ) from e
