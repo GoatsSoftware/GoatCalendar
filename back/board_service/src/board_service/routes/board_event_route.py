@@ -4,14 +4,17 @@ from uuid import UUID
 from auth_service.routes.authentication_route import get_current_user
 from database_service.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from shared_models.dtos.board_event_in_dto import BoardEventCreateDTO, BoardEventUpdateDTO
+from shared_models.dtos.board_event_in_dto import (
+    BoardEventCreateDTO,
+    BoardEventUpdateDTO,
+)
 from shared_models.dtos.board_event_out_dto import BoardEventOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
+from shared_models.schemas import BoardEvent
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from board_service.services import board_service
-
 
 route = APIRouter(
     prefix="/board-events",
@@ -79,7 +82,7 @@ async def create_board_event(
     event_data: BoardEventCreateDTO,
     session: db_session_dependency,
     current_user: user_connected_dependency,
-):
+) -> BoardEvent:
     """
     HTTP POST endpoint to create a new board event.
 
@@ -101,7 +104,7 @@ async def update_board_event(
     event_data: BoardEventUpdateDTO,
     session: db_session_dependency,
     _: user_connected_dependency,
-):
+) -> BoardEvent:
     """
     HTTP PUT endpoint to update an existing board event.
 

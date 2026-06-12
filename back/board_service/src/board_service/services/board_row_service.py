@@ -1,19 +1,19 @@
 from uuid import UUID
 
-from shared_models.dtos.board_row_in_dtos import BoardRowCreateDTO, BoardRowUpdateDTO
 from shared_models.dtos.board_row_comment_in_dto import (
     BoardRowCommentCreateDTO,
     BoardRowCommentUpdateDTO,
 )
-from shared_models.schemas import BoardRow, BoardRowComment, BoardRowTask
-from shared_models.exceptions import ConcurrencyException
-from sqlalchemy.ext.asyncio.session import AsyncSession
-
-from board_service.repositories import board_row_repository
+from shared_models.dtos.board_row_in_dtos import BoardRowCreateDTO, BoardRowUpdateDTO
 from shared_models.dtos.board_row_task_in_dto import (
     BoardRowTaskCreateDTO,
     BoardRowTaskUpdateDTO,
 )
+from shared_models.exceptions import ConcurrencyError
+from shared_models.schemas import BoardRow, BoardRowComment, BoardRowTask
+from sqlalchemy.ext.asyncio.session import AsyncSession
+
+from board_service.repositories import board_row_repository
 
 
 async def get_board_row_by_id(board_row_id: UUID, session: AsyncSession) -> BoardRow:
@@ -60,10 +60,9 @@ async def create_board_row(
     :param session: The active database session.
     :return: The newly created board row model.
     """
-    board_row_payload = board_row_data.model_dump(exclude_none=True)
-    board_row_payload["created_by_id"] = created_by_id
     return await board_row_repository.create_board_row(
-        board_row_payload,
+        board_row_data=board_row_data,
+        created_by_id=created_by_id,
         session=session,
     )
 
@@ -83,7 +82,7 @@ async def update_board_row(
     """
     return await board_row_repository.update_board_row(
         board_row_id=board_row_id,
-        updated_data=board_row_data.model_dump(exclude_none=True),
+        updated_data=board_row_data,
         session=session,
     )
 
@@ -103,7 +102,9 @@ async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> None:
 
 
 async def create_board_row_task(
-    task_data: BoardRowTaskCreateDTO, created_by_id: UUID, session: AsyncSession
+    task_data: BoardRowTaskCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
 ) -> BoardRowTask:
     """
     Create a new task inside a board row.
@@ -113,20 +114,17 @@ async def create_board_row_task(
     :param session: The active database session.
     :return: The fully loaded created task model.
     """
-    task_payload = task_data.model_dump(exclude_none=True)
-    task_payload["created_by_id"] = created_by_id
-    task_payload["version"] = 1
-    task = await board_row_repository.create_board_row_task(
-        task_payload,
-        session=session,
-    )
-    return await board_row_repository.get_board_row_task_by_id(
-        task_id=task.id,
+    return await board_row_repository.create_board_row_task(
+        task_data=task_data,
+        created_by_id=created_by_id,
         session=session,
     )
 
 
-async def get_board_row_task_by_id(task_id: UUID, session: AsyncSession) -> BoardRowTask:
+async def get_board_row_task_by_id(
+    task_id: UUID,
+    session: AsyncSession,
+) -> BoardRowTask:
     """
     Retrieve a single board row task by its identifier.
 
@@ -141,7 +139,8 @@ async def get_board_row_task_by_id(task_id: UUID, session: AsyncSession) -> Boar
 
 
 async def get_board_row_tasks_by_board_row_id(
-    board_row_id: UUID, session: AsyncSession
+    board_row_id: UUID,
+    session: AsyncSession,
 ) -> list[BoardRowTask]:
     """
     Retrieve all tasks belonging to a board row.
@@ -157,7 +156,8 @@ async def get_board_row_tasks_by_board_row_id(
 
 
 async def get_board_row_tasks_by_board_column_id(
-    board_column_id: UUID, session: AsyncSession
+    board_column_id: UUID,
+    session: AsyncSession,
 ) -> list[BoardRowTask]:
     """
     Retrieve all tasks associated with a board column.
@@ -173,7 +173,9 @@ async def get_board_row_tasks_by_board_column_id(
 
 
 async def update_board_row_task(
-    task_id: UUID, task_data: BoardRowTaskUpdateDTO, session: AsyncSession
+    task_id: UUID,
+    task_data: BoardRowTaskUpdateDTO,
+    session: AsyncSession,
 ) -> BoardRowTask:
     """
     Update an existing task using optimistic locking.
@@ -182,7 +184,7 @@ async def update_board_row_task(
     :param task_data: The validated payload containing updated task values.
     :param session: The active database session.
     :return: The updated task model.
-    :raises ConcurrencyException: If the client version is stale.
+    :raises ConcurrencyError: If the client version is stale.
     """
     task_payload = task_data.model_dump(exclude_none=True)
     version_from_client = task_payload.pop("version")
@@ -195,7 +197,7 @@ async def update_board_row_task(
     )
 
     if updated_task is None:
-        raise ConcurrencyException("Task version mismatch")
+        raise ConcurrencyError("Task version mismatch")
 
     return updated_task
 
@@ -224,16 +226,16 @@ async def create_board_row_comment(
     :param session: The active database session.
     :return: The newly created comment model.
     """
-    comment_payload = comment_data.model_dump(exclude_none=True)
-    comment_payload['created_by_id'] = created_by_id
     return await board_row_repository.create_board_row_comment(
-        comment_payload,
+        comment_data=comment_data,
+        created_by_id=created_by_id,
         session=session,
     )
 
 
 async def get_board_row_comment_by_id(
-    comment_id: UUID, session: AsyncSession
+    comment_id: UUID,
+    session: AsyncSession,
 ) -> BoardRowComment:
     """
     Retrieve a single board row comment by its identifier.
@@ -249,7 +251,8 @@ async def get_board_row_comment_by_id(
 
 
 async def get_board_row_comments_by_board_row_id(
-    board_row_id: UUID, session: AsyncSession
+    board_row_id: UUID,
+    session: AsyncSession,
 ) -> list[BoardRowComment]:
     """
     Retrieve all comments linked to a board row.
@@ -279,7 +282,7 @@ async def update_board_row_comment(
     """
     return await board_row_repository.update_board_row_comment(
         comment_id=comment_id,
-        updated_data=comment_data.model_dump(exclude_none=True),
+        updated_data=comment_data,
         session=session,
     )
 

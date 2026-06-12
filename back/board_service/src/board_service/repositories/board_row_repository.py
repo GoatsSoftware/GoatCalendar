@@ -1,11 +1,19 @@
 from uuid import UUID
 
+from shared_models.dtos import (
+    BoardRowCommentCreateDTO,
+    BoardRowCommentUpdateDTO,
+    BoardRowCreateDTO,
+    BoardRowTaskCreateDTO,
+    BoardRowTaskUpdateDTO,
+    BoardRowUpdateDTO,
+)
 from shared_models.schemas import BoardColumn, BoardRow, BoardRowComment, BoardRowTask
+from sqlalchemy import delete, update
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlmodel import select
-from sqlalchemy import update, delete
 
 
 def get_board_row_dependencies_loading_options() -> tuple:
@@ -86,7 +94,11 @@ async def get_board_rows_by_board_id(
     return result.unique().all()
 
 
-async def create_board_row_task(task_data: dict, session: AsyncSession) -> BoardRowTask:
+async def create_board_row_task(
+    task_data: BoardRowTaskCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
+) -> BoardRowTask:
     """
     Create a new task inside a board row.
 
@@ -94,14 +106,31 @@ async def create_board_row_task(task_data: dict, session: AsyncSession) -> Board
     :param session: The active database session.
     :return: The newly created board row task model.
     """
-    task = BoardRowTask(**task_data)
+    additional_data = {
+        "created_by_id": created_by_id,
+        "version": 1,
+    }
+
+    task = BoardRowTask()
+    task.sqlmodel_update(
+        obj=task_data.model_dump(exclude_unset=True),
+        update=additional_data,
+    )
+
     session.add(task)
     await session.commit()
     await session.refresh(task)
-    return task
+
+    return await get_board_row_task_by_id(
+        task_id=task.id,
+        session=session,
+    )
 
 
-async def get_board_row_task_by_id(task_id: UUID, session: AsyncSession) -> BoardRowTask:
+async def get_board_row_task_by_id(
+    task_id: UUID,
+    session: AsyncSession,
+) -> BoardRowTask:
     """
     Fetch a single board row task by its unique identifier.
 
@@ -119,7 +148,8 @@ async def get_board_row_task_by_id(task_id: UUID, session: AsyncSession) -> Boar
 
 
 async def get_board_row_tasks_by_board_row_id(
-    board_row_id: UUID, session: AsyncSession
+    board_row_id: UUID,
+    session: AsyncSession,
 ) -> list[BoardRowTask]:
     """
     Fetch all tasks associated with a specific board row.
@@ -138,7 +168,8 @@ async def get_board_row_tasks_by_board_row_id(
 
 
 async def get_board_row_tasks_by_board_column_id(
-    board_column_id: UUID, session: AsyncSession
+    board_column_id: UUID,
+    session: AsyncSession,
 ) -> list[BoardRowTask]:
     """
     Fetch all tasks associated with a specific board column.
@@ -157,7 +188,10 @@ async def get_board_row_tasks_by_board_column_id(
 
 
 async def update_board_row_task_with_version(
-    task_id: UUID, updated_data: dict, version_from_client: int, session: AsyncSession
+    task_id: UUID,
+    updated_data: BoardRowTaskUpdateDTO,
+    version_from_client: int,
+    session: AsyncSession,
 ) -> BoardRowTask | None:
     """
     Attempt to update a task only if the version matches.
@@ -198,7 +232,11 @@ async def delete_board_row_task(task_id: UUID, session: AsyncSession) -> None:
     await session.commit()
 
 
-async def create_board_row(board_row_data: dict, session: AsyncSession) -> BoardRow:
+async def create_board_row(
+    board_row_data: BoardRowCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
+) -> BoardRow:
     """
     Create a new board row record in the database.
 
@@ -206,14 +244,29 @@ async def create_board_row(board_row_data: dict, session: AsyncSession) -> Board
     :param session: The active database session.
     :return: The newly created board row model.
     """
-    board_row = BoardRow(**board_row_data)
+    additional_data = {"created_by_id": created_by_id}
+
+    board_row = BoardRow()
+    board_row.sqlmodel_update(
+        obj=board_row_data.model_dump(exclude_unset=True),
+        update=additional_data,
+    )
+
     session.add(board_row)
     await session.commit()
     await session.refresh(board_row)
-    return board_row
+
+    return await get_board_row_by_id(
+        board_row_id=board_row.id,
+        session=session,
+    )
 
 
-async def update_board_row(board_row_id: UUID, updated_data: dict, session: AsyncSession) -> BoardRow:
+async def update_board_row(
+    board_row_id: UUID,
+    updated_data: BoardRowUpdateDTO,
+    session: AsyncSession,
+) -> BoardRow:
     """
     Update an existing board row record.
 
@@ -224,17 +277,23 @@ async def update_board_row(board_row_id: UUID, updated_data: dict, session: Asyn
     :raises NoResultFound: If the row does not exist.
     """
     board_row = await session.get(BoardRow, board_row_id)
+
     if board_row is None:
         raise NoResultFound
-    for key, value in updated_data.items():
-        setattr(board_row, key, value)
+
+    board_row.sqlmodel_update(obj=updated_data.model_dump(exclude_unset=True))
+
     session.add(board_row)
     await session.commit()
     await session.refresh(board_row)
-    return board_row
+
+    return await get_board_row_by_id(
+        board_row_id=board_row_id,
+        session=session,
+    )
 
 
-async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> BoardRow:
+async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> None:
     """
     Delete an existing board row record.
 
@@ -244,14 +303,19 @@ async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> BoardRo
     :raises NoResultFound: If the row does not exist.
     """
     board_row = await session.get(BoardRow, board_row_id)
+
     if board_row is None:
         raise NoResultFound
+
     await session.delete(board_row)
     await session.commit()
-    return board_row
 
 
-async def create_board_row_comment(comment_data: dict, session: AsyncSession) -> BoardRowComment:
+async def create_board_row_comment(
+    comment_data: BoardRowCommentCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
+) -> BoardRowComment:
     """
     Create a new comment on a board row.
 
@@ -259,15 +323,27 @@ async def create_board_row_comment(comment_data: dict, session: AsyncSession) ->
     :param session: The active database session.
     :return: The newly created board row comment model.
     """
-    comment = BoardRowComment(**comment_data)
+    additional_data = {"created_by_id": created_by_id}
+
+    comment = BoardRowComment()
+    comment.sqlmodel_update(
+        obj=comment_data.model_dump(exclude_unset=False),
+        update=additional_data,
+    )
+
     session.add(comment)
     await session.commit()
     await session.refresh(comment)
-    return comment
+
+    return await get_board_row_comment_by_id(
+        comment_id=comment.id,
+        session=session,
+    )
 
 
 async def get_board_row_comment_by_id(
-    comment_id: UUID, session: AsyncSession
+    comment_id: UUID,
+    session: AsyncSession,
 ) -> BoardRowComment:
     """
     Fetch a single board row comment by its unique identifier.
@@ -286,7 +362,8 @@ async def get_board_row_comment_by_id(
 
 
 async def get_board_row_comments_by_board_row_id(
-    board_row_id: UUID, session: AsyncSession
+    board_row_id: UUID,
+    session: AsyncSession,
 ) -> list[BoardRowComment]:
     """
     Fetch all comments associated with a specific board row.
@@ -304,7 +381,11 @@ async def get_board_row_comments_by_board_row_id(
     return result.unique().all()
 
 
-async def update_board_row_comment(comment_id: UUID, updated_data: dict, session: AsyncSession) -> BoardRowComment:
+async def update_board_row_comment(
+    comment_id: UUID,
+    updated_data: BoardRowCommentUpdateDTO,
+    session: AsyncSession,
+) -> BoardRowComment:
     """
     Update a board row comment.
 
@@ -315,14 +396,20 @@ async def update_board_row_comment(comment_id: UUID, updated_data: dict, session
     :raises NoResultFound: If the comment does not exist.
     """
     comment = await session.get(BoardRowComment, comment_id)
+
     if comment is None:
         raise NoResultFound
-    for key, value in updated_data.items():
-        setattr(comment, key, value)
+
+    comment.sqlmodel_update(obj=updated_data.model_dump(exclude_unset=True))
+
     session.add(comment)
     await session.commit()
     await session.refresh(comment)
-    return comment
+
+    return await get_board_row_comment_by_id(
+        comment_id=comment_id,
+        session=session,
+    )
 
 
 async def delete_board_row_comment(comment_id: UUID, session: AsyncSession) -> None:
@@ -336,6 +423,8 @@ async def delete_board_row_comment(comment_id: UUID, session: AsyncSession) -> N
     """
     stmt = delete(BoardRowComment).where(BoardRowComment.id == comment_id)
     result = await session.execute(stmt)
+
     if result.rowcount == 0:
         raise NoResultFound
+
     await session.commit()

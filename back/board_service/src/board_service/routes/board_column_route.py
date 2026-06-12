@@ -4,14 +4,16 @@ from uuid import UUID
 from auth_service.routes.authentication_route import get_current_user
 from database_service.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from shared_models.dtos.board_column_in_dto import BoardColumnCreateDTO, BoardColumnUpdateDTO
-from shared_models.dtos.board_column_out_dto import BoardColumnOutDTO
+from shared_models.dtos.board_column_in_dto import (
+    BoardColumnCreateDTO,
+    BoardColumnUpdateDTO,
+)
 from shared_models.dtos.user_auth_dto import UserAuthDTO
+from shared_models.schemas import BoardColumn
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from board_service.services import board_service
-
 
 route = APIRouter(
     prefix="/board-columns",
@@ -32,7 +34,7 @@ async def get_board_columns_by_board_id(
     board_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> list[BoardColumnOutDTO]:
+) -> list[BoardColumn]:
     """
     HTTP GET endpoint to fetch all columns belonging to a board.
 
@@ -52,7 +54,7 @@ async def get_board_column_by_id(
     column_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> BoardColumnOutDTO:
+) -> BoardColumn:
     """
     HTTP GET endpoint to fetch a single board column by its ID.
 
@@ -79,7 +81,7 @@ async def create_board_column(
     column_data: BoardColumnCreateDTO,
     session: db_session_dependency,
     current_user: user_connected_dependency,
-):
+) -> BoardColumn:
     """
     HTTP POST endpoint to create a new board column.
 
@@ -101,7 +103,7 @@ async def update_board_column(
     column_data: BoardColumnUpdateDTO,
     session: db_session_dependency,
     _: user_connected_dependency,
-):
+) -> BoardColumn:
     """
     HTTP PUT endpoint to update an existing board column.
 

@@ -1,11 +1,22 @@
 from uuid import UUID
 
+from shared_models.dtos import (
+    BoardColumnCreateDTO,
+    BoardColumnUpdateDTO,
+    BoardCreateDTO,
+    BoardEventCreateDTO,
+    BoardEventUpdateDTO,
+    BoardPermissionCreateDTO,
+    BoardPermissionUpdateDTO,
+    BoardUpdateDTO,
+)
+from shared_models.enums import UserRoleInBoard
 from shared_models.schemas import Board, BoardColumn, BoardEvent, UserBoardPermission
+from sqlalchemy import delete
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlmodel import select
-from sqlalchemy import delete
 
 
 def get_board_dependencies_loading_options() -> tuple:
@@ -98,7 +109,11 @@ async def get_user_boards(user_id: UUID, session: AsyncSession) -> list[Board]:
     return result.unique().all()
 
 
-async def create_board(board_data: dict, session: AsyncSession) -> Board:
+async def create_board(
+    board_data: BoardCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
+) -> Board:
     """
     Create a new board record in the database.
 
@@ -106,14 +121,28 @@ async def create_board(board_data: dict, session: AsyncSession) -> Board:
     :param session: The active database session.
     :return: The newly created board model.
     """
-    board = Board(**board_data)
+    user_permission = UserBoardPermission()
+    board = Board()
+    board.name = board_data.name
+    board.description = board_data.description
+    board.created_by_id = created_by_id
+    user_permission.user_id = created_by_id
+    user_permission.user_role_in_board = UserRoleInBoard.OWNER
+
+    board.user_relations.append(user_permission)
+
     session.add(board)
     await session.commit()
     await session.refresh(board)
-    return board
+
+    return await get_board_by_id(board_id=board.id, session=session)
 
 
-async def update_board(board_id: UUID, updated_data: dict, session: AsyncSession) -> Board:
+async def update_board(
+    board_id: UUID,
+    updated_data: BoardUpdateDTO,
+    session: AsyncSession,
+) -> Board:
     """
     Update an existing board record.
 
@@ -126,15 +155,16 @@ async def update_board(board_id: UUID, updated_data: dict, session: AsyncSession
     board = await session.get(Board, board_id)
     if board is None:
         raise NoResultFound
-    for key, value in updated_data.items():
-        setattr(board, key, value)
+
+    board.sqlmodel_update(obj=updated_data.model_dump(exclude_unset=True))
+
     session.add(board)
     await session.commit()
-    await session.refresh(board)
-    return board
+
+    return await get_board_by_id(board_id=board_id, session=session)
 
 
-async def delete_board(board_id: UUID, session: AsyncSession) -> Board:
+async def delete_board(board_id: UUID, session: AsyncSession) -> None:
     """
     Delete an existing board record.
 
@@ -146,12 +176,16 @@ async def delete_board(board_id: UUID, session: AsyncSession) -> Board:
     board = await session.get(Board, board_id)
     if board is None:
         raise NoResultFound
+
     await session.delete(board)
     await session.commit()
-    return board
 
 
-async def create_board_column(column_data: dict, session: AsyncSession) -> BoardColumn:
+async def create_board_column(
+    column_data: BoardColumnCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
+) -> BoardColumn:
     """
     Create a new board column.
 
@@ -159,11 +193,22 @@ async def create_board_column(column_data: dict, session: AsyncSession) -> Board
     :param session: The active database session.
     :return: The newly created board column model.
     """
-    column = BoardColumn(**column_data)
+    additional_data = {"created_by_id": created_by_id}
+
+    column = BoardColumn()
+    column.sqlmodel_update(
+        obj=column_data.model_dump(exclude_unset=True),
+        update=additional_data,
+    )
+
     session.add(column)
     await session.commit()
     await session.refresh(column)
-    return column
+
+    return await get_board_column_by_id(
+        column_id=column.id,
+        session=session,
+    )
 
 
 async def get_board_column_by_id(column_id: UUID, session: AsyncSession) -> BoardColumn:
@@ -184,7 +229,8 @@ async def get_board_column_by_id(column_id: UUID, session: AsyncSession) -> Boar
 
 
 async def get_board_columns_by_board_id(
-    board_id: UUID, session: AsyncSession
+    board_id: UUID,
+    session: AsyncSession,
 ) -> list[BoardColumn]:
     """
     Fetch all columns associated with a specific board.
@@ -202,7 +248,11 @@ async def get_board_columns_by_board_id(
     return result.unique().all()
 
 
-async def update_board_column(column_id: UUID, updated_data: dict, session: AsyncSession) -> BoardColumn:
+async def update_board_column(
+    column_id: UUID,
+    updated_data: BoardColumnUpdateDTO,
+    session: AsyncSession,
+) -> BoardColumn:
     """
     Update a board column.
 
@@ -213,14 +263,18 @@ async def update_board_column(column_id: UUID, updated_data: dict, session: Asyn
     :raises NoResultFound: If the column does not exist.
     """
     column = await session.get(BoardColumn, column_id)
+
     if column is None:
         raise NoResultFound
-    for key, value in updated_data.items():
-        setattr(column, key, value)
-    session.add(column)
+
+    column.sqlmodel_update(obj=updated_data.model_dump(exclude_unset=True))
+
     await session.commit()
-    await session.refresh(column)
-    return column
+
+    return await get_board_column_by_id(
+        column_id=column.id,
+        session=session,
+    )
 
 
 async def delete_board_column(column_id: UUID, session: AsyncSession) -> None:
@@ -234,12 +288,18 @@ async def delete_board_column(column_id: UUID, session: AsyncSession) -> None:
     """
     stmt = delete(BoardColumn).where(BoardColumn.id == column_id)
     result = await session.execute(stmt)
+
     if result.rowcount == 0:
         raise NoResultFound
+
     await session.commit()
 
 
-async def create_board_event(event_data: dict, session: AsyncSession) -> BoardEvent:
+async def create_board_event(
+    event_data: BoardEventCreateDTO,
+    created_by_id: UUID,
+    session: AsyncSession,
+) -> BoardEvent:
     """
     Create a board event or milestone.
 
@@ -247,11 +307,25 @@ async def create_board_event(event_data: dict, session: AsyncSession) -> BoardEv
     :param session: The active database session.
     :return: The newly created board event model.
     """
-    event = BoardEvent(**event_data)
+    additional_data = {
+        "created_by_id": created_by_id,
+        "version": 1,
+    }
+
+    event = BoardEvent()
+    event.sqlmodel_update(
+        obj=event_data.model_dump(exclude_unset=True),
+        update=additional_data,
+    )
     session.add(event)
+
     await session.commit()
     await session.refresh(event)
-    return event
+
+    return await get_board_event_by_id(
+        event_id=event.id,
+        session=session,
+    )
 
 
 async def get_board_event_by_id(event_id: UUID, session: AsyncSession) -> BoardEvent:
@@ -272,7 +346,8 @@ async def get_board_event_by_id(event_id: UUID, session: AsyncSession) -> BoardE
 
 
 async def get_board_events_by_board_id(
-    board_id: UUID, session: AsyncSession
+    board_id: UUID,
+    session: AsyncSession,
 ) -> list[BoardEvent]:
     """
     Fetch all events associated with a specific board.
@@ -290,7 +365,11 @@ async def get_board_events_by_board_id(
     return result.unique().all()
 
 
-async def update_board_event(event_id: UUID, updated_data: dict, session: AsyncSession) -> BoardEvent:
+async def update_board_event(
+    event_id: UUID,
+    updated_data: BoardEventUpdateDTO,
+    session: AsyncSession,
+) -> BoardEvent:
     """
     Update a board event.
 
@@ -301,14 +380,18 @@ async def update_board_event(event_id: UUID, updated_data: dict, session: AsyncS
     :raises NoResultFound: If the event does not exist.
     """
     event = await session.get(BoardEvent, event_id)
+
     if event is None:
         raise NoResultFound
-    for key, value in updated_data.items():
-        setattr(event, key, value)
-    session.add(event)
+
+    event.sqlmodel_update(obj=updated_data.model_dump(exclude_unset=True))
+
     await session.commit()
-    await session.refresh(event)
-    return event
+
+    return await get_board_event_by_id(
+        event_id=event.id,
+        session=session,
+    )
 
 
 async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
@@ -322,12 +405,17 @@ async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
     """
     stmt = delete(BoardEvent).where(BoardEvent.id == event_id)
     result = await session.execute(stmt)
+
     if result.rowcount == 0:
         raise NoResultFound
+
     await session.commit()
 
 
-async def add_user_to_board(permission_data: dict, session: AsyncSession) -> UserBoardPermission:
+async def add_user_to_board(
+    permission_data: BoardPermissionCreateDTO,
+    session: AsyncSession,
+) -> UserBoardPermission:
     """
     Add a user to a board with a specific role.
 
@@ -335,15 +423,24 @@ async def add_user_to_board(permission_data: dict, session: AsyncSession) -> Use
     :param session: The active database session.
     :return: The newly created board permission model.
     """
-    permission = UserBoardPermission(**permission_data)
+    permission = UserBoardPermission()
+    permission.sqlmodel_update(obj=permission_data.model_dump(exclude_unset=True))
     session.add(permission)
+
     await session.commit()
     await session.refresh(permission)
-    return permission
+
+    return await get_board_permission(
+        board_id=permission.board_id,
+        user_id=permission.user_id,
+        session=session,
+    )
 
 
 async def get_board_permission(
-    board_id: UUID, user_id: UUID, session: AsyncSession
+    board_id: UUID,
+    user_id: UUID,
+    session: AsyncSession,
 ) -> UserBoardPermission:
     """
     Fetch a single permission attached to a board and user pair.
@@ -366,7 +463,8 @@ async def get_board_permission(
 
 
 async def get_board_permissions_by_board_id(
-    board_id: UUID, session: AsyncSession
+    board_id: UUID,
+    session: AsyncSession,
 ) -> list[UserBoardPermission]:
     """
     Fetch all permissions attached to a specific board.
@@ -385,7 +483,10 @@ async def get_board_permissions_by_board_id(
 
 
 async def update_user_board_permission(
-    board_id: UUID, user_id: UUID, updated_data: dict, session: AsyncSession
+    board_id: UUID,
+    user_id: UUID,
+    updated_data: BoardPermissionUpdateDTO,
+    session: AsyncSession,
 ) -> UserBoardPermission:
     """
     Update a user's role in a board.
@@ -403,17 +504,26 @@ async def update_user_board_permission(
     )
     result = await session.exec(stmt)
     permission = result.first()
+
     if permission is None:
         raise NoResultFound
-    for key, value in updated_data.items():
-        setattr(permission, key, value)
-    session.add(permission)
+
+    permission.sqlmodel_update(obj=updated_data.model_dump(exclude_unset=True))
+
     await session.commit()
-    await session.refresh(permission)
-    return permission
+
+    return await get_board_permission(
+        board_id=permission.board_id,
+        user_id=permission.user_id,
+        session=session,
+    )
 
 
-async def remove_user_from_board(board_id: UUID, user_id: UUID, session: AsyncSession) -> None:
+async def remove_user_from_board(
+    board_id: UUID,
+    user_id: UUID,
+    session: AsyncSession,
+) -> None:
     """
     Remove a user from a board.
 
@@ -428,6 +538,8 @@ async def remove_user_from_board(board_id: UUID, user_id: UUID, session: AsyncSe
         UserBoardPermission.user_id == user_id,
     )
     result = await session.execute(stmt)
+
     if result.rowcount == 0:
         raise NoResultFound
+
     await session.commit()

@@ -10,11 +10,11 @@ from shared_models.dtos.board_permission_in_dto import (
 )
 from shared_models.dtos.board_permission_out_dto import BoardPermissionOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
+from shared_models.schemas import UserBoardPermission
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from board_service.services import board_service
-
 
 route = APIRouter(
     prefix="/boards",
@@ -89,7 +89,7 @@ async def add_user_to_board(
     permission_data: BoardPermissionCreateDTO,
     session: db_session_dependency,
     _: user_connected_dependency,
-):
+) -> UserBoardPermission:
     """
     HTTP POST endpoint to grant a user access to a board.
 
@@ -114,7 +114,7 @@ async def update_user_board_permission(
     permission_data: BoardPermissionUpdateDTO,
     session: db_session_dependency,
     _: user_connected_dependency,
-):
+) -> UserBoardPermission:
     """
     HTTP PUT endpoint to update a user's role on a board.
 
@@ -140,7 +140,10 @@ async def update_user_board_permission(
         ) from exception
 
 
-@route.delete("/{board_id}/permissions/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@route.delete(
+    "/{board_id}/permissions/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def remove_user_from_board(
     board_id: UUID,
     user_id: UUID,

@@ -17,48 +17,19 @@ services:
             retries: 10
             start_period: 40s
 
-    database-seed:
-        build:
-            context: .
-            dockerfile: production/Dockerfile.DatabaseService
-        depends_on:
-            mysql-db:
-                condition: service_healthy
-        restart: "no"
-
-    auth-service:
-        build:
-            context: .
-            dockerfile: production/Dockerfile.AuthService
-        ports:
-            - "5001:5001"
-        depends_on:
-            mysql-db:
-                condition: service_healthy
-            database-seed:
-                condition: service_completed_successfully
-
-    board-service:
-        build:
-            context: .
-            dockerfile: production/Dockerfile.BoardService
-        ports:
-            - "5002:5002"
-        depends_on:
-            mysql-db:
-                condition: service_healthy
-            database-seed:
-                condition: service_completed_successfully
-
     # database-seed:
-    #     image: antonind5/goat-calendar-database_service
+    #     build:
+    #         context: .
+    #         dockerfile: production/Dockerfile.DatabaseService
     #     depends_on:
     #         mysql-db:
     #             condition: service_healthy
     #     restart: "no"
 
     # auth-service:
-    #     image: antonind5/goat-calendar-auth_service
+    #     build:
+    #         context: .
+    #         dockerfile: production/Dockerfile.AuthService
     #     ports:
     #         - "5001:5001"
     #     depends_on:
@@ -68,7 +39,9 @@ services:
     #             condition: service_completed_successfully
 
     # board-service:
-    #     image: antonind5/goat-calendar-board_service
+    #     build:
+    #         context: .
+    #         dockerfile: production/Dockerfile.BoardService
     #     ports:
     #         - "5002:5002"
     #     depends_on:
@@ -76,6 +49,33 @@ services:
     #             condition: service_healthy
     #         database-seed:
     #             condition: service_completed_successfully
+
+    database-seed:
+        image: antonind5/goat-calendar-database_service
+        depends_on:
+            mysql-db:
+                condition: service_healthy
+        restart: "no"
+
+    auth-service:
+        image: antonind5/goat-calendar-auth_service
+        ports:
+            - "5001:5001"
+        depends_on:
+            mysql-db:
+                condition: service_healthy
+            database-seed:
+                condition: service_completed_successfully
+
+    board-service:
+        image: antonind5/goat-calendar-board_service
+        ports:
+            - "5002:5002"
+        depends_on:
+            mysql-db:
+                condition: service_healthy
+            database-seed:
+                condition: service_completed_successfully
 
     # front-service:
     #     build:

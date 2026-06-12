@@ -99,7 +99,11 @@ async def create_board_row(
     )
 
 
-@route.put("/{board_row_id}", response_model=BoardRowOutDTO, status_code=status.HTTP_200_OK)
+@route.put(
+    "/{board_row_id}",
+    response_model=BoardRowOutDTO,
+    status_code=status.HTTP_200_OK,
+)
 async def update_board_row(
     board_row_id: UUID,
     board_row_data: BoardRowUpdateDTO,

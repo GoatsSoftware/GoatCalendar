@@ -10,7 +10,7 @@ from shared_models.dtos.board_row_task_in_dto import (
 )
 from shared_models.dtos.board_row_task_out_dto import BoardRowTaskOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
-from shared_models.exceptions import ConcurrencyException
+from shared_models.exceptions import ConcurrencyError
 from shared_models.schemas import BoardRowTask
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
@@ -43,11 +43,17 @@ async def create_task(
     :return: The newly created task model.
     """
     return await board_row_service.create_board_row_task(
-        task_data=task_data, created_by_id=current_user.id, session=session
+        task_data=task_data,
+        created_by_id=current_user.id,
+        session=session,
     )
 
 
-@route.get("/{task_id}", response_model=BoardRowTaskOutDTO, status_code=status.HTTP_200_OK)
+@route.get(
+    "/{task_id}",
+    response_model=BoardRowTaskOutDTO,
+    status_code=status.HTTP_200_OK,
+)
 async def get_task_by_id(
     task_id: UUID,
     session: db_session_dependency,
@@ -122,12 +128,16 @@ async def get_tasks_by_board_column_id(
     )
 
 
-@route.put("/{task_id}", response_model=BoardRowTaskOutDTO, status_code=status.HTTP_200_OK)
+@route.put(
+    "/{task_id}",
+    response_model=BoardRowTaskOutDTO,
+    status_code=status.HTTP_200_OK,
+)
 async def update_task(
     task_id: UUID,
     task_data: BoardRowTaskUpdateDTO,
     session: db_session_dependency,
-    current_user: user_connected_dependency,
+    _: user_connected_dependency,
 ) -> BoardRowTask:
     """
     HTTP PUT endpoint to update an existing task.
@@ -135,20 +145,22 @@ async def update_task(
     :param task_id: The UUID of the task to update.
     :param task_data: The validated payload containing updated task values.
     :param session: The injected database session.
-    :param current_user: The authenticated user dependency.
+    :param _: The authenticated user dependency.
     :return: The updated task model.
     :raises HTTPException: 404 error if the task does not exist.
     :raises HTTPException: 409 error if the task version is stale.
     """
     try:
         return await board_row_service.update_board_row_task(
-            task_id=task_id, task_data=task_data, session=session
+            task_id=task_id,
+            task_data=task_data,
+            session=session,
         )
-    except ConcurrencyException:
+    except ConcurrencyError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="This task has been modified by another user. Please refresh the board.",
-        )
+        ) from e
     except NoResultFound as exception:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -160,14 +172,14 @@ async def update_task(
 async def delete_task(
     task_id: UUID,
     session: db_session_dependency,
-    current_user: user_connected_dependency,
+    _: user_connected_dependency,
 ) -> Response:
     """
     HTTP DELETE endpoint to remove a task.
 
     :param task_id: The UUID of the task to delete.
     :param session: The injected database session.
-    :param current_user: The authenticated user dependency.
+    :param _: The authenticated user dependency.
     :return: An empty HTTP 204 response.
     :raises HTTPException: 404 error if the task does not exist.
     """

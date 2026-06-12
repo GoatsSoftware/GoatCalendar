@@ -7,7 +7,6 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from shared_models.dtos.board_in_dtos import BoardCreateDTO, BoardUpdateDTO
 from shared_models.dtos.board_out_dto import BoardOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
-from shared_models.schemas import Board
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
@@ -25,8 +24,9 @@ user_connected_dependency = Annotated[UserAuthDTO, Depends(get_current_user)]
 
 @route.get("", response_model=list[BoardOutDTO], status_code=status.HTTP_200_OK)
 async def get_all_boards(
-    session: db_session_dependency, _: user_connected_dependency,
-) -> list[Board]:
+    session: db_session_dependency,
+    _: user_connected_dependency,
+) -> list[BoardOutDTO]:
     """
     HTTP GET endpoint to fetch a list of all existing boards.
 
@@ -42,7 +42,7 @@ async def get_board_by_id(
     board_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> Board:
+) -> BoardOutDTO:
     """
     HTTP GET endpoint to fetch a single board configuration by its ID.
 
@@ -70,7 +70,7 @@ async def get_user_boards(
     user_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> list[Board]:
+) -> list[BoardOutDTO]:
     """
     HTTP GET endpoint to fetch all boards belonging to a specific user.
 
@@ -94,7 +94,7 @@ async def create_board(
     board_data: BoardCreateDTO,
     session: db_session_dependency,
     current_user: user_connected_dependency,
-) -> Board:
+) -> BoardOutDTO:
     """HTTP POST endpoint to create a new board."""
     return await board_service.create_board(
         board_data=board_data,
@@ -109,7 +109,7 @@ async def update_board(
     board_data: BoardUpdateDTO,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> Board:
+) -> BoardOutDTO:
     """HTTP PUT endpoint to update an existing board."""
     try:
         return await board_service.update_board(

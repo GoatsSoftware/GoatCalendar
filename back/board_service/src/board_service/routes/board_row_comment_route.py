@@ -8,13 +8,12 @@ from shared_models.dtos.board_row_comment_in_dto import (
     BoardRowCommentCreateDTO,
     BoardRowCommentUpdateDTO,
 )
-from shared_models.dtos.board_row_comment_out_dto import BoardRowCommentOutDTO
 from shared_models.dtos.user_auth_dto import UserAuthDTO
+from shared_models.schemas import BoardRowComment
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from board_service.services import board_row_service
-
 
 route = APIRouter(
     prefix="/board-row-comments",
@@ -35,7 +34,7 @@ async def get_board_row_comment_by_id(
     comment_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> BoardRowCommentOutDTO:
+) -> BoardRowComment:
     """
     HTTP GET endpoint to fetch a single board row comment by its ID.
 
@@ -65,7 +64,7 @@ async def get_board_row_comments_by_board_row_id(
     board_row_id: UUID,
     session: db_session_dependency,
     _: user_connected_dependency,
-) -> list[BoardRowCommentOutDTO]:
+) -> list[BoardRowComment]:
     """
     HTTP GET endpoint to fetch all comments attached to a board row.
 
@@ -85,7 +84,7 @@ async def create_board_row_comment(
     comment_data: BoardRowCommentCreateDTO,
     session: db_session_dependency,
     current_user: user_connected_dependency,
-):
+) -> BoardRowComment:
     """
     HTTP POST endpoint to create a new comment on a board row.
 
@@ -107,7 +106,7 @@ async def update_board_row_comment(
     comment_data: BoardRowCommentUpdateDTO,
     session: db_session_dependency,
     _: user_connected_dependency,
-):
+) -> BoardRowComment:
     """
     HTTP PUT endpoint to update an existing board row comment.
 
