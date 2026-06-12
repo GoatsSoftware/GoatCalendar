@@ -142,21 +142,28 @@ jobs:
           cd back/${{ matrix.service }}
           CURRENT_VERSION=$(pdm show --version)
           
-          TARGET_REF="HEAD~1"
+          TARGET_REF="${{ github.event.before }}"
+          if [ -z "$TARGET_REF" ] || [ "$TARGET_REF" = "0000000000000000000000000000000000000000" ]; then
+            TARGET_REF="HEAD~1"
+          fi
           
           echo "Comparing current version against $TARGET_REF"
           
-          # Checkout the old pyproject.toml to a temporary file
-          git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > pyproject.toml.old 2>/dev/null || true
-          
-          if [ -s pyproject.toml.old ]; then
-            mv pyproject.toml pyproject.toml.new
-            mv pyproject.toml.old pyproject.toml
-            # Use PDM to read the version from the temporary file safely
-            OLD_VERSION=$(pdm show --version 2>/dev/null || echo "0.0.0")
-            mv pyproject.toml.new pyproject.toml
+          if git diff --name-only "$TARGET_REF" HEAD | grep -q "back/${{ matrix.service }}/pyproject.toml"; then
+            
+            git show "$TARGET_REF:back/${{ matrix.service }}/pyproject.toml" > pyproject.toml.old 2>/dev/null || true
+            
+            if [ -s pyproject.toml.old ]; then
+              mv pyproject.toml pyproject.toml.new
+              mv pyproject.toml.old pyproject.toml
+              OLD_VERSION=$(pdm show --version 2>/dev/null || echo "0.0.0")
+              mv pyproject.toml.new pyproject.toml
+            else
+              OLD_VERSION="0.0.0"
+            fi
           else
-            OLD_VERSION="0.0.0"
+            # If the file didn't change in this push, the version is identical
+            OLD_VERSION="$CURRENT_VERSION"
           fi
           
           echo "Old version: $OLD_VERSION"
@@ -167,6 +174,7 @@ jobs:
             echo "Version has NOT changed. Skipping build/publish."
           else
             echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
             echo "Version changed from $OLD_VERSION to $CURRENT_VERSION."
           fi
 
