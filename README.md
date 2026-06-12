@@ -7,6 +7,7 @@
   - [Installation en prod](#installation-en-prod)
   - [Back](#back-1)
   - [Front](#front-1)
+  - [Lancement de l'application](#lancement-de-lapplication)
 
 # Installation en dev
 
@@ -140,3 +141,12 @@ REFRESH_TOKEN_DURATION_HOURS=24
 ```
 
 ## Front
+
+## Lancement de l'application
+
+Pour lancer les services, se positionner dans le répertoire **GoatCalendar** :
+```bash
+docker-compose pull
+docker-compose build
+docker-compose up
+```
