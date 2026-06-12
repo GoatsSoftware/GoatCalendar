@@ -1,4 +1,9 @@
+from uuid import UUID
+
+from shared_models.dtos.user_dtos import UserInDTO
 from shared_models.schemas import User
+from sqlalchemy import or_
+from sqlalchemy.exc import NoResultFound
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -31,3 +36,35 @@ async def get_user_by_email_address(email_address: str, session: AsyncSession) -
     statement = select(User).where(User.email_address == email_address)
     result = await session.exec(statement)
     return result.unique().one()
+
+
+async def search_users(query: str, session: AsyncSession) -> list[User]:
+    """Search users by display name or email."""
+    search_term = f"%{query}%"
+    statement = select(User).where(
+        or_(
+            User.first_name.ilike(search_term),
+            User.last_name.ilike(search_term),
+            User.email_address.ilike(search_term),
+        ),
+    )
+    result = await session.exec(statement)
+    return result.unique().all()
+
+
+async def update_user(
+    user_id: UUID,
+    update_data: UserInDTO,
+    session: AsyncSession,
+) -> User:
+    """Update a user record."""
+    user = await session.get(User, user_id)
+
+    if user is None:
+        raise NoResultFound
+
+    user.sqlmodel_update(update_data.model_dump(exclude_unset=True))
+
+    await session.commit()
+    await session.refresh(user)
+    return user

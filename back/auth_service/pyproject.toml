@@ -1,6 +1,6 @@
 [project]
 name = "goat-calendar-auth-service"
-version = "0.2.0"
+version = "0.3.0"
 description = "Default template for PDM package"
 authors = [
     {name = "GoatsSoftware", email = "antonin.durand576@gmail.com"},

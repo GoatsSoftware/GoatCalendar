@@ -20,7 +20,10 @@ route = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/authentication/auth", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="http://localhost:5001/authentication/auth",
+    auto_error=False,
+)
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
