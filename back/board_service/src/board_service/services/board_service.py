@@ -5,7 +5,6 @@ from shared_models.dtos import (
     BoardColumnUpdateDTO,
     BoardEventCreateDTO,
     BoardEventUpdateDTO,
-    BoardPermissionCreateDTO,
     BoardPermissionUpdateDTO,
 )
 from shared_models.dtos.board_event_out_dto import BoardEventOutDTO
@@ -353,7 +352,7 @@ async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
 
 
 async def add_user_to_board(
-    permission_data: BoardPermissionCreateDTO,
+    permission_data: dict,
     session: AsyncSession,
 ) -> UserBoardPermission:
     """

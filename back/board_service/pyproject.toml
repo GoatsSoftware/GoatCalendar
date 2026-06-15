@@ -14,6 +14,7 @@ license = {text = "MIT"}
 test = [
     "ruff>=0.15.15",
     "pytest>=9.1.0",
+    "pytest-cov>=7.1.0",
 ]
 prod = [
     "goat-calendar-database-service",
@@ -70,10 +71,12 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
+    "ANN001", # Parametrized test callables are intentionally generic
     "D101", # Test classes are named descriptively
     "D102", # Test methods are named descriptively
     "D103", # Fixtures are named descriptively
     "PLR2004", # HTTP status codes are clearer inline in assertions
+    "PT012", # Parametrized exception tests may select one of two calls
     "S101", # Pytest uses plain assertions
     "S106", # Test tokens are intentionally hardcoded
 ]

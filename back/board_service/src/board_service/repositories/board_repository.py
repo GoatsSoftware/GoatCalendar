@@ -6,7 +6,6 @@ from shared_models.dtos import (
     BoardCreateDTO,
     BoardEventCreateDTO,
     BoardEventUpdateDTO,
-    BoardPermissionCreateDTO,
     BoardPermissionUpdateDTO,
     BoardUpdateDTO,
 )
@@ -416,7 +415,7 @@ async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
 
 
 async def add_user_to_board(
-    permission_data: BoardPermissionCreateDTO,
+    permission_data: dict,
     session: AsyncSession,
 ) -> UserBoardPermission:
     """
@@ -427,7 +426,7 @@ async def add_user_to_board(
     :return: The newly created board permission model.
     """
     permission = UserBoardPermission()
-    permission.sqlmodel_update(obj=permission_data.model_dump(exclude_unset=True))
+    permission.sqlmodel_update(obj=permission_data)
     session.add(permission)
 
     await session.commit()
