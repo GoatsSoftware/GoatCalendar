@@ -23,6 +23,8 @@ class UserOutDTO(BaseModel):
 
 
 class UserInDTO(BaseModel):
+    """Input payload used to create or update a user."""
+
     email_address: str | None = Field(default=None)
 
     first_name: str | None = Field(default=None)

@@ -11,6 +11,8 @@ class UserSearchQueryDTO(BaseModel):
     @field_validator("q")
     @classmethod
     def validate_q(cls, value: str) -> str:
+        """Reject search queries containing unsupported characters."""  # noqa: D202
+
         normalized_value = value.strip()
         message = f"Search query must be at least {MIN_SEARCH_QUERY_LENGTH} characters"
 
