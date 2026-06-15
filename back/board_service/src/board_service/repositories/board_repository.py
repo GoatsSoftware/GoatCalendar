@@ -118,6 +118,7 @@ async def create_board(
     Create a new board record in the database.
 
     :param board_data: The raw board payload ready for persistence.
+    :param created_by_id: The UUID of the user creating the board.
     :param session: The active database session.
     :return: The newly created board model.
     """
@@ -170,7 +171,7 @@ async def delete_board(board_id: UUID, session: AsyncSession) -> None:
 
     :param board_id: The UUID of the board to delete.
     :param session: The active database session.
-    :return: The deleted board model.
+    :return: None.
     :raises NoResultFound: If the board does not exist.
     """
     board = await session.get(Board, board_id)
@@ -190,6 +191,7 @@ async def create_board_column(
     Create a new board column.
 
     :param column_data: The raw board column payload ready for persistence.
+    :param created_by_id: The UUID of the user creating the column.
     :param session: The active database session.
     :return: The newly created board column model.
     """
@@ -304,6 +306,7 @@ async def create_board_event(
     Create a board event or milestone.
 
     :param event_data: The raw board event payload ready for persistence.
+    :param created_by_id: The UUID of the user creating the event.
     :param session: The active database session.
     :return: The newly created board event model.
     """

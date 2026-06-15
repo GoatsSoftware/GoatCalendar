@@ -95,7 +95,14 @@ async def create_board(
     session: db_session_dependency,
     current_user: user_connected_dependency,
 ) -> BoardOutDTO:
-    """HTTP POST endpoint to create a new board."""
+    """
+    HTTP POST endpoint to create a new board.
+
+    :param board_data: The validated payload describing the new board.
+    :param session: The injected database session.
+    :param current_user: The authenticated user creating the board.
+    :return: The newly created board data transfer object.
+    """
     return await board_service.create_board(
         board_data=board_data,
         created_by_id=current_user.id,
@@ -110,7 +117,16 @@ async def update_board(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> BoardOutDTO:
-    """HTTP PUT endpoint to update an existing board."""
+    """
+    HTTP PUT endpoint to update an existing board.
+
+    :param board_id: The UUID of the board to update.
+    :param board_data: The validated payload containing updated board values.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The updated board data transfer object.
+    :raises HTTPException: 404 error if the board does not exist.
+    """
     try:
         return await board_service.update_board(
             board_id=board_id,
@@ -130,7 +146,15 @@ async def delete_board(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> Response:
-    """HTTP DELETE endpoint to remove a board."""
+    """
+    HTTP DELETE endpoint to remove a board.
+
+    :param board_id: The UUID of the board to delete.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: An empty HTTP 204 response.
+    :raises HTTPException: 404 error if the board does not exist.
+    """
     try:
         await board_service.delete_board(board_id=board_id, session=session)
         return Response(status_code=status.HTTP_204_NO_CONTENT)

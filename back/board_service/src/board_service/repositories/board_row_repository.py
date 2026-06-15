@@ -103,6 +103,7 @@ async def create_board_row_task(
     Create a new task inside a board row.
 
     :param task_data: The raw task payload ready for persistence.
+    :param created_by_id: The UUID of the user creating the task.
     :param session: The active database session.
     :return: The newly created board row task model.
     """
@@ -241,6 +242,7 @@ async def create_board_row(
     Create a new board row record in the database.
 
     :param board_row_data: The raw board row payload ready for persistence.
+    :param created_by_id: The UUID of the user creating the board row.
     :param session: The active database session.
     :return: The newly created board row model.
     """
@@ -299,7 +301,7 @@ async def delete_board_row(board_row_id: UUID, session: AsyncSession) -> None:
 
     :param board_row_id: The UUID of the row to delete.
     :param session: The active database session.
-    :return: The deleted board row model.
+    :return: None.
     :raises NoResultFound: If the row does not exist.
     """
     board_row = await session.get(BoardRow, board_row_id)
@@ -320,6 +322,7 @@ async def create_board_row_comment(
     Create a new comment on a board row.
 
     :param comment_data: The raw comment payload ready for persistence.
+    :param created_by_id: The UUID of the user creating the comment.
     :param session: The active database session.
     :return: The newly created board row comment model.
     """
