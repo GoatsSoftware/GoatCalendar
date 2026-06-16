@@ -7,6 +7,8 @@ from shared_models.enums import BoardTaskStatus
 
 
 class BoardRowTaskCreateDTO(BaseModel):
+    """Payload used to create a task in a board row."""
+
     board_row_id: UUID
     board_column_id: UUID
 
@@ -20,6 +22,8 @@ class BoardRowTaskCreateDTO(BaseModel):
 
 
 class BoardRowTaskUpdateDTO(BaseModel):
+    """Payload used to update a task in a board row."""
+
     task_name: str | None = Field(default=None, max_length=125)
     task_content: str | None = Field(default=None, max_length=125)
     task_status: BoardTaskStatus | None = None

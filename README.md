@@ -57,6 +57,11 @@ To export dependancies for production (used automatically in dockerfile) :
 pdm export --pyproject --prod --group prod --format requirements --output requirements.txt --no-hashes
 ```
 
+To execute tests :
+```bash
+pdm run pytest
+```
+
 Create a `.env` file for each project in `back` folder :
 
 - Database service

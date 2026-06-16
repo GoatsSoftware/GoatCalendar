@@ -91,7 +91,14 @@ async def create_board_row(
     session: db_session_dependency,
     current_user: user_connected_dependency,
 ) -> BoardRow:
-    """HTTP POST endpoint to create a new board row."""
+    """
+    HTTP POST endpoint to create a new board row.
+
+    :param board_row_data: The validated payload describing the new board row.
+    :param session: The injected database session.
+    :param current_user: The authenticated user creating the board row.
+    :return: The newly created board row model.
+    """
     return await board_row_service.create_board_row(
         board_row_data=board_row_data,
         created_by_id=current_user.id,
@@ -110,7 +117,16 @@ async def update_board_row(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> BoardRow:
-    """HTTP PUT endpoint to update an existing board row."""
+    """
+    HTTP PUT endpoint to update an existing board row.
+
+    :param board_row_id: The UUID of the board row to update.
+    :param board_row_data: The validated payload containing updated row values.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: The updated board row model.
+    :raises HTTPException: 404 error if the board row does not exist.
+    """
     try:
         return await board_row_service.update_board_row(
             board_row_id=board_row_id,
@@ -130,7 +146,15 @@ async def delete_board_row(
     session: db_session_dependency,
     _: user_connected_dependency,
 ) -> Response:
-    """HTTP DELETE endpoint to remove a board row."""
+    """
+    HTTP DELETE endpoint to remove a board row.
+
+    :param board_row_id: The UUID of the board row to delete.
+    :param session: The injected database session.
+    :param _: The authenticated user dependency.
+    :return: An empty HTTP 204 response.
+    :raises HTTPException: 404 error if the board row does not exist.
+    """
     try:
         await board_row_service.delete_board_row(
             board_row_id=board_row_id,

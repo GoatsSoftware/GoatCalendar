@@ -1,3 +1,4 @@
+import logging
 from asyncio import sleep
 from collections.abc import AsyncGenerator
 
@@ -7,6 +8,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 db_conn_settings = get_db_connection_settings()
 max_db_conn_retries = 10
@@ -34,7 +37,11 @@ async def create_db_and_tables(nb_tries: int = 0) -> None:
         async with engine.begin() as conn:
             await conn.run_sync(SQLModel.metadata.create_all)
     except SQLAlchemyError as exception:
-        print(f"Failed to connect to db in try n°{nb_tries}, exception: {exception}")
+        logger.warning(
+            "Failed to connect to database on attempt %s: %s",
+            nb_tries,
+            exception,
+        )
 
         # retry connection
         if nb_tries < max_db_conn_retries:

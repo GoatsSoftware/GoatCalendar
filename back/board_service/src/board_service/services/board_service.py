@@ -5,7 +5,6 @@ from shared_models.dtos import (
     BoardColumnUpdateDTO,
     BoardEventCreateDTO,
     BoardEventUpdateDTO,
-    BoardPermissionCreateDTO,
     BoardPermissionUpdateDTO,
 )
 from shared_models.dtos.board_event_out_dto import BoardEventOutDTO
@@ -117,7 +116,14 @@ async def create_board(
     created_by_id: UUID,
     session: AsyncSession,
 ) -> BoardOutDTO:
-    """Create a new board and return its serialized DTO."""
+    """
+    Create a new board and return its serialized DTO.
+
+    :param board_data: The validated payload describing the new board.
+    :param created_by_id: The UUID of the authenticated board creator.
+    :param session: The active database session.
+    :return: The newly created board output DTO.
+    """
     board = await board_repository.create_board(
         board_data=board_data,
         created_by_id=created_by_id,
@@ -162,7 +168,14 @@ async def update_board(
     board_data: BoardUpdateDTO,
     session: AsyncSession,
 ) -> BoardOutDTO:
-    """Update an existing board and return the latest DTO."""
+    """
+    Update an existing board and return the latest DTO.
+
+    :param board_id: The UUID of the board to update.
+    :param board_data: The validated payload containing updated board values.
+    :param session: The active database session.
+    :return: The updated board output DTO.
+    """
     board = await board_repository.update_board(
         board_id=board_id,
         updated_data=board_data,
@@ -172,7 +185,13 @@ async def update_board(
 
 
 async def delete_board(board_id: UUID, session: AsyncSession) -> None:
-    """Delete a board by its identifier."""
+    """
+    Delete a board by its identifier.
+
+    :param board_id: The UUID of the board to delete.
+    :param session: The active database session.
+    :return: None.
+    """
     await board_repository.delete_board(board_id=board_id, session=session)
 
 
@@ -333,7 +352,7 @@ async def delete_board_event(event_id: UUID, session: AsyncSession) -> None:
 
 
 async def add_user_to_board(
-    permission_data: BoardPermissionCreateDTO,
+    permission_data: dict,
     session: AsyncSession,
 ) -> UserBoardPermission:
     """

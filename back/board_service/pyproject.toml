@@ -1,6 +1,6 @@
 [project]
 name = "goat-calendar-board-service"
-version = "0.3.1"
+version = "0.3.2"
 description = "Default template for PDM package"
 authors = [
     {name = "GoatsSoftware", email = "antonin.durand576@gmail.com"},
@@ -13,6 +13,8 @@ license = {text = "MIT"}
 [project.optional-dependencies]
 test = [
     "ruff>=0.15.15",
+    "pytest>=9.1.0",
+    "pytest-cov>=7.1.0",
 ]
 prod = [
     "goat-calendar-database-service",
@@ -43,6 +45,9 @@ ruff_format = "ruff format"
 ruff_all = {composite = ["ruff_format", "ruff_lint"]}
 dev_win = { cmd = "fastapi dev main.py --host %SERVER_HOST% --port %SERVER_PORT%", env_file = ".env" }
 
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
@@ -60,5 +65,18 @@ ignore = [
     "D100", # Missing docstring in public module
     "TRY003", # Avoid specifying long messages outside the exception class
     "EM101", # Exception must not use a string literal, assign to variable first,
-    "FAST001" # FastAPI routes with redundant `response_model` argument
+    "FAST001", # FastAPI routes with redundant `response_model` argument
+    "COM812", # Conflicts with the Ruff formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "ANN001", # Parametrized test callables are intentionally generic
+    "D101", # Test classes are named descriptively
+    "D102", # Test methods are named descriptively
+    "D103", # Fixtures are named descriptively
+    "PLR2004", # HTTP status codes are clearer inline in assertions
+    "PT012", # Parametrized exception tests may select one of two calls
+    "S101", # Pytest uses plain assertions
+    "S106", # Test tokens are intentionally hardcoded
 ]

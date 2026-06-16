@@ -176,7 +176,7 @@ async def refresh_access_token(
         minutes=AUTH_SETTINGS.access_token_duration_minutes,
     )
     new_access_token = create_token(
-        data={"sub": user.email_address},
+        data={"sub": user.email_address, "token_type": TokenType.ACCESS},
         expires_delta=access_token_expires,
     )
 
