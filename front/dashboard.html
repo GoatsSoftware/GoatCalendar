@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GoatCalendar - Boards</title>
+    <link rel="stylesheet" href="./styles/main.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand-lockup compact" href="./dashboard.html">
+        <img src="./assets/logo_efrei.png" alt="EFREI" class="school-logo">
+        <strong>GoatCalendar</strong>
+      </a>
+      <nav class="top-nav">
+        <a href="./dashboard.html" aria-current="page">Boards</a>
+        <a href="./board.html">Board detail</a>
+      </nav>
+      <div class="header-actions">
+        <span id="current-user" class="user-chip"></span>
+        <button id="logout-button" class="button button-secondary" type="button">Logout</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="page-title">
+        <div>
+          <p class="eyebrow">Workspace</p>
+          <h1>Boards and users</h1>
+        </div>
+        <button id="refresh-button" class="button button-secondary" type="button">Refresh</button>
+      </section>
+
+      <section class="grid-two">
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Boards</h2>
+            <span id="board-count" class="counter-pill">0</span>
+          </div>
+          <form id="create-board-form" class="inline-form">
+            <input name="name" placeholder="Board name" maxlength="125" required>
+            <input name="description" placeholder="Description" maxlength="250">
+            <button class="button button-primary" type="submit">Create</button>
+          </form>
+          <div id="boards-list" class="board-list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Users</h2>
+          </div>
+          <form id="search-users-form" class="inline-form">
+            <input name="q" placeholder="Search users" minlength="2">
+            <button class="button button-secondary" type="submit">Search</button>
+          </form>
+          <div id="users-list" class="user-list"></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>My profile</h2>
+        </div>
+        <form id="profile-form" class="inline-form">
+          <input name="first_name" placeholder="First name">
+          <input name="last_name" placeholder="Last name">
+          <input name="email_address" type="email" placeholder="Email">
+          <button class="button button-primary" type="submit">Update</button>
+        </form>
+        <p id="dashboard-feedback" class="form-feedback" role="status"></p>
+      </section>
+    </main>
+    <script type="module" src="./scripts/pages/dashboard.js"></script>
+  </body>
+</html>

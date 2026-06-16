@@ -1,0 +1,55 @@
+.counter-pill,
+.user-chip,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: var(--radius-small);
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.counter-pill,
+.user-chip {
+  background: #f0f3ff;
+  color: var(--color-primary);
+}
+
+.status-pill {
+  color: #ffffff;
+}
+
+.status-done {
+  background: var(--color-positive);
+}
+
+.status-working {
+  background: var(--color-warning);
+}
+
+.status-stuck {
+  background: var(--color-negative);
+}
+
+.status-neutral {
+  background: var(--color-purple);
+}
+
+.muted {
+  color: var(--color-muted);
+}
+
+.board-card {
+  display: grid;
+  gap: 10px;
+  border-left: 5px solid var(--color-primary);
+}
+
+.board-card:nth-child(3n + 2) {
+  border-left-color: var(--color-positive);
+}
+
+.board-card:nth-child(3n) {
+  border-left-color: var(--color-warning);
+}

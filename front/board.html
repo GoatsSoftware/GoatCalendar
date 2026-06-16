@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GoatCalendar - Board detail</title>
+    <link rel="stylesheet" href="./styles/main.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand-lockup compact" href="./dashboard.html">
+        <img src="./assets/logo_efrei.png" alt="EFREI" class="school-logo">
+        <strong>GoatCalendar</strong>
+      </a>
+      <nav class="top-nav">
+        <a href="./dashboard.html">Boards</a>
+        <a href="./board.html" aria-current="page">Board detail</a>
+      </nav>
+      <div class="header-actions">
+        <span id="current-user" class="user-chip"></span>
+        <button id="logout-button" class="button button-secondary" type="button">Logout</button>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="page-title">
+        <div>
+          <p class="eyebrow">Board</p>
+          <h1 id="board-title">Board detail</h1>
+        </div>
+        <form id="load-board-form" class="inline-form tight">
+          <input name="board_id" placeholder="Board UUID" required>
+          <button class="button button-primary" type="submit">Load</button>
+        </form>
+      </section>
+
+      <section class="status-strip">
+        <span class="status-pill status-done">Completed</span>
+        <span class="status-pill status-working">Accepted</span>
+        <span class="status-pill status-stuck">Pending</span>
+      </section>
+
+      <section class="board-toolbar panel">
+        <form id="create-column-form" class="inline-form">
+          <select name="name">
+            <option value="TaskName">Task name</option>
+            <option value="TaskContent">Task content</option>
+            <option value="TaskStatus">Task status</option>
+            <option value="Deadline">Deadline</option>
+            <option value="Comment">Comment</option>
+          </select>
+          <select name="type">
+            <option value="TEXT">Text</option>
+            <option value="LONG_TEXT">Long text</option>
+            <option value="STATUS">Status</option>
+            <option value="DATE">Date</option>
+            <option value="COMMENT">Comment</option>
+          </select>
+          <input name="position" type="number" min="0" value="0">
+          <button class="button button-secondary" type="submit">Add column</button>
+        </form>
+        <button id="create-row-button" class="button button-primary" type="button">Add row</button>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Rows and tasks</h2>
+          <span id="board-feedback" class="form-feedback" role="status"></span>
+        </div>
+        <div id="board-grid" class="work-table"></div>
+      </section>
+
+      <section class="grid-two">
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Events</h2>
+          </div>
+          <form id="create-event-form" class="form-grid">
+            <input name="title" placeholder="Title" maxlength="125">
+            <input name="description" placeholder="Description" maxlength="250">
+            <input name="starting_from" type="date" required>
+            <input name="deadline" type="date" required>
+            <button class="button button-primary" type="submit">Create event</button>
+          </form>
+          <div id="events-list" class="compact-list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-header">
+            <h2>Permissions</h2>
+          </div>
+          <form id="add-permission-form" class="form-grid">
+            <input name="user_id" placeholder="User UUID" required>
+            <select name="user_role_in_board">
+              <option value="viewer">Viewer</option>
+              <option value="editor">Editor</option>
+              <option value="owner">Owner</option>
+            </select>
+            <button class="button button-primary" type="submit">Invite</button>
+          </form>
+          <div id="permissions-list" class="compact-list"></div>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="./scripts/pages/board.js"></script>
+  </body>
+</html>

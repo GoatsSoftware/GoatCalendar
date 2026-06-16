@@ -1,0 +1,58 @@
+:root {
+  --color-primary: #0073ea;
+  --color-primary-strong: #0060c7;
+  --color-positive: #00c875;
+  --color-warning: #fdab3d;
+  --color-negative: #e2445c;
+  --color-purple: #a25ddc;
+  --color-ink: #323338;
+  --color-muted: #676879;
+  --color-line: #d0d4e4;
+  --color-panel: #ffffff;
+  --color-page: #f6f7fb;
+  --color-hover: #e5f4ff;
+  --shadow-soft: 0 8px 22px rgba(29, 30, 43, 0.08);
+  --radius-small: 6px;
+  --radius-panel: 8px;
+  --font-main: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--color-ink);
+  background: var(--color-page);
+  font-family: var(--font-main);
+  font-size: 15px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.eyebrow {
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
