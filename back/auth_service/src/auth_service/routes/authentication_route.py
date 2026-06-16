@@ -21,7 +21,7 @@ route = APIRouter(
 )
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="http://localhost:5001/authentication/auth",
+    tokenUrl="/authentication/auth",
     auto_error=False,
 )
 

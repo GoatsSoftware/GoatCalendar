@@ -578,7 +578,12 @@ class TestBoardRowRepository:
             is None
         )
 
+        session.execute.return_value = Mock(rowcount=1)
         asyncio.run(board_row_repository.delete_board_row_task(TASK_ID, session))
+
+        session.execute.return_value = Mock(rowcount=0)
+        with pytest.raises(NoResultFound):
+            asyncio.run(board_row_repository.delete_board_row_task(TASK_ID, session))
 
     def test_comment_crud(self) -> None:
         session = board_session()

@@ -81,7 +81,7 @@ DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 SERVER_HOST="127.0.0.1"
 SERVER_PORT=5001
-FRONT_URL="127.0.0.1:80"
+FRONT_URL="http://127.0.0.1:80"
 ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
 ACCESS_TOKEN_DURATION_MINUTES=1000
 REFRESH_TOKEN_DURATION_HOURS=24
@@ -95,7 +95,7 @@ DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 SERVER_HOST="127.0.0.1"
 SERVER_PORT=5002
-FRONT_URL="127.0.0.1:80"
+FRONT_URL="http://127.0.0.1:80"
 ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
 ACCESS_TOKEN_DURATION_MINUTES=1000
 REFRESH_TOKEN_DURATION_HOURS=24
@@ -125,7 +125,7 @@ DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"
 SERVER_HOST="0.0.0.0"
 SERVER_PORT=5001
-FRONT_URL="front-service:80"
+FRONT_URL="http://front-service:80"
 ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
 ACCESS_TOKEN_DURATION_MINUTES=1000
 REFRESH_TOKEN_DURATION_HOURS=24
@@ -139,7 +139,7 @@ DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"
 SERVER_HOST="0.0.0.0"
 SERVER_PORT=5002
-FRONT_URL="front-service:80"
+FRONT_URL="http://front-service:80"
 ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
 ACCESS_TOKEN_DURATION_MINUTES=1000
 REFRESH_TOKEN_DURATION_HOURS=24
