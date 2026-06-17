@@ -190,7 +190,8 @@ class TestBoardRepositoryCrud:
         assert stored_board.name == "New"
 
         asyncio.run(board_repository.delete_board(BOARD_ID, session))
-        session.delete.assert_awaited_once_with(stored_board)
+        assert session.execute.await_count == 7
+        session.commit.assert_awaited()
 
     @pytest.mark.parametrize(
         "repository_method",
