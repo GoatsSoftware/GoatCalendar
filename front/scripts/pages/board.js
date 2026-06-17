@@ -224,23 +224,26 @@ function renderTasksCell(row) {
   const cell = createElement("div", "table-cell");
 
   if (!row.tasks?.length) {
-    cell.append(createElement("span", "muted", "No tasks"));
+    cell.append(createElement("span", "muted", "No task yet"));
     return cell;
   }
 
   row.tasks.forEach((task) => {
     const wrapper = createElement("div", "task-actions");
-    const taskItem = createElement("button", "task-line", task.task_name);
+    const taskItem = createElement("div", "task-line");
     const actions = createElement("div", "mini-actions");
+    const editButton = createElement("button", "button button-secondary", "Edit");
     const deleteButton = createElement("button", "button button-secondary", "Delete");
 
-    taskItem.type = "button";
-    taskItem.title = task.task_content || "Click to cycle status";
-    taskItem.append(createElement("span", "muted", `v${task.version}`));
-    taskItem.addEventListener("click", () => cycleTaskStatus(task));
+    taskItem.append(
+      createElement("strong", "", task.task_name),
+      createElement("span", "muted", `v${task.version}`),
+    );
+    editButton.type = "button";
+    editButton.addEventListener("click", () => editTask(task));
     deleteButton.type = "button";
     deleteButton.addEventListener("click", () => deleteTask(task));
-    actions.append(deleteButton);
+    actions.append(editButton, deleteButton);
     wrapper.append(taskItem, actions);
     cell.append(wrapper);
   });
@@ -250,8 +253,16 @@ function renderTasksCell(row) {
 
 function renderStatusCell(row) {
   const cell = createElement("div", "table-cell");
-  const status = row.tasks?.[0]?.task_status ?? "pending";
-  cell.append(statusPill(status));
+
+  if (!row.tasks?.length) {
+    cell.append(createElement("span", "muted", "-"));
+    return cell;
+  }
+
+  row.tasks.forEach((task) => {
+    cell.append(statusSelect(task));
+  });
+
   return cell;
 }
 
@@ -374,6 +385,27 @@ function statusPill(status) {
   return createElement("span", `status-pill ${classes[status] ?? "status-neutral"}`, status);
 }
 
+function statusSelect(task) {
+  const select = document.createElement("select");
+  select.className = "status-select";
+  select.title = `Update ${task.task_name} status`;
+
+  [
+    ["pending", "Pending"],
+    ["accepted", "Accepted"],
+    ["completed", "Completed"],
+  ].forEach(([value, label]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    option.selected = value === task.task_status;
+    select.append(option);
+  });
+
+  select.addEventListener("change", () => updateTaskStatus(task, select.value));
+  return select;
+}
+
 async function deleteColumn(column) {
   try {
     await boardApi.deleteColumn(column.id);
@@ -427,16 +459,36 @@ async function deleteTask(task) {
   }
 }
 
-async function cycleTaskStatus(task) {
-  const next = {
-    pending: "accepted",
-    accepted: "completed",
-    completed: "pending",
-  }[task.task_status] ?? "pending";
+async function updateTaskStatus(task, taskStatus) {
+  try {
+    await boardApi.updateTask(task.id, {
+      task_status: taskStatus,
+      version: task.version,
+    });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Task status updated.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function editTask(task) {
+  const taskName = window.prompt("Task name", task.task_name);
+
+  if (!taskName) {
+    return;
+  }
+
+  const taskContent = window.prompt("Task content", task.task_content ?? "");
+
+  if (taskContent === null) {
+    return;
+  }
 
   try {
     await boardApi.updateTask(task.id, {
-      task_status: next,
+      task_name: taskName,
+      task_content: taskContent,
       version: task.version,
     });
     await loadBoard(state.board.id);

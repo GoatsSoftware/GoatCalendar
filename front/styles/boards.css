@@ -75,10 +75,29 @@
   border-radius: var(--radius-small);
   background: transparent;
   color: var(--color-ink);
-  cursor: pointer;
   font: inherit;
   padding: 6px;
   text-align: left;
+}
+
+.status-select {
+  border-width: 0;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.status-select:has(option[value="completed"]:checked) {
+  background: var(--color-positive);
+}
+
+.status-select:has(option[value="accepted"]:checked) {
+  background: var(--color-warning);
+}
+
+.status-select:has(option[value="pending"]:checked) {
+  background: var(--color-negative);
 }
 
 .task-actions {
