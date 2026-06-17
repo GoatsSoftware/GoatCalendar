@@ -41,26 +41,29 @@
       </section>
 
       <section class="board-toolbar panel">
-        <form id="create-column-form" class="inline-form">
-          <select name="name">
-            <option value="TaskName">Task name</option>
-            <option value="TaskContent">Task content</option>
-            <option value="TaskStatus">Task status</option>
-            <option value="Deadline">Deadline</option>
-            <option value="Comment">Comment</option>
-          </select>
-          <select name="type">
-            <option value="TEXT">Text</option>
-            <option value="LONG_TEXT">Long text</option>
-            <option value="STATUS">Status</option>
-            <option value="DATE">Date</option>
-            <option value="COMMENT">Comment</option>
-          </select>
-          <input name="position" type="number" min="0" value="0">
-          <button class="button button-secondary" type="submit">Add column</button>
-        </form>
-        <button id="create-row-button" class="button button-primary" type="button">Add row</button>
-        <div id="columns-list" class="chip-list"></div>
+        <button id="create-row-button" class="button button-primary" type="button">Add task row</button>
+        <details class="columns-details">
+          <summary>Columns</summary>
+          <form id="create-column-form" class="inline-form">
+            <select name="name">
+              <option value="TaskName">Task name</option>
+              <option value="TaskContent">Task content</option>
+              <option value="TaskStatus">Task status</option>
+              <option value="Deadline">Deadline</option>
+              <option value="Comment">Comment</option>
+            </select>
+            <select name="type">
+              <option value="TEXT">Text</option>
+              <option value="LONG_TEXT">Long text</option>
+              <option value="STATUS">Status</option>
+              <option value="DATE">Date</option>
+              <option value="COMMENT">Comment</option>
+            </select>
+            <input name="position" type="text" inputmode="numeric" pattern="[0-9]*" value="0">
+            <button class="button button-secondary" type="submit">Add column</button>
+          </form>
+          <div id="columns-list" class="chip-list"></div>
+        </details>
       </section>
 
       <section class="panel">

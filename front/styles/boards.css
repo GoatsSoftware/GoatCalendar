@@ -39,9 +39,20 @@
 
 .chip-list {
   display: flex;
-  flex-basis: 100%;
   flex-wrap: wrap;
   gap: 8px;
+  margin-top: 10px;
+}
+
+.columns-details {
+  min-width: min(100%, 720px);
+}
+
+.columns-details summary {
+  cursor: pointer;
+  color: var(--color-muted);
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .column-chip {
@@ -78,6 +89,11 @@
   font: inherit;
   padding: 6px;
   text-align: left;
+}
+
+.task-content {
+  color: var(--color-muted);
+  line-height: 1.35;
 }
 
 .status-select {

@@ -53,9 +53,32 @@ $("#create-row-button").addEventListener("click", async () => {
   }
 
   try {
-    await boardApi.createRow(state.board.id);
+    const taskName = window.prompt("Task name", "New task");
+
+    if (!taskName) {
+      return;
+    }
+
+    const taskContent = window.prompt("Task content", "");
+
+    if (taskContent === null) {
+      return;
+    }
+
+    const taskColumn = await ensureTaskColumn();
+    const row = await boardApi.createRow(state.board.id);
+    await boardApi.createTask({
+      board_row_id: row.id,
+      board_column_id: taskColumn.id,
+      task_name: taskName,
+      task_content: taskContent,
+      task_status: "pending",
+      starting_from: today(),
+      deadline: today(),
+      assigned_to_id: getDefaultAssigneeId(),
+    });
     await loadBoard(state.board.id);
-    setFeedback(feedback, "Row created.", "success");
+    setFeedback(feedback, "Task row created.", "success");
   } catch (error) {
     setFeedback(feedback, error.message, "error");
   }
@@ -194,9 +217,9 @@ function renderBoard() {
     const line = createElement("article", "table-row");
     line.append(
       renderRowCell(row, index),
-      renderTasksCell(row),
+      renderTaskNameCell(row),
+      renderTaskContentCell(row),
       renderStatusCell(row),
-      renderCommentsCell(row),
       renderRowActions(row),
     );
     boardGrid.append(line);
@@ -205,7 +228,7 @@ function renderBoard() {
 
 function renderHeaderRow() {
   const header = createElement("div", "table-row header");
-  ["Row", "Tasks", "Status", "Comments", "Actions"].forEach((label) => {
+  ["Row", "Task name", "Content", "Status", "Actions"].forEach((label) => {
     header.append(createElement("span", "table-cell", label));
   });
   return header;
@@ -220,49 +243,48 @@ function renderRowCell(row, index) {
   return cell;
 }
 
-function renderTasksCell(row) {
+function renderTaskNameCell(row) {
   const cell = createElement("div", "table-cell");
+  const task = primaryTask(row);
 
-  if (!row.tasks?.length) {
+  if (!task) {
     cell.append(createElement("span", "muted", "No task yet"));
     return cell;
   }
 
-  row.tasks.forEach((task) => {
-    const wrapper = createElement("div", "task-actions");
-    const taskItem = createElement("div", "task-line");
-    const actions = createElement("div", "mini-actions");
-    const editButton = createElement("button", "button button-secondary", "Edit");
-    const deleteButton = createElement("button", "button button-secondary", "Delete");
+  const taskItem = createElement("div", "task-line");
+  taskItem.append(
+    createElement("strong", "", task.task_name),
+    createElement("span", "muted", `v${task.version}`),
+  );
+  cell.append(taskItem);
 
-    taskItem.append(
-      createElement("strong", "", task.task_name),
-      createElement("span", "muted", `v${task.version}`),
-    );
-    editButton.type = "button";
-    editButton.addEventListener("click", () => editTask(task));
-    deleteButton.type = "button";
-    deleteButton.addEventListener("click", () => deleteTask(task));
-    actions.append(editButton, deleteButton);
-    wrapper.append(taskItem, actions);
-    cell.append(wrapper);
-  });
+  return cell;
+}
 
+function renderTaskContentCell(row) {
+  const cell = createElement("div", "table-cell");
+  const task = primaryTask(row);
+
+  if (!task) {
+    cell.append(createElement("span", "muted", "Use Create task"));
+    return cell;
+  }
+
+  cell.append(createElement("span", "task-content", task.task_content || "No content"));
   return cell;
 }
 
 function renderStatusCell(row) {
   const cell = createElement("div", "table-cell");
+  const task = primaryTask(row);
 
-  if (!row.tasks?.length) {
+  if (!task) {
     cell.append(createElement("span", "muted", "-"));
     return cell;
   }
 
-  row.tasks.forEach((task) => {
-    cell.append(statusSelect(task));
-  });
-
+  cell.append(statusSelect(task));
   return cell;
 }
 
@@ -295,19 +317,24 @@ function renderCommentsCell(row) {
 
 function renderRowActions(row) {
   const cell = createElement("div", "table-cell");
-  const addTaskButton = createElement("button", "button button-secondary", "Add task");
+  const task = primaryTask(row);
+  const editTaskButton = createElement(
+    "button",
+    "button button-secondary",
+    task ? "Edit" : "Create task",
+  );
   const addCommentButton = createElement("button", "button button-secondary", "Comment");
   const deleteButton = createElement("button", "button button-secondary", "Delete row");
 
-  addTaskButton.type = "button";
+  editTaskButton.type = "button";
   addCommentButton.type = "button";
   deleteButton.type = "button";
 
-  addTaskButton.addEventListener("click", () => createTask(row));
+  editTaskButton.addEventListener("click", () => (task ? editTask(task) : createTask(row)));
   addCommentButton.addEventListener("click", () => createComment(row));
   deleteButton.addEventListener("click", () => deleteRow(row));
 
-  cell.append(addTaskButton, addCommentButton, deleteButton);
+  cell.append(editTaskButton, addCommentButton, deleteButton);
   return cell;
 }
 
@@ -417,11 +444,11 @@ async function deleteColumn(column) {
 }
 
 async function createTask(row) {
-  const column = state.columns[0];
-  const assignee = state.permissions[0]?.user ?? state.board.created_by;
+  const column = await ensureTaskColumn();
+  const assignedToId = getDefaultAssigneeId();
 
-  if (!column || !assignee) {
-    setFeedback(feedback, "Create a column and permission first.", "error");
+  if (!column || !assignedToId) {
+    setFeedback(feedback, "Unable to resolve default task metadata.", "error");
     return;
   }
 
@@ -440,7 +467,7 @@ async function createTask(row) {
       task_status: "pending",
       starting_from: today(),
       deadline: today(),
-      assigned_to_id: assignee.id,
+      assigned_to_id: assignedToId,
     });
     await loadBoard(state.board.id);
     setFeedback(feedback, "Task created.", "success");
@@ -457,6 +484,45 @@ async function deleteTask(task) {
   } catch (error) {
     setFeedback(feedback, error.message, "error");
   }
+}
+
+function primaryTask(row) {
+  return row.tasks?.[0] ?? null;
+}
+
+function getDefaultAssigneeId() {
+  return state.permissions[0]?.user?.id ?? state.board?.created_by_id ?? state.board?.created_by?.id;
+}
+
+async function ensureTaskColumn() {
+  const taskColumn = state.columns.find((column) => column.name === "TaskName") ?? state.columns[0];
+
+  if (taskColumn) {
+    return taskColumn;
+  }
+
+  const defaultColumns = [
+    ["TaskName", "TEXT"],
+    ["TaskContent", "LONG_TEXT"],
+    ["TaskStatus", "STATUS"],
+  ];
+  let createdTaskColumn = null;
+
+  for (const [index, [name, type]] of defaultColumns.entries()) {
+    const column = await boardApi.createColumn({
+      board_id: state.board.id,
+      name,
+      type,
+      position: index,
+    });
+
+    if (name === "TaskName") {
+      createdTaskColumn = column;
+    }
+  }
+
+  state.columns = await boardApi.columns(state.board.id);
+  return createdTaskColumn ?? state.columns[0];
 }
 
 async function updateTaskStatus(task, taskStatus) {
