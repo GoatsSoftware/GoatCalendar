@@ -121,6 +121,14 @@ Puis ouvrir `http://localhost:8080`.
 
 Les URLs des services sont centralisées dans `front/scripts/config.js`.
 
+Comptes de demo seedés :
+
+- `aliceproprio@gmail.com`
+- `boblocataire@gmail.com`
+- `clairemixte@gmail.com`
+
+Mot de passe : `azerty`
+
 
 
 ## Installation en prod

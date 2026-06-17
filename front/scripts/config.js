@@ -3,4 +3,4 @@ export const API_CONFIG = {
   boardBaseUrl: "http://localhost:5002",
 };
 
-export const DEMO_PASSWORD = "password";
+export const DEMO_PASSWORD = "azerty";
