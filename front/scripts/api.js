@@ -190,6 +190,19 @@ export const boardApi = {
     });
   },
 
+  updateComment(commentId, data) {
+    return request(API_CONFIG.boardBaseUrl, `/board-row-comments/${commentId}`, {
+      method: "PUT",
+      body: jsonBody(data),
+    });
+  },
+
+  deleteComment(commentId) {
+    return request(API_CONFIG.boardBaseUrl, `/board-row-comments/${commentId}`, {
+      method: "DELETE",
+    });
+  },
+
   events(boardId) {
     return request(API_CONFIG.boardBaseUrl, `/board-events/board/${boardId}`);
   },
@@ -197,6 +210,13 @@ export const boardApi = {
   createEvent(data) {
     return request(API_CONFIG.boardBaseUrl, "/board-events", {
       method: "POST",
+      body: jsonBody(data),
+    });
+  },
+
+  updateEvent(eventId, data) {
+    return request(API_CONFIG.boardBaseUrl, `/board-events/${eventId}`, {
+      method: "PUT",
       body: jsonBody(data),
     });
   },

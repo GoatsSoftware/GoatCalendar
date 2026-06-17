@@ -131,10 +131,30 @@ function renderBoards(boards) {
     );
     const actions = createElement("div", "list-item-actions");
     const openLink = createElement("a", "button button-primary", "Open");
+    const renameButton = createElement("button", "button button-secondary", "Rename");
     const deleteButton = createElement("button", "button button-secondary", "Delete");
 
     openLink.href = `./board.html?board_id=${encodeURIComponent(board.id)}`;
+    renameButton.type = "button";
     deleteButton.type = "button";
+    renameButton.addEventListener("click", async () => {
+      const name = window.prompt("Board name", board.name ?? "");
+
+      if (!name) {
+        return;
+      }
+
+      try {
+        await boardApi.updateBoard(board.id, {
+          name,
+          description: board.description ?? "",
+        });
+        await loadBoards();
+        setFeedback(feedback, "Board updated.", "success");
+      } catch (error) {
+        setFeedback(feedback, error.message, "error");
+      }
+    });
     deleteButton.addEventListener("click", async () => {
       try {
         await boardApi.deleteBoard(board.id);
@@ -145,7 +165,7 @@ function renderBoards(boards) {
       }
     });
 
-    actions.append(openLink, deleteButton);
+    actions.append(openLink, renameButton, deleteButton);
     item.append(title, description, meta, actions);
     boardsList.append(item);
   });

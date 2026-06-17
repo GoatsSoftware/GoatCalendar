@@ -1,6 +1,7 @@
 .counter-pill,
 .user-chip,
-.status-pill {
+.status-pill,
+.column-chip {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -36,8 +37,69 @@
   background: var(--color-purple);
 }
 
+.chip-list {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.column-chip {
+  gap: 8px;
+  border: 1px solid var(--color-line);
+  background: #ffffff;
+  color: var(--color-muted);
+}
+
+.column-chip button {
+  border: 0;
+  background: transparent;
+  color: var(--color-negative);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
 .muted {
   color: var(--color-muted);
+}
+
+.task-line,
+.comment-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  font: inherit;
+  padding: 6px;
+  text-align: left;
+}
+
+.task-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.mini-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.mini-actions .button {
+  min-height: 28px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.task-line:hover,
+.comment-line:hover {
+  background: var(--color-hover);
 }
 
 .board-card {

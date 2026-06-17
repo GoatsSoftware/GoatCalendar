@@ -1,0 +1,554 @@
+import { boardApi } from "../api.js";
+import { hydrateShell } from "../app_shell.js";
+import {
+  $,
+  createElement,
+  empty,
+  formDataToObject,
+  formatDate,
+  formatUser,
+  setFeedback,
+} from "../dom.js";
+import { requireSession } from "../session.js";
+
+const session = requireSession();
+const feedback = $("#board-feedback");
+const boardTitle = $("#board-title");
+const loadBoardForm = $("#load-board-form");
+const createColumnForm = $("#create-column-form");
+const createEventForm = $("#create-event-form");
+const addPermissionForm = $("#add-permission-form");
+const boardGrid = $("#board-grid");
+const columnsList = $("#columns-list");
+const eventsList = $("#events-list");
+const permissionsList = $("#permissions-list");
+
+let state = {
+  board: null,
+  rows: [],
+  columns: [],
+  events: [],
+  permissions: [],
+};
+
+if (session) {
+  hydrateShell(feedback);
+  const initialBoardId = new URLSearchParams(window.location.search).get("board_id");
+
+  if (initialBoardId) {
+    loadBoardForm.elements.board_id.value = initialBoardId;
+    loadBoard(initialBoardId);
+  }
+}
+
+loadBoardForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await loadBoard(loadBoardForm.elements.board_id.value.trim());
+});
+
+$("#create-row-button").addEventListener("click", async () => {
+  if (!state.board) {
+    setFeedback(feedback, "Load a board first.", "error");
+    return;
+  }
+
+  try {
+    await boardApi.createRow(state.board.id);
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Row created.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+});
+
+createColumnForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!state.board) {
+    setFeedback(feedback, "Load a board first.", "error");
+    return;
+  }
+
+  const data = formDataToObject(createColumnForm);
+
+  try {
+    await boardApi.createColumn({
+      board_id: state.board.id,
+      name: data.name,
+      type: data.type,
+      position: Number(data.position ?? 0),
+    });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Column created.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+});
+
+createEventForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!state.board) {
+    setFeedback(feedback, "Load a board first.", "error");
+    return;
+  }
+
+  const data = formDataToObject(createEventForm);
+
+  try {
+    await boardApi.createEvent({
+      board_id: state.board.id,
+      title: data.title ?? null,
+      description: data.description ?? "",
+      starting_from: data.starting_from,
+      deadline: data.deadline,
+    });
+    createEventForm.reset();
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Event created.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+});
+
+addPermissionForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!state.board) {
+    setFeedback(feedback, "Load a board first.", "error");
+    return;
+  }
+
+  const data = formDataToObject(addPermissionForm);
+
+  try {
+    await boardApi.addPermission(state.board.id, data);
+    addPermissionForm.reset();
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Permission added.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+});
+
+async function loadBoard(boardId) {
+  if (!boardId) {
+    return;
+  }
+
+  setFeedback(feedback, "Loading board...");
+
+  try {
+    const [board, rows, columns, events, permissions] = await Promise.all([
+      boardApi.board(boardId),
+      boardApi.rows(boardId),
+      boardApi.columns(boardId),
+      boardApi.events(boardId),
+      boardApi.permissions(boardId),
+    ]);
+    state = { board, rows, columns, events, permissions };
+    boardTitle.textContent = board.name ?? "Untitled board";
+    renderColumns();
+    renderBoard();
+    renderEvents();
+    renderPermissions();
+    setFeedback(feedback, "Board loaded.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+function renderColumns() {
+  empty(columnsList);
+
+  if (state.columns.length === 0) {
+    columnsList.append(createElement("span", "muted", "No columns yet."));
+    return;
+  }
+
+  state.columns.forEach((column) => {
+    const chip = createElement("span", "column-chip");
+    const deleteButton = createElement("button", "", "x");
+
+    deleteButton.type = "button";
+    deleteButton.title = `Delete ${column.name}`;
+    deleteButton.addEventListener("click", () => deleteColumn(column));
+    chip.append(
+      createElement("span", "", `${column.position}. ${column.name}`),
+      deleteButton,
+    );
+    columnsList.append(chip);
+  });
+}
+
+function renderBoard() {
+  empty(boardGrid);
+  boardGrid.append(renderHeaderRow());
+
+  if (state.rows.length === 0) {
+    boardGrid.append(createElement("p", "muted", "No rows yet."));
+    return;
+  }
+
+  state.rows.forEach((row, index) => {
+    const line = createElement("article", "table-row");
+    line.append(
+      renderRowCell(row, index),
+      renderTasksCell(row),
+      renderStatusCell(row),
+      renderCommentsCell(row),
+      renderRowActions(row),
+    );
+    boardGrid.append(line);
+  });
+}
+
+function renderHeaderRow() {
+  const header = createElement("div", "table-row header");
+  ["Row", "Tasks", "Status", "Comments", "Actions"].forEach((label) => {
+    header.append(createElement("span", "table-cell", label));
+  });
+  return header;
+}
+
+function renderRowCell(row, index) {
+  const cell = createElement("div", "table-cell");
+  cell.append(
+    createElement("strong", "", `Row ${index + 1}`),
+    createElement("span", "muted", row.id),
+  );
+  return cell;
+}
+
+function renderTasksCell(row) {
+  const cell = createElement("div", "table-cell");
+
+  if (!row.tasks?.length) {
+    cell.append(createElement("span", "muted", "No tasks"));
+    return cell;
+  }
+
+  row.tasks.forEach((task) => {
+    const wrapper = createElement("div", "task-actions");
+    const taskItem = createElement("button", "task-line", task.task_name);
+    const actions = createElement("div", "mini-actions");
+    const deleteButton = createElement("button", "button button-secondary", "Delete");
+
+    taskItem.type = "button";
+    taskItem.title = task.task_content || "Click to cycle status";
+    taskItem.append(createElement("span", "muted", `v${task.version}`));
+    taskItem.addEventListener("click", () => cycleTaskStatus(task));
+    deleteButton.type = "button";
+    deleteButton.addEventListener("click", () => deleteTask(task));
+    actions.append(deleteButton);
+    wrapper.append(taskItem, actions);
+    cell.append(wrapper);
+  });
+
+  return cell;
+}
+
+function renderStatusCell(row) {
+  const cell = createElement("div", "table-cell");
+  const status = row.tasks?.[0]?.task_status ?? "pending";
+  cell.append(statusPill(status));
+  return cell;
+}
+
+function renderCommentsCell(row) {
+  const cell = createElement("div", "table-cell");
+
+  if (!row.comments?.length) {
+    cell.append(createElement("span", "muted", "No comments"));
+    return cell;
+  }
+
+  row.comments.slice(0, 2).forEach((comment) => {
+    const wrapper = createElement("div", "task-actions");
+    const commentLine = createElement("button", "comment-line", comment.content);
+    const actions = createElement("div", "mini-actions");
+    const deleteButton = createElement("button", "button button-secondary", "Delete");
+
+    commentLine.type = "button";
+    commentLine.title = "Click to edit comment";
+    commentLine.addEventListener("click", () => editComment(comment));
+    deleteButton.type = "button";
+    deleteButton.addEventListener("click", () => deleteComment(comment));
+    actions.append(deleteButton);
+    wrapper.append(commentLine, actions);
+    cell.append(wrapper);
+  });
+
+  return cell;
+}
+
+function renderRowActions(row) {
+  const cell = createElement("div", "table-cell");
+  const addTaskButton = createElement("button", "button button-secondary", "Add task");
+  const addCommentButton = createElement("button", "button button-secondary", "Comment");
+  const deleteButton = createElement("button", "button button-secondary", "Delete row");
+
+  addTaskButton.type = "button";
+  addCommentButton.type = "button";
+  deleteButton.type = "button";
+
+  addTaskButton.addEventListener("click", () => createTask(row));
+  addCommentButton.addEventListener("click", () => createComment(row));
+  deleteButton.addEventListener("click", () => deleteRow(row));
+
+  cell.append(addTaskButton, addCommentButton, deleteButton);
+  return cell;
+}
+
+function renderEvents() {
+  empty(eventsList);
+
+  if (state.events.length === 0) {
+    eventsList.append(createElement("p", "muted", "No events yet."));
+    return;
+  }
+
+  state.events.forEach((event) => {
+    const item = createElement("article", "list-item");
+    const editButton = createElement("button", "button button-secondary", "Edit");
+    const deleteButton = createElement("button", "button button-secondary", "Delete");
+    const actions = createElement("div", "list-item-actions");
+
+    editButton.type = "button";
+    deleteButton.type = "button";
+    editButton.addEventListener("click", () => editEvent(event));
+    deleteButton.addEventListener("click", () => deleteEvent(event));
+    actions.append(editButton, deleteButton);
+
+    item.append(
+      createElement("strong", "", event.title ?? "Untitled event"),
+      createElement("span", "muted", `${formatDate(event.starting_from)} - ${formatDate(event.deadline)}`),
+      createElement("p", "muted", event.description || "No description"),
+      actions,
+    );
+    eventsList.append(item);
+  });
+}
+
+function renderPermissions() {
+  empty(permissionsList);
+
+  if (state.permissions.length === 0) {
+    permissionsList.append(createElement("p", "muted", "No permissions yet."));
+    return;
+  }
+
+  state.permissions.forEach((permission) => {
+    const item = createElement("article", "list-item");
+    const roleSelect = document.createElement("select");
+    const removeButton = createElement("button", "button button-secondary", "Remove");
+
+    ["viewer", "editor", "owner"].forEach((role) => {
+      const option = document.createElement("option");
+      option.value = role;
+      option.textContent = role;
+      option.selected = role === permission.user_role_in_board;
+      roleSelect.append(option);
+    });
+
+    roleSelect.addEventListener("change", () => updatePermission(permission, roleSelect.value));
+    removeButton.type = "button";
+    removeButton.addEventListener("click", () => removePermission(permission));
+
+    item.append(
+      createElement("strong", "", formatUser(permission.user)),
+      createElement("span", "muted", permission.user.email_address),
+      roleSelect,
+      removeButton,
+    );
+    permissionsList.append(item);
+  });
+}
+
+function statusPill(status) {
+  const classes = {
+    completed: "status-done",
+    accepted: "status-working",
+    pending: "status-stuck",
+  };
+  return createElement("span", `status-pill ${classes[status] ?? "status-neutral"}`, status);
+}
+
+async function deleteColumn(column) {
+  try {
+    await boardApi.deleteColumn(column.id);
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Column deleted.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function createTask(row) {
+  const column = state.columns[0];
+  const assignee = state.permissions[0]?.user ?? state.board.created_by;
+
+  if (!column || !assignee) {
+    setFeedback(feedback, "Create a column and permission first.", "error");
+    return;
+  }
+
+  const taskName = window.prompt("Task name", "New task");
+
+  if (!taskName) {
+    return;
+  }
+
+  try {
+    await boardApi.createTask({
+      board_row_id: row.id,
+      board_column_id: column.id,
+      task_name: taskName,
+      task_content: "",
+      task_status: "pending",
+      starting_from: today(),
+      deadline: today(),
+      assigned_to_id: assignee.id,
+    });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Task created.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function deleteTask(task) {
+  try {
+    await boardApi.deleteTask(task.id);
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Task deleted.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function cycleTaskStatus(task) {
+  const next = {
+    pending: "accepted",
+    accepted: "completed",
+    completed: "pending",
+  }[task.task_status] ?? "pending";
+
+  try {
+    await boardApi.updateTask(task.id, {
+      task_status: next,
+      version: task.version,
+    });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Task updated.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function createComment(row) {
+  const content = window.prompt("Comment", "New comment");
+
+  if (!content) {
+    return;
+  }
+
+  try {
+    await boardApi.createComment({
+      board_row_id: row.id,
+      content,
+    });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Comment created.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function editComment(comment) {
+  const content = window.prompt("Comment", comment.content);
+
+  if (!content) {
+    return;
+  }
+
+  try {
+    await boardApi.updateComment(comment.id, { content });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Comment updated.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function deleteComment(comment) {
+  try {
+    await boardApi.deleteComment(comment.id);
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Comment deleted.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function deleteRow(row) {
+  try {
+    await boardApi.deleteRow(row.id);
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Row deleted.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function editEvent(event) {
+  const title = window.prompt("Event title", event.title ?? "");
+
+  if (title === null) {
+    return;
+  }
+
+  try {
+    await boardApi.updateEvent(event.id, { title });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Event updated.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function deleteEvent(event) {
+  try {
+    await boardApi.deleteEvent(event.id);
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Event deleted.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function updatePermission(permission, role) {
+  try {
+    await boardApi.updatePermission(state.board.id, permission.user_id, {
+      user_role_in_board: role,
+    });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Permission updated.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function removePermission(permission) {
+  try {
+    await boardApi.removePermission(state.board.id, permission.user_id);
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Permission removed.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
