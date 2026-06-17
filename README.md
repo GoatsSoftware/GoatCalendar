@@ -103,6 +103,24 @@ REFRESH_TOKEN_DURATION_HOURS=24
 
 ## Front
 
+Le front est volontairement statique : HTML, CSS et JavaScript natif uniquement.
+
+Configuration API par défaut :
+
+- Auth service : `http://localhost:5001`
+- Board service : `http://localhost:5002`
+
+Pour lancer le front en dev :
+
+```bash
+cd front
+py -m http.server 8080
+```
+
+Puis ouvrir `http://localhost:8080`.
+
+Les URLs des services sont centralisées dans `front/scripts/config.js`.
+
 
 
 ## Installation en prod
@@ -146,6 +164,12 @@ REFRESH_TOKEN_DURATION_HOURS=24
 ```
 
 ## Front
+
+Le service front est servi par Nginx dans le `docker-compose.yml` et exposé sur :
+
+```bash
+http://localhost:8080
+```
 
 ## Lancement de l'application
 
