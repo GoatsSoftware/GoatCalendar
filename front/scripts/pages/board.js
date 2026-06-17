@@ -22,6 +22,7 @@ const boardGrid = $("#board-grid");
 const columnsList = $("#columns-list");
 const eventsList = $("#events-list");
 const permissionsList = $("#permissions-list");
+const boardDetailLink = $("#board-detail-link");
 
 let state = {
   board: null,
@@ -44,6 +45,15 @@ if (session) {
 loadBoardForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   await loadBoard(loadBoardForm.elements.board_id.value.trim());
+});
+
+boardDetailLink?.addEventListener("click", async (event) => {
+  if (!state.board?.id) {
+    return;
+  }
+
+  event.preventDefault();
+  await loadBoard(state.board.id);
 });
 
 $("#create-row-button").addEventListener("click", async () => {
@@ -171,6 +181,7 @@ async function loadBoard(boardId) {
     ]);
     state = { board, rows, columns, events, permissions };
     boardTitle.textContent = board.name ?? "Untitled board";
+    syncBoardDetailLink(board.id);
     renderColumns();
     renderBoard();
     renderEvents();
@@ -179,6 +190,14 @@ async function loadBoard(boardId) {
   } catch (error) {
     setFeedback(feedback, error.message, "error");
   }
+}
+
+function syncBoardDetailLink(boardId) {
+  if (!boardDetailLink) {
+    return;
+  }
+
+  boardDetailLink.href = `./board.html?board_id=${encodeURIComponent(boardId)}`;
 }
 
 function renderColumns() {

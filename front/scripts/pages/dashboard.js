@@ -18,6 +18,7 @@ const feedback = $("#dashboard-feedback");
 const createBoardForm = $("#create-board-form");
 const searchUsersForm = $("#search-users-form");
 const profileForm = $("#profile-form");
+const boardDetailLink = $("#board-detail-link");
 
 if (session) {
   hydrateShell(feedback).then((user) => {
@@ -114,6 +115,7 @@ async function loadUsers() {
 function renderBoards(boards) {
   empty(boardsList);
   boardCount.textContent = String(boards.length);
+  syncBoardDetailLink(boards[0]?.id);
 
   if (boards.length === 0) {
     boardsList.append(createElement("p", "muted", "No boards yet."));
@@ -169,6 +171,21 @@ function renderBoards(boards) {
     item.append(title, description, meta, actions);
     boardsList.append(item);
   });
+}
+
+function syncBoardDetailLink(boardId) {
+  if (!boardDetailLink) {
+    return;
+  }
+
+  if (!boardId) {
+    boardDetailLink.href = "./board.html";
+    boardDetailLink.setAttribute("aria-disabled", "true");
+    return;
+  }
+
+  boardDetailLink.href = `./board.html?board_id=${encodeURIComponent(boardId)}`;
+  boardDetailLink.removeAttribute("aria-disabled");
 }
 
 function renderUsers(users) {

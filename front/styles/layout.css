@@ -75,6 +75,13 @@
   color: var(--color-primary);
 }
 
+.top-nav a[aria-disabled="true"] {
+  color: var(--color-muted);
+  cursor: not-allowed;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
 .app-shell {
   display: grid;
   gap: 18px;
