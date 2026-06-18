@@ -1,6 +1,9 @@
 .auth-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f6f7fb 0%, #e5f4ff 100%);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 241, 194, 0.9) 0 120px, transparent 125px),
+    radial-gradient(circle at 88% 18%, rgba(201, 247, 223, 0.9) 0 150px, transparent 155px),
+    linear-gradient(135deg, #f8fbff 0%, #e7f5ff 100%);
 }
 
 .auth-shell {
@@ -12,15 +15,25 @@
 
 .auth-panel,
 .panel {
-  border: 1px solid var(--color-line);
+  border: 2px solid rgba(203, 212, 234, 0.9);
   border-radius: var(--radius-panel);
   background: var(--color-panel);
   box-shadow: var(--shadow-soft);
 }
 
 .auth-panel {
+  position: relative;
+  overflow: hidden;
   width: min(420px, 100%);
   padding: 28px;
+}
+
+.auth-panel::before {
+  position: absolute;
+  inset: 0;
+  border-top: 6px solid var(--color-primary);
+  content: "";
+  pointer-events: none;
 }
 
 .app-header {
@@ -32,8 +45,9 @@
   align-items: center;
   gap: 24px;
   min-height: 64px;
-  border-bottom: 1px solid var(--color-line);
-  background: var(--color-panel);
+  border-bottom: 2px solid rgba(203, 212, 234, 0.9);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
   padding: 0 24px;
 }
 
@@ -90,6 +104,10 @@
   padding: 24px;
 }
 
+.app-shell.wide-shell {
+  max-width: 1760px;
+}
+
 .page-title,
 .panel-header {
   display: flex;
@@ -99,7 +117,21 @@
 }
 
 .panel {
+  position: relative;
+  overflow: hidden;
   padding: 18px;
+}
+
+.panel::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--panel-accent, var(--color-primary));
+  content: "";
+}
+
+.panel > * {
+  position: relative;
 }
 
 .grid-two {

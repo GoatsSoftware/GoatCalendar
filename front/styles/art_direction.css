@@ -1,17 +1,23 @@
 :root {
   --color-primary: #0073ea;
   --color-primary-strong: #0060c7;
+  --color-primary-soft: #dff0ff;
   --color-positive: #00c875;
   --color-warning: #fdab3d;
   --color-negative: #e2445c;
   --color-purple: #a25ddc;
+  --color-pink: #ff6f91;
+  --color-mint: #c9f7df;
+  --color-sun: #fff1c2;
+  --color-lilac: #efe4ff;
+  --color-sky: #eaf6ff;
   --color-ink: #323338;
   --color-muted: #676879;
-  --color-line: #d0d4e4;
-  --color-panel: #ffffff;
-  --color-page: #f6f7fb;
+  --color-line: #cbd4ea;
+  --color-panel: rgba(255, 255, 255, 0.92);
+  --color-page: #f7f8fc;
   --color-hover: #e5f4ff;
-  --shadow-soft: 0 8px 22px rgba(29, 30, 43, 0.08);
+  --shadow-soft: 0 14px 34px rgba(29, 30, 43, 0.1);
   --radius-small: 6px;
   --radius-panel: 8px;
   --font-main: Inter, "Segoe UI", Arial, sans-serif;
@@ -24,7 +30,10 @@
 body {
   margin: 0;
   color: var(--color-ink);
-  background: var(--color-page);
+  background:
+    radial-gradient(circle at 8% 10%, rgba(0, 200, 117, 0.12) 0 140px, transparent 145px),
+    radial-gradient(circle at 94% 8%, rgba(253, 171, 61, 0.16) 0 180px, transparent 185px),
+    linear-gradient(180deg, #f8fbff 0%, #f4f6fb 46%, #f8fff9 100%);
   font-family: var(--font-main);
   font-size: 15px;
 }
@@ -43,6 +52,7 @@ p {
 h1 {
   font-size: 32px;
   font-weight: 700;
+  letter-spacing: 0;
 }
 
 h2 {
@@ -55,4 +65,9 @@ h2 {
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
+}
+
+::selection {
+  background: var(--color-sun);
+  color: var(--color-ink);
 }
