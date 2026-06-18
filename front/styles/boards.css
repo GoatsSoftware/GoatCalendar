@@ -13,7 +13,7 @@
 
 .counter-pill,
 .user-chip {
-  background: #f0f3ff;
+  background: linear-gradient(180deg, #f7fbff 0%, var(--color-primary-soft) 100%);
   color: var(--color-primary);
 }
 
@@ -22,15 +22,15 @@
 }
 
 .status-done {
-  background: var(--color-positive);
+  background: linear-gradient(180deg, #19dc8d 0%, var(--color-positive) 100%);
 }
 
 .status-working {
-  background: var(--color-warning);
+  background: linear-gradient(180deg, #ffbd5c 0%, var(--color-warning) 100%);
 }
 
 .status-stuck {
-  background: var(--color-negative);
+  background: linear-gradient(180deg, #f15d74 0%, var(--color-negative) 100%);
 }
 
 .status-neutral {
@@ -59,7 +59,7 @@
   gap: 12px;
   align-items: center;
   border: 1px solid var(--color-line);
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
   color: var(--color-muted);
   padding: 8px 10px;
 }
@@ -217,13 +217,22 @@
 .board-card {
   display: grid;
   gap: 10px;
-  border-left: 5px solid var(--color-primary);
+  border-left: 8px solid var(--color-primary);
+  background:
+    linear-gradient(90deg, rgba(0, 115, 234, 0.08), transparent 32%),
+    #ffffff;
 }
 
 .board-card:nth-child(3n + 2) {
   border-left-color: var(--color-positive);
+  background:
+    linear-gradient(90deg, rgba(0, 200, 117, 0.1), transparent 32%),
+    #ffffff;
 }
 
 .board-card:nth-child(3n) {
   border-left-color: var(--color-warning);
+  background:
+    linear-gradient(90deg, rgba(253, 171, 61, 0.14), transparent 32%),
+    #ffffff;
 }

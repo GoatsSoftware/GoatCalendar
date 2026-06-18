@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 140" role="img" aria-labelledby="title">
+  <title id="title">Chibi goat mascot</title>
+  <defs>
+    <linearGradient id="wool" x1="18" x2="138" y1="20" y2="126" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffdf7"/>
+      <stop offset="1" stop-color="#f0f4ff"/>
+    </linearGradient>
+  </defs>
+  <path fill="#fff1c2" d="M20 112c12 14 105 14 120 0 10-10 6-31-7-42-19-17-86-17-106 0-13 11-17 32-7 42Z"/>
+  <path fill="#fdab3d" d="M44 41c-13-8-17-25-8-31 11 3 21 16 19 29l-11 2Zm72-2c-2-13 8-26 19-29 9 6 5 23-8 31l-11-2Z"/>
+  <path fill="url(#wool)" stroke="#323338" stroke-width="4" d="M45 43c-6-20 15-34 28-20 11-14 35-2 32 18 21 5 30 30 17 48 4 19-16 34-34 24-14 11-37 8-47-8-19 2-31-16-21-32-7-16 6-31 25-30Z"/>
+  <path fill="#fffdf7" stroke="#323338" stroke-width="4" d="M54 56c-9 8-9 31 0 40 13 14 42 14 55 0 9-9 9-32 0-40-13-13-42-13-55 0Z"/>
+  <circle cx="63" cy="75" r="5" fill="#323338"/>
+  <circle cx="99" cy="75" r="5" fill="#323338"/>
+  <path fill="#ffb3c7" d="M70 88c6 4 16 4 22 0-1 10-21 10-22 0Z"/>
+  <path fill="none" stroke="#323338" stroke-linecap="round" stroke-width="4" d="M76 84c3 3 7 3 10 0"/>
+  <path fill="#e7d8bd" stroke="#323338" stroke-width="4" d="M31 62c-16-7-19 15-5 22 10 5 17-5 16-15l-11-7Zm98 0c16-7 19 15 5 22-10 5-17-5-16-15l11-7Z"/>
+  <path fill="#323338" d="M48 112h12v16H48zm52 0h12v16h-12z"/>
+  <path fill="#00c875" d="M34 127c29-7 58-7 92 0-27 10-66 10-92 0Z"/>
+</svg>
