@@ -117,6 +117,7 @@ class TestUserRoutes:
 
         assert response.status_code == 200
         assert response.json()[0]["email_address"] == EMAIL
+        assert "password" not in response.json()[0]
 
     def test_search_users(self, client: TestClient, user: User) -> None:
         with patch(
@@ -127,6 +128,7 @@ class TestUserRoutes:
 
         assert response.status_code == 200
         assert response.json()[0]["email_address"] == EMAIL
+        assert "password" not in response.json()[0]
 
     def test_update_me(self, client: TestClient, user: User) -> None:
         with patch(
@@ -136,6 +138,7 @@ class TestUserRoutes:
             response = client.put("/users/me", json={"first_name": "Updated"})
 
         assert response.status_code == 200
+        assert "password" not in response.json()
 
     def test_update_me_not_found(self, client: TestClient) -> None:
         with patch(

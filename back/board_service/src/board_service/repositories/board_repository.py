@@ -10,7 +10,15 @@ from shared_models.dtos import (
     BoardUpdateDTO,
 )
 from shared_models.enums import UserRoleInBoard
-from shared_models.schemas import Board, BoardColumn, BoardEvent, UserBoardPermission
+from shared_models.schemas import (
+    Board,
+    BoardColumn,
+    BoardEvent,
+    BoardRow,
+    BoardRowComment,
+    BoardRowTask,
+    UserBoardPermission,
+)
 from sqlalchemy import delete
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
@@ -177,7 +185,21 @@ async def delete_board(board_id: UUID, session: AsyncSession) -> None:
     if board is None:
         raise NoResultFound
 
-    await session.delete(board)
+    board_rows = select(BoardRow.id).where(BoardRow.board_id == board_id)
+
+    await session.execute(
+        delete(BoardRowTask).where(BoardRowTask.board_row_id.in_(board_rows)),
+    )
+    await session.execute(
+        delete(BoardRowComment).where(BoardRowComment.board_row_id.in_(board_rows)),
+    )
+    await session.execute(delete(BoardRow).where(BoardRow.board_id == board_id))
+    await session.execute(delete(BoardEvent).where(BoardEvent.board_id == board_id))
+    await session.execute(
+        delete(UserBoardPermission).where(UserBoardPermission.board_id == board_id),
+    )
+    await session.execute(delete(BoardColumn).where(BoardColumn.board_id == board_id))
+    await session.execute(delete(Board).where(Board.id == board_id))
     await session.commit()
 
 

@@ -147,6 +147,7 @@ jobs:
             echo "Version has NOT changed. Skipping build/publish."
           else
             echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
             echo "Version changed from $OLD_VERSION to $CURRENT_VERSION."
           fi
 
@@ -223,6 +224,7 @@ jobs:
             echo "Version has NOT changed. Skipping build/publish."
           else
             echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
             echo "Version changed from $OLD_VERSION to $CURRENT_VERSION."
           fi
 

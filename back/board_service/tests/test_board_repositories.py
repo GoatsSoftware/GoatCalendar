@@ -190,7 +190,8 @@ class TestBoardRepositoryCrud:
         assert stored_board.name == "New"
 
         asyncio.run(board_repository.delete_board(BOARD_ID, session))
-        session.delete.assert_awaited_once_with(stored_board)
+        assert session.execute.await_count == 7
+        session.commit.assert_awaited()
 
     @pytest.mark.parametrize(
         "repository_method",
@@ -578,7 +579,12 @@ class TestBoardRowRepository:
             is None
         )
 
+        session.execute.return_value = Mock(rowcount=1)
         asyncio.run(board_row_repository.delete_board_row_task(TASK_ID, session))
+
+        session.execute.return_value = Mock(rowcount=0)
+        with pytest.raises(NoResultFound):
+            asyncio.run(board_row_repository.delete_board_row_task(TASK_ID, session))
 
     def test_comment_crud(self) -> None:
         session = board_session()

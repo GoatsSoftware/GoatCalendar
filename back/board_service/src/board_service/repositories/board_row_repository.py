@@ -229,7 +229,11 @@ async def delete_board_row_task(task_id: UUID, session: AsyncSession) -> None:
     :return: None.
     """
     stmt = delete(BoardRowTask).where(BoardRowTask.id == task_id)
-    await session.execute(stmt)
+    result = await session.execute(stmt)
+
+    if result.rowcount == 0:
+        raise NoResultFound
+
     await session.commit()
 
 

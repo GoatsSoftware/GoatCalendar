@@ -4,10 +4,7 @@
 - [Installation en dev](#installation-en-dev)
   - [Back](#back)
   - [Front](#front)
-  - [Installation en prod](#installation-en-prod)
-  - [Back](#back-1)
-  - [Front](#front-1)
-  - [Lancement de l'application](#lancement-de-lapplication)
+- [Installation en prod](#installation-en-prod)
 
 # Installation en dev
 
@@ -62,6 +59,11 @@ To execute tests :
 pdm run pytest
 ```
 
+To run services : 
+```bash
+pdm run dev_win
+```
+
 Create a `.env` file for each project in `back` folder :
 
 - Database service
@@ -81,7 +83,7 @@ DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 SERVER_HOST="127.0.0.1"
 SERVER_PORT=5001
-FRONT_URL="127.0.0.1:80"
+FRONT_URL="http://localhost:8080"
 ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
 ACCESS_TOKEN_DURATION_MINUTES=1000
 REFRESH_TOKEN_DURATION_HOURS=24
@@ -95,7 +97,7 @@ DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 SERVER_HOST="127.0.0.1"
 SERVER_PORT=5002
-FRONT_URL="127.0.0.1:80"
+FRONT_URL="http://localhost:8080"
 ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
 ACCESS_TOKEN_DURATION_MINUTES=1000
 REFRESH_TOKEN_DURATION_HOURS=24
@@ -103,51 +105,35 @@ REFRESH_TOKEN_DURATION_HOURS=24
 
 ## Front
 
+Le front est volontairement statique : HTML, CSS et JavaScript natif uniquement.
 
+Configuration API par défaut :
 
-## Installation en prod
+- Auth service : `http://localhost:5001`
+- Board service : `http://localhost:5002`
 
-## Back
-
--  Database service
-
-```bash
-ENV_MODE="prod"
-DB_DIALECT="mysql+aiomysql"
-DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"
-```
-
-- Auth service
+Pour lancer le front en dev :
 
 ```bash
-ENV_MODE="prod"
-DB_DIALECT="mysql+aiomysql"
-DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"
-SERVER_HOST="0.0.0.0"
-SERVER_PORT=5001
-FRONT_URL="front-service:80"
-ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
-ACCESS_TOKEN_DURATION_MINUTES=1000
-REFRESH_TOKEN_DURATION_HOURS=24
+cd front
+py -m http.server 8080
 ```
 
-- Board service
+Puis ouvrir `http://localhost:8080`.
 
-```bash
-ENV_MODE="prod"
-DB_DIALECT="mysql+aiomysql"
-DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"
-SERVER_HOST="0.0.0.0"
-SERVER_PORT=5002
-FRONT_URL="front-service:80"
-ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
-ACCESS_TOKEN_DURATION_MINUTES=1000
-REFRESH_TOKEN_DURATION_HOURS=24
-```
+Les URLs des services sont centralisées dans `front/scripts/config.js`.
 
-## Front
+Comptes de demo seedés :
 
-## Lancement de l'application
+- `aliceproprio@gmail.com`
+- `boblocataire@gmail.com`
+- `clairemixte@gmail.com`
+
+Mot de passe : `azerty`
+
+
+
+# Installation en prod
 
 Pour lancer les services, se positionner dans le répertoire **GoatCalendar** :
 ```bash

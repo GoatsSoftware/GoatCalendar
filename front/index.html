@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GoatCalendar - Sign in</title>
+    <link rel="stylesheet" href="./styles/main.css">
+  </head>
+  <body class="auth-page">
+    <main class="auth-shell">
+      <section class="auth-panel">
+        <div class="brand-lockup">
+          <img src="./assets/logo_efrei.png" alt="EFREI" class="school-logo">
+          <div>
+            <p class="eyebrow">GoatsSoftware</p>
+            <h1>GoatCalendar</h1>
+          </div>
+        </div>
+
+        <form id="login-form" class="form-stack">
+          <label>
+            Email
+            <input id="email" type="email" value="aliceproprio@gmail.com" autocomplete="username" required>
+          </label>
+          <label>
+            Password
+            <input id="password" type="password" value="azerty" autocomplete="current-password" required>
+          </label>
+          <button class="button button-primary" type="submit">Sign in</button>
+          <p id="login-feedback" class="form-feedback" role="status"></p>
+        </form>
+
+        <div class="demo-users">
+          <button class="button button-ghost" type="button" data-demo-user="aliceproprio@gmail.com">Alice</button>
+          <button class="button button-ghost" type="button" data-demo-user="boblocataire@gmail.com">Bob</button>
+          <button class="button button-ghost" type="button" data-demo-user="clairemixte@gmail.com">Claire</button>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="./scripts/pages/login.js"></script>
+  </body>
+</html>

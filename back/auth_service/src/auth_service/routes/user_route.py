@@ -3,9 +3,8 @@ from typing import Annotated
 from database_service.database import get_db_session
 from fastapi import APIRouter, Depends, HTTPException
 from shared_models.dtos.user_auth_dto import UserAuthDTO
-from shared_models.dtos.user_dtos import UserInDTO
+from shared_models.dtos.user_dtos import UserInDTO, UserOutDTO
 from shared_models.dtos.user_search_query_dto import UserSearchQueryDTO
-from shared_models.schemas import User
 from sqlalchemy.exc import NoResultFound
 from sqlmodel.ext.asyncio.session import AsyncSession
 from starlette import status
@@ -27,11 +26,12 @@ USER_NOT_FOUND_DETAIL = "User not found"
 
 @route.get(
     "",
+    response_model=list[UserOutDTO],
     status_code=status.HTTP_200_OK,
 )
 async def get_all_users(
     session: db_session_dependency,
-) -> list[User]:
+) -> list[UserOutDTO]:
     """
     HTTP GET endpoint to fetch a complete list of all registered users.
 
@@ -43,12 +43,13 @@ async def get_all_users(
 
 @route.get(
     "/search",
+    response_model=list[UserOutDTO],
     status_code=status.HTTP_200_OK,
 )
 async def search_users(
     search_query: search_users_query_dependency,
     session: db_session_dependency,
-) -> list[User]:
+) -> list[UserOutDTO]:
     """
     HTTP GET endpoint to search users by name or email.
 
@@ -61,6 +62,7 @@ async def search_users(
 
 @route.put(
     "/me",
+    response_model=UserOutDTO,
     status_code=status.HTTP_200_OK,
     responses={
         400: {"description": "Invalid user update payload"},
@@ -71,7 +73,7 @@ async def update_me(
     user_update: UserInDTO,
     session: db_session_dependency,
     current_user: current_user_dependency,
-) -> User:
+) -> UserOutDTO:
     """
     HTTP PUT endpoint to update the profile of the authenticated user.
 
