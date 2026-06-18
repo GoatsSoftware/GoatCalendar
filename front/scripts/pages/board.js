@@ -103,16 +103,24 @@ createColumnForm.addEventListener("submit", async (event) => {
   }
 
   const data = formDataToObject(createColumnForm);
+  const [name, type] = data.column_key.split(":");
+  const existingColumn = state.columns.find((column) => column.name === name);
+
+  if (existingColumn) {
+    setFeedback(feedback, `${columnLabel(existingColumn.name)} is already visible.`, "success");
+    return;
+  }
 
   try {
     await boardApi.createColumn({
       board_id: state.board.id,
-      name: data.name,
-      type: data.type,
-      position: Number(data.position ?? 0),
+      name,
+      type,
+      position: normalizeColumnPosition(data.position),
     });
+    createColumnForm.reset();
     await loadBoard(state.board.id);
-    setFeedback(feedback, "Column created.", "success");
+    setFeedback(feedback, `${columnLabel(name)} column is now visible.`, "success");
   } catch (error) {
     setFeedback(feedback, error.message, "error");
   }
@@ -210,22 +218,33 @@ function renderColumns() {
 
   state.columns.forEach((column) => {
     const chip = createElement("span", "column-chip");
-    const deleteButton = createElement("button", "", "x");
+    const label = createElement("span", "column-chip-label");
 
-    deleteButton.type = "button";
-    deleteButton.title = `Delete ${column.name}`;
-    deleteButton.addEventListener("click", () => deleteColumn(column));
-    chip.append(
-      createElement("span", "", `${column.position}. ${column.name}`),
-      deleteButton,
+    label.append(
+      createElement("strong", "", columnLabel(column.name)),
+      createElement("small", "", `${column.type} - position ${column.position}`),
     );
+
+    if (isCoreColumn(column.name)) {
+      chip.append(label, createElement("span", "column-chip-static", "Core"));
+    } else {
+      const deleteButton = createElement("button", "", "Remove");
+
+      deleteButton.type = "button";
+      deleteButton.title = `Delete ${column.name}`;
+      deleteButton.addEventListener("click", () => deleteColumn(column));
+      chip.append(label, deleteButton);
+    }
+
     columnsList.append(chip);
   });
 }
 
 function renderBoard() {
   empty(boardGrid);
-  boardGrid.append(renderHeaderRow());
+  const visibleColumns = getVisibleColumns();
+  boardGrid.style.setProperty("--board-data-column-count", visibleColumns.length);
+  boardGrid.append(renderHeaderRow(visibleColumns));
 
   if (state.rows.length === 0) {
     boardGrid.append(createElement("p", "muted", "No rows yet."));
@@ -234,20 +253,18 @@ function renderBoard() {
 
   state.rows.forEach((row, index) => {
     const line = createElement("article", "table-row");
-    line.append(
-      renderRowCell(row, index),
-      renderTaskNameCell(row),
-      renderTaskContentCell(row),
-      renderStatusCell(row),
-      renderRowActions(row),
-    );
+    line.append(renderRowCell(row, index));
+    visibleColumns.forEach((column) => {
+      line.append(renderColumnCell(row, column));
+    });
+    line.append(renderRowActions(row));
     boardGrid.append(line);
   });
 }
 
-function renderHeaderRow() {
+function renderHeaderRow(visibleColumns) {
   const header = createElement("div", "table-row header");
-  ["Row", "Task name", "Content", "Status", "Actions"].forEach((label) => {
+  ["Row", ...visibleColumns.map((column) => columnLabel(column.name)), "Actions"].forEach((label) => {
     header.append(createElement("span", "table-cell", label));
   });
   return header;
@@ -259,6 +276,36 @@ function renderRowCell(row, index) {
     createElement("strong", "", `Row ${index + 1}`),
     createElement("span", "muted", row.id),
   );
+  return cell;
+}
+
+function renderColumnCell(row, column) {
+  if (column.name === "TaskName") {
+    return renderTaskNameCell(row);
+  }
+
+  if (column.name === "TaskContent") {
+    return renderTaskContentCell(row);
+  }
+
+  if (column.name === "TaskStatus") {
+    return renderStatusCell(row);
+  }
+
+  if (column.name === "Deadline") {
+    return renderTaskDateCell(row, "deadline", "No deadline");
+  }
+
+  if (column.name === "StartingFrom") {
+    return renderTaskDateCell(row, "starting_from", "No start date");
+  }
+
+  if (column.name === "Comment") {
+    return renderCommentsCell(row);
+  }
+
+  const cell = createElement("div", "table-cell");
+  cell.append(createElement("span", "muted", "Not displayed"));
   return cell;
 }
 
@@ -307,11 +354,37 @@ function renderStatusCell(row) {
   return cell;
 }
 
+function renderTaskDateCell(row, fieldName, emptyText) {
+  const cell = createElement("div", "table-cell");
+  const task = primaryTask(row);
+
+  if (!task) {
+    cell.append(createElement("span", "muted", "-"));
+    return cell;
+  }
+
+  const button = createElement(
+    "button",
+    "date-cell-button",
+    task[fieldName] ? formatDate(task[fieldName]) : emptyText,
+  );
+
+  button.type = "button";
+  button.title = "Click to edit date";
+  button.addEventListener("click", () => editTaskDate(task, fieldName));
+  cell.append(button);
+  return cell;
+}
+
 function renderCommentsCell(row) {
   const cell = createElement("div", "table-cell");
+  const addButton = createElement("button", "button button-secondary compact-button", "Add comment");
+
+  addButton.type = "button";
+  addButton.addEventListener("click", () => createComment(row));
 
   if (!row.comments?.length) {
-    cell.append(createElement("span", "muted", "No comments"));
+    cell.append(createElement("span", "muted", "No comments"), addButton);
     return cell;
   }
 
@@ -331,6 +404,7 @@ function renderCommentsCell(row) {
     cell.append(wrapper);
   });
 
+  cell.append(addButton);
   return cell;
 }
 
@@ -509,6 +583,53 @@ function primaryTask(row) {
   return row.tasks?.[0] ?? null;
 }
 
+function getVisibleColumns() {
+  const fallbackColumns = [
+    { name: "TaskName", type: "TEXT", position: 0 },
+    { name: "TaskContent", type: "LONG_TEXT", position: 1 },
+    { name: "TaskStatus", type: "STATUS", position: 2 },
+  ];
+  const columns = state.columns.length > 0 ? state.columns : fallbackColumns;
+  const displayableColumns = columns.filter((column) => column.name !== "TaskID" && column.name !== "Files");
+  const baseNames = ["TaskName", "TaskContent", "TaskStatus"];
+  const withBaseColumns = [
+    ...baseNames
+      .filter((name) => !displayableColumns.some((column) => column.name === name))
+      .map((name, index) => fallbackColumns[index]),
+    ...displayableColumns,
+  ];
+
+  return withBaseColumns.sort((left, right) => left.position - right.position);
+}
+
+function columnLabel(name) {
+  const labels = {
+    TaskID: "Task ID",
+    TaskName: "Task name",
+    TaskContent: "Content",
+    TaskStatus: "Status",
+    Comment: "Comments",
+    StartingFrom: "Start date",
+    Deadline: "Deadline",
+    Files: "Files",
+  };
+
+  return labels[name] ?? name;
+}
+
+function isCoreColumn(name) {
+  return ["TaskName", "TaskContent", "TaskStatus"].includes(name);
+}
+
+function normalizeColumnPosition(value) {
+  if (value === undefined || value === null || value === "") {
+    return state.columns.length;
+  }
+
+  const position = Number.parseInt(value, 10);
+  return Number.isNaN(position) || position < 0 ? state.columns.length : position;
+}
+
 function getDefaultAssigneeId() {
   return state.permissions[0]?.user?.id ?? state.board?.created_by_id ?? state.board?.created_by?.id;
 }
@@ -578,6 +699,25 @@ async function editTask(task) {
     });
     await loadBoard(state.board.id);
     setFeedback(feedback, "Task updated.", "success");
+  } catch (error) {
+    setFeedback(feedback, error.message, "error");
+  }
+}
+
+async function editTaskDate(task, fieldName) {
+  const value = window.prompt(columnLabel(fieldName === "deadline" ? "Deadline" : "StartingFrom"), task[fieldName] ?? today());
+
+  if (!value) {
+    return;
+  }
+
+  try {
+    await boardApi.updateTask(task.id, {
+      [fieldName]: value,
+      version: task.version,
+    });
+    await loadBoard(state.board.id);
+    setFeedback(feedback, "Task date updated.", "success");
   } catch (error) {
     setFeedback(feedback, error.message, "error");
   }
