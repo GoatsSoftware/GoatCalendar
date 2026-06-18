@@ -103,7 +103,14 @@ createColumnForm.addEventListener("submit", async (event) => {
   }
 
   const data = formDataToObject(createColumnForm);
-  const [name, type] = data.column_key.split(":");
+  const columnConfig = readColumnConfig(data);
+
+  if (!columnConfig) {
+    setFeedback(feedback, "Choose a column before showing it.", "error");
+    return;
+  }
+
+  const { name, type } = columnConfig;
   const existingColumn = state.columns.find((column) => column.name === name);
 
   if (existingColumn) {
@@ -619,6 +626,34 @@ function columnLabel(name) {
 
 function isCoreColumn(name) {
   return ["TaskName", "TaskContent", "TaskStatus"].includes(name);
+}
+
+function readColumnConfig(data) {
+  const configuredColumns = {
+    Deadline: "DATE",
+    Comment: "COMMENT",
+    StartingFrom: "DATE",
+    TaskName: "TEXT",
+    TaskContent: "LONG_TEXT",
+    TaskStatus: "STATUS",
+  };
+
+  if (data.column_key) {
+    const [name, type] = String(data.column_key).split(":");
+
+    if (name && type) {
+      return { name, type };
+    }
+  }
+
+  if (data.name) {
+    return {
+      name: data.name,
+      type: data.type || configuredColumns[data.name] || "TEXT",
+    };
+  }
+
+  return null;
 }
 
 function normalizeColumnPosition(value) {

@@ -34,11 +34,43 @@ async function request(baseUrl, path, options = {}) {
   const payload = await readResponse(response);
 
   if (!response.ok) {
-    const detail = typeof payload === "object" && payload !== null ? payload.detail : payload;
-    throw new Error(detail || `Request failed with ${response.status}`);
+    throw new Error(formatApiError(payload, response.status));
   }
 
   return payload;
+}
+
+function formatApiError(payload, status) {
+  if (!payload) {
+    return `Request failed with ${status}`;
+  }
+
+  if (typeof payload === "string") {
+    return payload;
+  }
+
+  const detail = payload.detail ?? payload.message ?? payload.error ?? payload;
+
+  if (Array.isArray(detail)) {
+    return detail.map(formatValidationIssue).join(" ");
+  }
+
+  if (typeof detail === "object" && detail !== null) {
+    return JSON.stringify(detail);
+  }
+
+  return String(detail);
+}
+
+function formatValidationIssue(issue) {
+  if (typeof issue === "string") {
+    return issue;
+  }
+
+  const location = Array.isArray(issue.loc) ? issue.loc.join(".") : issue.loc;
+  const message = issue.msg ?? JSON.stringify(issue);
+
+  return location ? `${location}: ${message}.` : `${message}.`;
 }
 
 function jsonBody(data) {
