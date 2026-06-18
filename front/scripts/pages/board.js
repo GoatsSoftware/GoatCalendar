@@ -556,7 +556,7 @@ function statusSelect(task) {
     select.append(option);
   });
 
-  select.addEventListener("change", () => updateTaskStatus(task, select.value));
+  select.addEventListener("change", () => updateTaskStatus(task, select.value, select));
   return select;
 }
 
@@ -810,17 +810,37 @@ async function ensureTaskColumn() {
   return createdTaskColumn ?? state.columns[0];
 }
 
-async function updateTaskStatus(task, taskStatus) {
+async function updateTaskStatus(task, taskStatus, sourceElement = null) {
   try {
     await boardApi.updateTask(task.id, {
       task_status: taskStatus,
       version: task.version,
     });
+    if (taskStatus === "completed" && task.task_status !== "completed") {
+      playGoatSnack(sourceElement);
+    }
     await loadBoard(state.board.id);
     setFeedback(feedback, "Task status updated.", "success");
   } catch (error) {
     setFeedback(feedback, error.message, "error");
   }
+}
+
+function playGoatSnack(sourceElement) {
+  const anchor = sourceElement?.closest(".table-cell") ?? document.body;
+  const snack = createElement("div", "goat-snack");
+  const goat = document.createElement("img");
+  const grass = createElement("span", "goat-grass", "");
+  const text = createElement("span", "goat-snack-text", "nom");
+
+  goat.src = "./assets/goat_chibi.svg";
+  goat.alt = "";
+  goat.setAttribute("aria-hidden", "true");
+  snack.setAttribute("aria-hidden", "true");
+  snack.append(grass, goat, text);
+  anchor.append(snack);
+
+  window.setTimeout(() => snack.remove(), 2100);
 }
 
 async function editTask(task) {

@@ -193,6 +193,103 @@
   background: var(--color-negative);
 }
 
+.goat-snack {
+  position: absolute;
+  z-index: 3;
+  right: 8px;
+  bottom: 4px;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 78px;
+  pointer-events: none;
+  animation: goat-snack-pop 2100ms ease both;
+}
+
+.goat-snack img {
+  width: 58px;
+  transform-origin: 50% 80%;
+  animation: goat-graze 520ms ease-in-out 4;
+}
+
+.goat-grass {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  width: 42px;
+  height: 12px;
+  border-radius: 999px 999px 2px 2px;
+  background:
+    linear-gradient(100deg, transparent 0 12%, var(--color-positive) 13% 21%, transparent 22% 34%, var(--color-positive) 35% 48%, transparent 49% 60%, var(--color-positive) 61% 74%, transparent 75%),
+    var(--color-mint);
+}
+
+.goat-snack-text {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 2px solid rgba(0, 200, 117, 0.28);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--color-positive);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  animation: goat-snack-text 2100ms ease both;
+}
+
+@keyframes goat-snack-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.72);
+  }
+  14%,
+  78% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.92);
+  }
+}
+
+@keyframes goat-graze {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(8px);
+  }
+}
+
+@keyframes goat-snack-text {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  32%,
+  76% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .goat-snack,
+  .goat-snack img,
+  .goat-snack-text {
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+  }
+}
+
 .task-actions {
   display: grid;
   gap: 6px;

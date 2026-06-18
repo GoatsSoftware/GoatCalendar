@@ -46,6 +46,7 @@
 }
 
 .table-cell {
+  position: relative;
   display: grid;
   align-content: center;
   min-height: 48px;
