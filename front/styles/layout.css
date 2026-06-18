@@ -62,12 +62,18 @@
 }
 
 .school-logo {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--color-line);
+  width: 96px;
+  height: 34px;
+  border: 2px solid rgba(0, 115, 234, 0.18);
   border-radius: var(--radius-small);
   object-fit: contain;
   background: #ffffff;
+  padding: 4px 6px;
+}
+
+.brand-lockup.compact .school-logo {
+  width: 82px;
+  height: 32px;
 }
 
 .top-nav,
@@ -120,6 +126,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .panel {
@@ -172,13 +179,18 @@
 }
 
 .goat-inline {
+  flex: 0 0 42px;
   width: 42px;
   height: 42px;
+  max-width: 42px;
+  max-height: 42px;
   object-fit: contain;
   transform: rotate(-5deg);
 }
 
 .goat-mascot {
+  height: auto;
+  max-width: 86px;
   pointer-events: none;
   user-select: none;
 }
@@ -188,6 +200,7 @@
   right: 18px;
   bottom: 18px;
   width: 78px;
+  max-height: 78px;
   opacity: 0.92;
 }
 

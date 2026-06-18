@@ -208,6 +208,8 @@
 
 .goat-snack img {
   width: 58px;
+  max-width: 58px;
+  height: auto;
   transform-origin: 50% 80%;
   animation: goat-graze 520ms ease-in-out 4;
 }
