@@ -23,6 +23,26 @@ const columnsList = $("#columns-list");
 const eventsList = $("#events-list");
 const permissionsList = $("#permissions-list");
 const boardDetailLink = $("#board-detail-link");
+const DEFAULT_COLUMN_WIDTHS = {
+  Row: 150,
+  TaskName: 260,
+  TaskContent: 320,
+  TaskStatus: 150,
+  Deadline: 180,
+  StartingFrom: 180,
+  Comment: 260,
+  Actions: 190,
+};
+const WIDTH_LIMITS = {
+  Row: [120, 240],
+  TaskName: [180, 420],
+  TaskContent: [220, 560],
+  TaskStatus: [130, 220],
+  Deadline: [150, 260],
+  StartingFrom: [150, 260],
+  Comment: [200, 560],
+  Actions: [170, 320],
+};
 
 let state = {
   board: null,
@@ -31,6 +51,7 @@ let state = {
   events: [],
   permissions: [],
 };
+let columnWidths = {};
 
 if (session) {
   hydrateShell(feedback);
@@ -195,6 +216,7 @@ async function loadBoard(boardId) {
       boardApi.permissions(boardId),
     ]);
     state = { board, rows, columns, events, permissions };
+    columnWidths = loadColumnWidths(board.id);
     boardTitle.textContent = board.name ?? "Untitled board";
     syncBoardDetailLink(board.id);
     renderColumns();
@@ -226,6 +248,7 @@ function renderColumns() {
   state.columns.forEach((column) => {
     const chip = createElement("span", "column-chip");
     const label = createElement("span", "column-chip-label");
+    const widthControl = renderColumnWidthControl(column.name);
 
     label.append(
       createElement("strong", "", columnLabel(column.name)),
@@ -233,14 +256,14 @@ function renderColumns() {
     );
 
     if (isCoreColumn(column.name)) {
-      chip.append(label, createElement("span", "column-chip-static", "Core"));
+      chip.append(label, widthControl, createElement("span", "column-chip-static", "Core"));
     } else {
       const deleteButton = createElement("button", "", "Remove");
 
       deleteButton.type = "button";
       deleteButton.title = `Delete ${column.name}`;
       deleteButton.addEventListener("click", () => deleteColumn(column));
-      chip.append(label, deleteButton);
+      chip.append(label, widthControl, deleteButton);
     }
 
     columnsList.append(chip);
@@ -250,8 +273,10 @@ function renderColumns() {
 function renderBoard() {
   empty(boardGrid);
   const visibleColumns = getVisibleColumns();
-  boardGrid.style.setProperty("--board-data-column-count", visibleColumns.length);
-  boardGrid.append(renderHeaderRow(visibleColumns));
+  const template = getTableTemplate(visibleColumns);
+
+  boardGrid.style.setProperty("--board-table-width", `${template.totalWidth}px`);
+  boardGrid.append(renderHeaderRow(visibleColumns, template));
 
   if (state.rows.length === 0) {
     boardGrid.append(createElement("p", "muted", "No rows yet."));
@@ -260,6 +285,7 @@ function renderBoard() {
 
   state.rows.forEach((row, index) => {
     const line = createElement("article", "table-row");
+    applyTableTemplate(line, template);
     line.append(renderRowCell(row, index));
     visibleColumns.forEach((column) => {
       line.append(renderColumnCell(row, column));
@@ -269,8 +295,9 @@ function renderBoard() {
   });
 }
 
-function renderHeaderRow(visibleColumns) {
+function renderHeaderRow(visibleColumns, template) {
   const header = createElement("div", "table-row header");
+  applyTableTemplate(header, template);
   ["Row", ...visibleColumns.map((column) => columnLabel(column.name)), "Actions"].forEach((label) => {
     header.append(createElement("span", "table-cell", label));
   });
@@ -626,6 +653,89 @@ function columnLabel(name) {
 
 function isCoreColumn(name) {
   return ["TaskName", "TaskContent", "TaskStatus"].includes(name);
+}
+
+function renderColumnWidthControl(columnName) {
+  const wrapper = createElement("label", "column-width-control");
+  const value = createElement("span", "", `${getColumnWidth(columnName)}px`);
+  const range = document.createElement("input");
+  const [min, max] = getWidthLimits(columnName);
+
+  range.type = "range";
+  range.min = min;
+  range.max = max;
+  range.step = "10";
+  range.value = getColumnWidth(columnName);
+  range.title = `Resize ${columnLabel(columnName)} column`;
+  range.addEventListener("input", () => {
+    setColumnWidth(columnName, Number(range.value));
+    value.textContent = `${getColumnWidth(columnName)}px`;
+    renderBoard();
+  });
+
+  wrapper.append(createElement("small", "", "Width"), range, value);
+  return wrapper;
+}
+
+function getTableTemplate(visibleColumns) {
+  const widths = [
+    getColumnWidth("Row"),
+    ...visibleColumns.map((column) => getColumnWidth(column.name)),
+    getColumnWidth("Actions"),
+  ];
+
+  return {
+    columns: widths.map((width) => `${width}px`).join(" "),
+    totalWidth: widths.reduce((total, width) => total + width, 0),
+  };
+}
+
+function applyTableTemplate(rowElement, template) {
+  rowElement.style.gridTemplateColumns = template.columns;
+  rowElement.style.width = `${template.totalWidth}px`;
+  rowElement.style.minWidth = `${template.totalWidth}px`;
+}
+
+function getColumnWidth(columnName) {
+  const [min, max] = getWidthLimits(columnName);
+  const width = columnWidths[columnName] ?? DEFAULT_COLUMN_WIDTHS[columnName] ?? 180;
+
+  return Math.min(Math.max(width, min), max);
+}
+
+function setColumnWidth(columnName, width) {
+  columnWidths[columnName] = getClampedColumnWidth(columnName, width);
+  saveColumnWidths();
+}
+
+function getClampedColumnWidth(columnName, width) {
+  const [min, max] = getWidthLimits(columnName);
+
+  return Math.min(Math.max(width, min), max);
+}
+
+function getWidthLimits(columnName) {
+  return WIDTH_LIMITS[columnName] ?? [140, 420];
+}
+
+function loadColumnWidths(boardId) {
+  try {
+    return JSON.parse(localStorage.getItem(columnWidthStorageKey(boardId)) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveColumnWidths() {
+  if (!state.board?.id) {
+    return;
+  }
+
+  localStorage.setItem(columnWidthStorageKey(state.board.id), JSON.stringify(columnWidths));
+}
+
+function columnWidthStorageKey(boardId) {
+  return `goatcalendar:board:${boardId}:column-widths`;
 }
 
 function readColumnConfig(data) {

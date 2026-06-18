@@ -2,15 +2,18 @@
   display: grid;
   gap: 10px;
   overflow-x: auto;
+  padding-bottom: 4px;
+  width: 100%;
 }
 
 .table-row {
   display: grid;
-  grid-template-columns: 150px repeat(var(--board-data-column-count, 3), minmax(160px, 1fr)) 190px;
-  min-width: max(900px, calc((var(--board-data-column-count, 3) + 2) * 170px));
+  grid-template-columns: 150px minmax(180px, 1fr) minmax(220px, 1.2fr) 150px 190px;
+  min-width: 900px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-small);
   background: #ffffff;
+  overflow: hidden;
 }
 
 .table-row.header {
@@ -25,7 +28,9 @@
   display: grid;
   align-content: center;
   min-height: 48px;
+  min-width: 0;
   border-right: 1px solid var(--color-line);
+  overflow-wrap: anywhere;
   padding: 10px;
 }
 
