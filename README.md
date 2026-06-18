@@ -4,10 +4,7 @@
 - [Installation en dev](#installation-en-dev)
   - [Back](#back)
   - [Front](#front)
-  - [Installation en prod](#installation-en-prod)
-  - [Back](#back-1)
-  - [Front](#front-1)
-  - [Lancement de l'application](#lancement-de-lapplication)
+- [Installation en prod](#installation-en-prod)
 
 # Installation en dev
 
@@ -62,6 +59,11 @@ To execute tests :
 pdm run pytest
 ```
 
+To run services : 
+```bash
+pdm run dev_win
+```
+
 Create a `.env` file for each project in `back` folder :
 
 - Database service
@@ -81,7 +83,7 @@ DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 SERVER_HOST="127.0.0.1"
 SERVER_PORT=5001
-FRONT_URL="http://127.0.0.1:80"
+FRONT_URL="http://localhost:8080"
 ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
 ACCESS_TOKEN_DURATION_MINUTES=1000
 REFRESH_TOKEN_DURATION_HOURS=24
@@ -95,7 +97,7 @@ DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 SERVER_HOST="127.0.0.1"
 SERVER_PORT=5002
-FRONT_URL="http://127.0.0.1:80"
+FRONT_URL="http://localhost:8080"
 ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
 ACCESS_TOKEN_DURATION_MINUTES=1000
 REFRESH_TOKEN_DURATION_HOURS=24
@@ -131,55 +133,7 @@ Mot de passe : `azerty`
 
 
 
-## Installation en prod
-
-## Back
-
--  Database service
-
-```bash
-ENV_MODE="prod"
-DB_DIALECT="mysql+aiomysql"
-DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"
-```
-
-- Auth service
-
-```bash
-ENV_MODE="prod"
-DB_DIALECT="mysql+aiomysql"
-DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"
-SERVER_HOST="0.0.0.0"
-SERVER_PORT=5001
-FRONT_URL="http://front-service:80"
-ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
-ACCESS_TOKEN_DURATION_MINUTES=1000
-REFRESH_TOKEN_DURATION_HOURS=24
-```
-
-- Board service
-
-```bash
-ENV_MODE="prod"
-DB_DIALECT="mysql+aiomysql"
-DB_URL="goatcalendar_user:goatcalendar_passwd@mysql-db:3306/goatcalendar_db"
-SERVER_HOST="0.0.0.0"
-SERVER_PORT=5002
-FRONT_URL="http://front-service:80"
-ENCRYPTION_KEY="q+b4dGwz4nZOjdoYvOwurO781EPliCKWxo0/2bTb7NeBN/lsybkh0EU+mWiefEtFtcIOrv0yZJHuakJQGYQz1Q=="
-ACCESS_TOKEN_DURATION_MINUTES=1000
-REFRESH_TOKEN_DURATION_HOURS=24
-```
-
-## Front
-
-Le service front est servi par Nginx dans le `docker-compose.yml` et exposé sur :
-
-```bash
-http://localhost:8080
-```
-
-## Lancement de l'application
+# Installation en prod
 
 Pour lancer les services, se positionner dans le répertoire **GoatCalendar** :
 ```bash
