@@ -136,6 +136,22 @@
   content: "";
 }
 
+.panel-blue {
+  --panel-accent: var(--color-primary);
+}
+
+.panel-green {
+  --panel-accent: var(--color-positive);
+}
+
+.panel-yellow {
+  --panel-accent: var(--color-warning);
+}
+
+.panel-purple {
+  --panel-accent: var(--color-purple);
+}
+
 .panel > * {
   position: relative;
 }

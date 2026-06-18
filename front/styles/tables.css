@@ -4,6 +4,7 @@
   overflow-x: auto;
   padding-bottom: 4px;
   width: 100%;
+  scrollbar-color: var(--color-primary-soft) transparent;
 }
 
 .table-row {
@@ -78,6 +79,16 @@
     linear-gradient(90deg, rgba(234, 246, 255, 0.72), transparent 34%),
     #ffffff;
   padding: 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.list-item:hover {
+  border-color: rgba(0, 115, 234, 0.32);
+  box-shadow: 0 10px 22px rgba(29, 30, 43, 0.08);
+  transform: translateY(-1px);
 }
 
 .list-item-actions {
