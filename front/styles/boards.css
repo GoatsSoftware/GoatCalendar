@@ -193,11 +193,26 @@
   background: var(--color-negative);
 }
 
+.status-select option {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.status-select option[value="completed"] {
+  background: var(--color-positive);
+}
+
+.status-select option[value="accepted"] {
+  background: var(--color-warning);
+}
+
+.status-select option[value="pending"] {
+  background: var(--color-negative);
+}
+
 .goat-snack {
-  position: absolute;
+  position: fixed;
   z-index: 3;
-  right: 8px;
-  bottom: 4px;
   display: grid;
   place-items: center;
   width: 84px;

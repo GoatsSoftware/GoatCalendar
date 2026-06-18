@@ -47,6 +47,27 @@
   --row-accent: var(--color-purple);
 }
 
+.table-row.row-completed {
+  --row-accent: var(--color-positive);
+  border-left-color: var(--color-positive);
+  box-shadow:
+    inset 14px 0 24px rgba(0, 200, 117, 0.16),
+    0 0 0 1px rgba(0, 200, 117, 0.12),
+    0 12px 26px rgba(0, 200, 117, 0.1);
+}
+
+.table-row.row-completed .table-cell:first-child::after {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: -4px;
+  width: 5px;
+  border-radius: 999px;
+  background: var(--color-positive);
+  box-shadow: 0 0 16px rgba(0, 200, 117, 0.72);
+  content: "";
+}
+
 .table-cell {
   position: relative;
   display: grid;

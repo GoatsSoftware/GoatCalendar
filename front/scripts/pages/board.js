@@ -287,6 +287,9 @@ function renderBoard() {
 
   state.rows.forEach((row, index) => {
     const line = createElement("article", "table-row");
+    if (primaryTask(row)?.task_status === "completed") {
+      line.classList.add("row-completed");
+    }
     applyTableTemplate(line, template);
     line.append(renderRowCell(row, index));
     visibleColumns.forEach((column) => {
@@ -829,18 +832,22 @@ async function updateTaskStatus(task, taskStatus, sourceElement = null) {
 }
 
 function playGoatSnack(sourceElement) {
-  const anchor = sourceElement?.closest(".table-cell") ?? document.body;
   const snack = createElement("div", "goat-snack");
   const goat = document.createElement("img");
   const grass = createElement("span", "goat-grass", "");
   const text = createElement("span", "goat-snack-text", "nom");
+  const rect = sourceElement?.getBoundingClientRect();
 
   goat.src = "./assets/goat_chibi.svg";
   goat.alt = "";
   goat.setAttribute("aria-hidden", "true");
   snack.setAttribute("aria-hidden", "true");
+  if (rect) {
+    snack.style.left = `${Math.min(rect.left + rect.width - 88, window.innerWidth - 96)}px`;
+    snack.style.top = `${Math.max(rect.top - 44, 12)}px`;
+  }
   snack.append(grass, goat, text);
-  anchor.append(snack);
+  document.body.append(snack);
 
   window.setTimeout(() => snack.remove(), 2100);
 }
