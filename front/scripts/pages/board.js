@@ -19,6 +19,7 @@ const createColumnForm = $("#create-column-form");
 const createEventForm = $("#create-event-form");
 const addPermissionForm = $("#add-permission-form");
 const boardGrid = $("#board-grid");
+const boardDataPanel = boardGrid?.closest(".board-data-panel");
 const columnsList = $("#columns-list");
 const eventsList = $("#events-list");
 const permissionsList = $("#permissions-list");
@@ -276,6 +277,7 @@ function renderBoard() {
   const template = getTableTemplate(visibleColumns);
 
   boardGrid.style.setProperty("--board-table-width", `${template.totalWidth}px`);
+  boardDataPanel?.style.setProperty("--board-panel-width", `${template.totalWidth + 44}px`);
   boardGrid.append(renderHeaderRow(visibleColumns, template));
 
   if (state.rows.length === 0) {

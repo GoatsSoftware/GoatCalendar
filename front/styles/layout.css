@@ -111,7 +111,8 @@
 }
 
 .app-shell.wide-shell {
-  max-width: 1760px;
+  width: 100%;
+  max-width: min(1760px, 100vw);
 }
 
 .page-title,
@@ -157,6 +158,12 @@
 
 .panel-purple {
   --panel-accent: var(--color-purple);
+}
+
+.board-data-panel {
+  justify-self: center;
+  width: min(100%, var(--board-panel-width, 100%));
+  max-width: calc(100vw - 48px);
 }
 
 .panel > * {

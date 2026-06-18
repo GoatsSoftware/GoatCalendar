@@ -1,6 +1,7 @@
 .work-table {
   display: grid;
   gap: 10px;
+  justify-items: center;
   overflow-x: auto;
   padding-bottom: 4px;
   width: 100%;
