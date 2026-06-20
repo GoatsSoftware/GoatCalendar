@@ -1,0 +1,79 @@
+erDiagram
+    USERS ||--o{ BOARDS : creates
+    USERS ||--o{ USERS_BOARDS_PERMISSION : has
+    BOARDS ||--o{ USERS_BOARDS_PERMISSION : grants
+    BOARDS ||--o{ BOARD_COLUMNS : contains
+    BOARDS ||--o{ BOARD_ROWS : contains
+    BOARDS ||--o{ BOARD_EVENTS : contains
+    BOARD_ROWS ||--o{ BOARD_ROW_TASKS : contains
+    BOARD_ROWS ||--o{ BOARD_COMMENTS : receives
+    BOARD_COLUMNS ||--o{ BOARD_ROW_TASKS : categorizes
+    USERS ||--o{ BOARD_ROW_TASKS : creates
+    USERS ||--o{ BOARD_ROW_TASKS : assigned
+    USERS ||--o{ BOARD_COMMENTS : writes
+    USERS ||--o{ BOARD_EVENTS : creates
+
+    USERS {
+        uuid id PK
+        string email_address
+        string password
+        string first_name
+        string last_name
+        enum role
+    }
+
+    BOARDS {
+        uuid id PK
+        string name
+        string description
+        uuid created_by_id FK
+    }
+
+    USERS_BOARDS_PERMISSION {
+        uuid user_id PK,FK
+        uuid board_id PK,FK
+        enum user_role_in_board
+    }
+
+    BOARD_COLUMNS {
+        uuid id PK
+        uuid board_id FK
+        enum name
+        enum type
+        int position
+    }
+
+    BOARD_ROWS {
+        uuid id PK
+        uuid board_id FK
+        uuid created_by_id FK
+    }
+
+    BOARD_ROW_TASKS {
+        uuid id PK
+        uuid board_row_id FK
+        uuid board_column_id FK
+        string task_name
+        string task_content
+        enum task_status
+        date starting_from
+        date deadline
+        int version
+    }
+
+    BOARD_COMMENTS {
+        uuid id PK
+        uuid board_row_id FK
+        string content
+        uuid created_by_id FK
+    }
+
+    BOARD_EVENTS {
+        uuid id PK
+        uuid board_id FK
+        string title
+        string description
+        date starting_from
+        date deadline
+        int version
+    }
