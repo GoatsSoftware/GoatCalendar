@@ -1,0 +1,29 @@
+flowchart TD
+    push[Push ou merge request]
+    checkout[Checkout du depot]
+    python[Installer Python 3.13]
+    pdm[Installer PDM]
+    deps[Installer les dependances dev et test]
+
+    subgraph qualite[Qualite et tests]
+        ruff[Ruff format + lint]
+        tests[Pytest par service]
+        coverage[Generer les rapports XML de couverture]
+    end
+
+    subgraph livraison[Build et analyse]
+        docker[Build images backend + front]
+        compose[Smoke test docker compose]
+        sonar[Analyse SonarCloud]
+    end
+
+    result[Rapports qualite, tests et couverture]
+
+    push --> checkout --> python --> pdm --> deps
+    deps --> ruff
+    deps --> tests
+    tests --> coverage
+    ruff --> docker --> compose
+    coverage --> sonar
+    compose --> result
+    sonar --> result

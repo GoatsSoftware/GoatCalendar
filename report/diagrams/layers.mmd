@@ -1,0 +1,16 @@
+flowchart TD
+    http[Requete HTTP]
+    route[Controller / routes FastAPI]
+    service[Service metier]
+    repo[Repository SQLModel]
+    db[(MySQL)]
+    dto[DTO et schemas partages]
+
+    http --> route
+    route --> service
+    service --> repo
+    repo --> db
+
+    route --> dto
+    service --> dto
+    repo --> dto

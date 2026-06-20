@@ -1,0 +1,20 @@
+flowchart TD
+    compose[docker-compose.yml]
+
+    compose --> mysql[mysql_db<br/>mysql:9.6.0<br/>3306:3306]
+    compose --> seed[database_seed<br/>Dockerfile.DatabaseService]
+    compose --> auth[auth_service<br/>Docker image<br/>5001:5001]
+    compose --> board[board_service<br/>Docker image<br/>5002:5002]
+    compose --> front[front_service<br/>Nginx<br/>8080:80]
+
+    mysql --> volume[(mysql_data)]
+    mysql --> health[healthcheck mysqladmin ping]
+
+    health --> seed
+    seed --> auth
+    seed --> board
+
+    auth --> mysql
+    board --> mysql
+    front --> auth
+    front --> board

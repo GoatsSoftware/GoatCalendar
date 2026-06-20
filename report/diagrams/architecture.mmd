@@ -1,0 +1,26 @@
+flowchart LR
+    browser[Navigateur<br/>localhost:8080]
+
+    subgraph docker[Docker Compose]
+        mysql[(MySQL 9.6.0)]
+        seed[database_seed<br/>database_service]
+        auth[auth_service<br/>FastAPI :5001]
+        board[board_service<br/>FastAPI :5002]
+        front[front_service<br/>Nginx :8080]
+    end
+
+    subgraph shared[shared_models]
+        models[shared_models<br/>SQLModel, DTO, enums, settings]
+    end
+
+    browser --> front
+    browser --> auth
+    browser --> board
+    board --> auth
+    auth --> seed
+    board --> seed
+    seed --> mysql
+
+    auth --> models
+    board --> models
+    seed --> models
