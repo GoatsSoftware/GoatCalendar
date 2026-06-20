@@ -8,15 +8,11 @@
 
 # Installation en dev
 
-https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/ci-based-analysis/gitlab-ci
+You must have **Python 3.13** or higher installed, to build and start back-end and front-end service.
 
 ## Back
 
 To create mysql container for project:
-
-```bash
-docker run -d -e MYSQL_ROOT_PASSWORD=azerty -e MYSQL_DATABASE=goatcalendar_db -e MYSQL_USER=goatcalendar_user -e MYSQL_PASSWORD=goatcalendar_passwd -p 3306:3306 mysql:latest
-```
 
 To setup PyPI credentials for the current project :
 
@@ -78,7 +74,6 @@ DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 
 ```bash
 ENV_MODE="prod"
-
 DB_DIALECT="mysql+aiomysql"
 DB_URL="goatcalendar_user:goatcalendar_passwd@localhost:3306/goatcalendar_db"
 SERVER_HOST="127.0.0.1"
@@ -131,8 +126,6 @@ Comptes de demo seedés :
 
 Mot de passe : `azerty`
 
-
-
 # Installation en prod
 
 Pour lancer les services, se positionner dans le répertoire **GoatCalendar** :
@@ -141,3 +134,13 @@ docker-compose pull
 docker-compose build
 docker-compose up
 ```
+
+Puis ouvrir `http://localhost:8080`.
+
+Comptes de demo seedés :
+
+- `aliceproprio@gmail.com`
+- `boblocataire@gmail.com`
+- `clairemixte@gmail.com`
+
+Mot de passe : `azerty`
