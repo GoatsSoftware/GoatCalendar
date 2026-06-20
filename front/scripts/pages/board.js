@@ -19,6 +19,7 @@ const createColumnForm = $("#create-column-form");
 const createEventForm = $("#create-event-form");
 const addPermissionForm = $("#add-permission-form");
 const boardGrid = $("#board-grid");
+const boardDataPanel = boardGrid?.closest(".board-data-panel");
 const columnsList = $("#columns-list");
 const eventsList = $("#events-list");
 const permissionsList = $("#permissions-list");
@@ -276,6 +277,7 @@ function renderBoard() {
   const template = getTableTemplate(visibleColumns);
 
   boardGrid.style.setProperty("--board-table-width", `${template.totalWidth}px`);
+  boardDataPanel?.style.setProperty("--board-panel-width", `${template.totalWidth + 44}px`);
   boardGrid.append(renderHeaderRow(visibleColumns, template));
 
   if (state.rows.length === 0) {
@@ -285,6 +287,9 @@ function renderBoard() {
 
   state.rows.forEach((row, index) => {
     const line = createElement("article", "table-row");
+    if (primaryTask(row)?.task_status === "completed") {
+      line.classList.add("row-completed");
+    }
     applyTableTemplate(line, template);
     line.append(renderRowCell(row, index));
     visibleColumns.forEach((column) => {
@@ -556,7 +561,7 @@ function statusSelect(task) {
     select.append(option);
   });
 
-  select.addEventListener("change", () => updateTaskStatus(task, select.value));
+  select.addEventListener("change", () => updateTaskStatus(task, select.value, select));
   return select;
 }
 
@@ -810,17 +815,41 @@ async function ensureTaskColumn() {
   return createdTaskColumn ?? state.columns[0];
 }
 
-async function updateTaskStatus(task, taskStatus) {
+async function updateTaskStatus(task, taskStatus, sourceElement = null) {
   try {
     await boardApi.updateTask(task.id, {
       task_status: taskStatus,
       version: task.version,
     });
+    if (taskStatus === "completed" && task.task_status !== "completed") {
+      playGoatSnack(sourceElement);
+    }
     await loadBoard(state.board.id);
     setFeedback(feedback, "Task status updated.", "success");
   } catch (error) {
     setFeedback(feedback, error.message, "error");
   }
+}
+
+function playGoatSnack(sourceElement) {
+  const snack = createElement("div", "goat-snack");
+  const goat = document.createElement("img");
+  const grass = createElement("span", "goat-grass", "");
+  const text = createElement("span", "goat-snack-text", "nom");
+  const rect = sourceElement?.getBoundingClientRect();
+
+  goat.src = "./assets/goat_chibi.svg";
+  goat.alt = "";
+  goat.setAttribute("aria-hidden", "true");
+  snack.setAttribute("aria-hidden", "true");
+  if (rect) {
+    snack.style.left = `${Math.min(rect.left + rect.width - 88, window.innerWidth - 96)}px`;
+    snack.style.top = `${Math.max(rect.top - 44, 12)}px`;
+  }
+  snack.append(grass, goat, text);
+  document.body.append(snack);
+
+  window.setTimeout(() => snack.remove(), 2100);
 }
 
 async function editTask(task) {

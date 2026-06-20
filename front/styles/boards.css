@@ -13,7 +13,7 @@
 
 .counter-pill,
 .user-chip {
-  background: #f0f3ff;
+  background: linear-gradient(180deg, #f7fbff 0%, var(--color-primary-soft) 100%);
   color: var(--color-primary);
 }
 
@@ -22,15 +22,15 @@
 }
 
 .status-done {
-  background: var(--color-positive);
+  background: linear-gradient(180deg, #19dc8d 0%, var(--color-positive) 100%);
 }
 
 .status-working {
-  background: var(--color-warning);
+  background: linear-gradient(180deg, #ffbd5c 0%, var(--color-warning) 100%);
 }
 
 .status-stuck {
-  background: var(--color-negative);
+  background: linear-gradient(180deg, #f15d74 0%, var(--color-negative) 100%);
 }
 
 .status-neutral {
@@ -59,7 +59,7 @@
   gap: 12px;
   align-items: center;
   border: 1px solid var(--color-line);
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
   color: var(--color-muted);
   padding: 8px 10px;
 }
@@ -193,6 +193,120 @@
   background: var(--color-negative);
 }
 
+.status-select option {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.status-select option[value="completed"] {
+  background: var(--color-positive);
+}
+
+.status-select option[value="accepted"] {
+  background: var(--color-warning);
+}
+
+.status-select option[value="pending"] {
+  background: var(--color-negative);
+}
+
+.goat-snack {
+  position: fixed;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 78px;
+  pointer-events: none;
+  animation: goat-snack-pop 2100ms ease both;
+}
+
+.goat-snack img {
+  width: 58px;
+  max-width: 58px;
+  height: auto;
+  transform-origin: 50% 80%;
+  animation: goat-graze 520ms ease-in-out 4;
+}
+
+.goat-grass {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  width: 42px;
+  height: 12px;
+  border-radius: 999px 999px 2px 2px;
+  background:
+    linear-gradient(100deg, transparent 0 12%, var(--color-positive) 13% 21%, transparent 22% 34%, var(--color-positive) 35% 48%, transparent 49% 60%, var(--color-positive) 61% 74%, transparent 75%),
+    var(--color-mint);
+}
+
+.goat-snack-text {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 2px solid rgba(0, 200, 117, 0.28);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--color-positive);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  animation: goat-snack-text 2100ms ease both;
+}
+
+@keyframes goat-snack-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.72);
+  }
+  14%,
+  78% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.92);
+  }
+}
+
+@keyframes goat-graze {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(8px);
+  }
+}
+
+@keyframes goat-snack-text {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  32%,
+  76% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .goat-snack,
+  .goat-snack img,
+  .goat-snack-text {
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+  }
+}
+
 .task-actions {
   display: grid;
   gap: 6px;
@@ -217,13 +331,22 @@
 .board-card {
   display: grid;
   gap: 10px;
-  border-left: 5px solid var(--color-primary);
+  border-left: 8px solid var(--color-primary);
+  background:
+    linear-gradient(90deg, rgba(0, 115, 234, 0.08), transparent 32%),
+    #ffffff;
 }
 
 .board-card:nth-child(3n + 2) {
   border-left-color: var(--color-positive);
+  background:
+    linear-gradient(90deg, rgba(0, 200, 117, 0.1), transparent 32%),
+    #ffffff;
 }
 
 .board-card:nth-child(3n) {
   border-left-color: var(--color-warning);
+  background:
+    linear-gradient(90deg, rgba(253, 171, 61, 0.14), transparent 32%),
+    #ffffff;
 }

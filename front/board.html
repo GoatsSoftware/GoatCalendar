@@ -22,11 +22,11 @@
       </div>
     </header>
 
-    <main class="app-shell">
+    <main class="app-shell wide-shell">
       <section class="page-title">
         <div>
           <p class="eyebrow">Board</p>
-          <h1 id="board-title">Board detail</h1>
+          <h1><span id="board-title">Board detail</span> <img src="./assets/goat_chibi.svg" alt="" class="goat-inline" aria-hidden="true"></h1>
         </div>
         <form id="load-board-form" class="inline-form tight">
           <input name="board_id" placeholder="Board UUID" required>
@@ -40,7 +40,7 @@
         <span class="status-pill status-stuck">Pending</span>
       </section>
 
-      <section class="board-toolbar panel">
+      <section class="board-toolbar panel panel-yellow">
         <button id="create-row-button" class="button button-primary" type="button">Add task row</button>
         <details class="columns-details">
           <summary>Columns</summary>
@@ -57,7 +57,7 @@
         </details>
       </section>
 
-      <section class="panel">
+      <section class="panel panel-blue board-data-panel">
         <div class="panel-header">
           <h2>Rows and tasks</h2>
           <span id="board-feedback" class="form-feedback" role="status"></span>
@@ -66,7 +66,7 @@
       </section>
 
       <section class="grid-two">
-        <article class="panel">
+        <article class="panel panel-green">
           <div class="panel-header">
             <h2>Events</h2>
           </div>
@@ -80,7 +80,7 @@
           <div id="events-list" class="compact-list"></div>
         </article>
 
-        <article class="panel">
+        <article class="panel panel-purple">
           <div class="panel-header">
             <h2>Permissions</h2>
           </div>
@@ -97,6 +97,6 @@
         </article>
       </section>
     </main>
-    <script type="module" src="./scripts/pages/board.js?v=20260618-column-widths"></script>
+    <script type="module" src="./scripts/pages/board.js?v=20260619-status-aura"></script>
   </body>
 </html>
