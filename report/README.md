@@ -6,22 +6,23 @@ Ce dossier contient le rapport DevOps en LaTeX.
 
 - `rapport.tex` : rapport principal en francais.
 - `diagrams/*.mmd` : sources Mermaid des schemas.
-- `assets/logo_efrei.png` : logo EFREI a remplacer si besoin.
-- `assets/google_labs_yann.png` : capture Google Labs de Yann a remplacer.
-- `assets/google_labs_antonin.png` : capture Google Labs d'Antonin a remplacer.
-- `assets/login_page.png` : capture de la page de login a remplacer.
-- `assets/dashboard_page.png` : capture du dashboard a remplacer.
-- `assets/board_page.png` : capture du detail d'un board a remplacer.
+- `assets/logo_efrei.png` : logo EFREI si besoin.
+- `assets/google_labs_yann.png` : capture Google Labs de Yann.
+- `assets/google_labs_antonin.png` : capture Google Labs d'Antonin.
+- `assets/login_page.png` : capture de la page de login.
+- `assets/dashboard_page.png` : capture du dashboard.
+- `assets/board_page.png` : capture du detail d'un board.
 
 ## Compilation VS Code
 
 La configuration VS Code est dans `../.vscode`.
 
-Prerequis systeme :
+Prérequis systeme :
 
 - extension VS Code `james-yu.latex-workshop`;
-- distribution LaTeX installee, par exemple MiKTeX ou TeX Live;
-- `pdflatex` disponible dans le `PATH`;
+- Perl d'insallé sur l'ordinateur;
+- distribution LaTeX installée, par exemple MiKTeX ou TeX Live (https://miktex.org/download);
+- Le package `pdflatex` disponible dans le `PATH` (installable avec MiKTeX console par exemple) ;
 - optionnel : `latexmk` pour les builds automatiques plus propres.
 
 Depuis VS Code, ouvrir `report/rapport.tex`, puis lancer `LaTeX Workshop: Build LaTeX project`.
